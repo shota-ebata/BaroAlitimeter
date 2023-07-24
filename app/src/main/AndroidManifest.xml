@@ -2,6 +2,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-feature
+        android:name="android.hardware.sensor.barometer"
+        android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.sensor.ambient_temperature"
+        android:required="false" />
+
     <application
         android:name=".App"
         android:allowBackup="true"
@@ -13,8 +21,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BaroAlitimeter"
         tools:targetApi="31">
+
         <activity
-            android:name=".MainActivity"
+            android:name=".ui.MainActivity"
             android:exported="true"
 
             android:theme="@style/Theme.BaroAlitimeter">
