@@ -2,18 +2,16 @@ package com.ebata_shota.baroalitimeter.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.baroalitimeter.domain.repository.CalcRepository
 import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
 import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
-import kotlin.math.pow
 
 
 @HiltViewModel
@@ -22,6 +20,7 @@ class MainViewModel
 constructor(
     private val sensorRepository: SensorRepository,
     private val prefRepository: PrefRepository,
+    private val calcRepository: CalcRepository,
 ) : ViewModel() {
 
     sealed class UiState {
@@ -55,7 +54,7 @@ constructor(
                     is UiState.ViewerMode -> state.copy(
                         pressureText = it.pressure?.formattedString(1),
                         altitudeText = it.pressure?.let { pressure ->
-                            calcAltitude(
+                            calcRepository.calcAltitude(
                                 pressure = pressure,
                                 seaLevelPressure = prefRepository.seaLevelPressure,
                                 temperature = prefRepository.temperature
@@ -67,7 +66,7 @@ constructor(
                     is UiState.EditModeAltitude -> state.copy(
                         pressureText = it.pressure?.formattedString(1),
                         defaultAltitudeText = it.pressure?.let { pressure ->
-                            calcAltitude(
+                            calcRepository.calcAltitude(
                                 pressure = pressure,
                                 seaLevelPressure = prefRepository.seaLevelPressure,
                                 temperature = prefRepository.temperature
@@ -79,7 +78,7 @@ constructor(
                     is UiState.EditModeTemperature -> state.copy(
                         pressureText = it.pressure?.formattedString(1),
                         altitudeText = it.pressure?.let { pressure ->
-                            calcAltitude(
+                            calcRepository.calcAltitude(
                                 pressure = pressure,
                                 seaLevelPressure = prefRepository.seaLevelPressure,
                                 temperature = prefRepository.temperature
@@ -137,7 +136,7 @@ constructor(
             val currentPressure = sensorRepository.pressureState.value.pressure
             currentPressure?.let { pressure ->
                 viewModelScope.launch {
-                    prefRepository.seaLevelPressure = calcSeaLevelPressure(pressure, prefRepository.temperature, altitude)
+                    prefRepository.seaLevelPressure = calcRepository.calcSeaLevelPressure(pressure, prefRepository.temperature, altitude)
                 }
             }
             _uiState.value = UiState.ViewerMode(
@@ -156,19 +155,6 @@ constructor(
             format = "%,.${fractionDigits}f"
         }
         return format.format(this)
-    }
-
-    private suspend fun calcAltitude(pressure: Float, seaLevelPressure: Float, temperature: Float): Float {
-        return withContext(Dispatchers.Default) {
-            ((((seaLevelPressure.toDouble() / pressure.toDouble()).pow(1 / 5.257) - 1) * (temperature + 273.15)) / 0.0065).toFloat()
-        }
-    }
-
-    private suspend fun calcSeaLevelPressure(pressure: Float, temperature: Float, altitude: Float): Float {
-        return withContext(Dispatchers.Default) {
-            val d = 0.0065 * altitude
-            (pressure * (1 - (d / (temperature + d + 273.15))).pow(-5.257)).toFloat()
-        }
     }
 
     companion object {
