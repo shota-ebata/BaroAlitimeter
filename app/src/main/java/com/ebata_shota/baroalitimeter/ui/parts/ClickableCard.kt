@@ -27,7 +27,7 @@ fun ClickableCard(
 ) {
     Card(
         modifier = modifier
-            .width(200.dp),
+            .width(250.dp),
         onClick = onClick ?: {},
         enabled = onClick != null,
         colors = CardDefaults.cardColors(
