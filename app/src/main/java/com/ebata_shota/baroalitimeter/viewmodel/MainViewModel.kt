@@ -9,6 +9,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -70,7 +71,7 @@ constructor(
                                 pressure = pressure,
                                 seaLevelPressure = prefRepository.seaLevelPressure,
                                 temperature = prefRepository.temperature
-                            ).formattedString(0, false)
+                            ).formattedString(0)
                         },
                         temperatureText = prefRepository.temperature.formattedString(1)
                     )
@@ -82,12 +83,17 @@ constructor(
                                 pressure = pressure,
                                 seaLevelPressure = prefRepository.seaLevelPressure,
                                 temperature = prefRepository.temperature
-                            ).formattedString(0, false)
+                            ).formattedString(0)
                         },
                         defaultTemperatureText = prefRepository.temperature.formattedString(1)
                     )
                 }
-            }.collect(_uiState)
+            }
+                .distinctUntilChanged { old, new ->
+                    // 重複を無視する
+                    old == new
+                }
+                .collect(_uiState)
         }
     }
 
