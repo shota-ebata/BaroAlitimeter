@@ -1,6 +1,7 @@
 package com.ebata_shota.baroalitimeter.ui.parts
 
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
@@ -37,7 +38,9 @@ fun EditTextFieldRow(
     modifier: Modifier = Modifier
 ) {
     Row(
-        modifier = modifier.padding(8.dp),
+        modifier = modifier
+            .padding(8.dp)
+            .height(100.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         val focusRequester = remember {
