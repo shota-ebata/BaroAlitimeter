@@ -2,6 +2,7 @@ package com.ebata_shota.baroalitimeter.ui.parts
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Card
@@ -37,11 +38,14 @@ fun ClickableCard(
         )
     ) {
         Box(
-            modifier = modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            modifier = modifier
+                .fillMaxWidth()
+                .height(100.dp)
         ) {
             Text(
-                modifier = modifier.padding(16.dp),
+                modifier = modifier
+                    .align(Alignment.Center)
+                    .padding(16.dp),
                 fontSize = 40.sp,
                 text = text
             )
@@ -54,7 +58,7 @@ fun ClickableCard(
 fun EnableViewerModeContentPreview() {
     BaroAlitimeterTheme {
         ClickableCard(
-            text = "テキスト",
+            text = "1000 m",
             onClick = {}
         )
     }
@@ -65,7 +69,7 @@ fun EnableViewerModeContentPreview() {
 fun NotEnableViewerModeContentPreview() {
     BaroAlitimeterTheme {
         ClickableCard(
-            text = "1000",
+            text = "1000 m",
             onClick = null
         )
     }
