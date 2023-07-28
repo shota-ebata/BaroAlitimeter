@@ -21,10 +21,10 @@ constructor(
     private val sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
     private val _pressureState: MutableStateFlow<Pressure> = MutableStateFlow(Pressure.Loading)
-    override val pressureState: StateFlow<Pressure> = _pressureState.asStateFlow()
+    override val pressureSensorState: StateFlow<Pressure> = _pressureState.asStateFlow()
 
     private val _temperatureState: MutableStateFlow<Temperature> = MutableStateFlow(Temperature.Loading)
-    override val temperatureState: StateFlow<Temperature> = _temperatureState.asStateFlow()
+    override val temperatureSensorState: StateFlow<Temperature> = _temperatureState.asStateFlow()
 
     init {
         val pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)

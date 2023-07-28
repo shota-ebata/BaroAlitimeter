@@ -53,17 +53,18 @@ constructor(
 
     init {
         viewModelScope.launch {
+
             combine(
-                sensorRepository.pressureState,
-                sensorRepository.temperatureState
-            ) { pressureState, temperatureState -> // TODO: temperatureStateをうまく使う
-                when (pressureState) {
+                sensorRepository.pressureSensorState,
+                sensorRepository.temperatureSensorState
+            ) { pressureSensorState, temperatureSensorState -> // TODO: temperatureStateをうまく使う
+                when (pressureSensorState) {
                     is Pressure.Loading -> UiState.Loading
                     is Pressure.Success -> when (uiState.value) {
-                        is UiState.Loading -> createViewMode(pressureState)
-                        is UiState.ViewerMode -> createViewMode(pressureState)
-                        is UiState.EditAltitudeMode -> createEditModeAltitude(pressureState)
-                        is UiState.EditTemperatureMode -> createEditModeTemperature(pressureState)
+                        is UiState.Loading -> createViewMode(pressureSensorState)
+                        is UiState.ViewerMode -> createViewMode(pressureSensorState)
+                        is UiState.EditAltitudeMode -> createEditModeAltitude(pressureSensorState)
+                        is UiState.EditTemperatureMode -> createEditModeTemperature(pressureSensorState)
                     }
                 }
             }.distinctUntilChanged { old, new ->
@@ -131,7 +132,7 @@ constructor(
 
     fun setTemperature(temperatureText: String) {
         val state = uiState.value
-        val pressureState = sensorRepository.pressureState.value
+        val pressureState = sensorRepository.pressureSensorState.value
         if (
             state is UiState.EditTemperatureMode
             && pressureState is Pressure.Success
@@ -159,7 +160,7 @@ constructor(
 
     fun setAltitude(altitudeText: String) {
         val state = uiState.value
-        val pressureState = sensorRepository.pressureState.value
+        val pressureState = sensorRepository.pressureSensorState.value
         if (
             state is UiState.EditAltitudeMode
             && pressureState is Pressure.Success
