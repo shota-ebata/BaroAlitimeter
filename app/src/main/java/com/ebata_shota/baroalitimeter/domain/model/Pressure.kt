@@ -1,6 +1,6 @@
 package com.ebata_shota.baroalitimeter.domain.model
 
-data class Pressure(
-    val pressure: Float? = null
-) {
+sealed class Pressure {
+    object Loading : Pressure()
+    data class Success(val value: Float) : Pressure()
 }

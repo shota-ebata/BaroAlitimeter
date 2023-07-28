@@ -6,6 +6,7 @@ import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
+import com.ebata_shota.baroalitimeter.domain.model.Temperature
 import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,15 +20,20 @@ constructor(
 ) : SensorRepository {
     private val sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-    private val _pressureState: MutableStateFlow<Pressure> = MutableStateFlow(Pressure())
+    private val _pressureState: MutableStateFlow<Pressure> = MutableStateFlow(Pressure.Loading)
     override val pressureState: StateFlow<Pressure> = _pressureState.asStateFlow()
+
+    private val _temperatureState: MutableStateFlow<Temperature> = MutableStateFlow(Temperature.Loading)
+    override val temperatureState: StateFlow<Temperature> = _temperatureState.asStateFlow()
 
     init {
         val pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
         sensorManager.registerListener(
             object : SensorEventListener {
                 override fun onSensorChanged(event: SensorEvent?) {
-                    _pressureState.value = pressureState.value.copy(pressure = event?.values?.firstOrNull())
+                    event?.values?.firstOrNull()?.let {
+                        _pressureState.value = Pressure.Success(value = it)
+                    }
                 }
 
                 override fun onAccuracyChanged(p0: Sensor?, p1: Int) = Unit
@@ -35,5 +41,24 @@ constructor(
             pressureSensor,
             SensorManager.SENSOR_DELAY_UI
         )
+
+        val temperatureSensor: Sensor? = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)
+        if (temperatureSensor != null) {
+            sensorManager.registerListener(
+                object : SensorEventListener {
+                    override fun onSensorChanged(event: SensorEvent?) {
+                        event?.values?.firstOrNull()?.let {
+                            _temperatureState.value = Temperature.Success(value = it)
+                        }
+                    }
+
+                    override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) = Unit
+                },
+                temperatureSensor,
+                SensorManager.SENSOR_DELAY_UI
+            )
+        } else {
+            _temperatureState.value = Temperature.HasNotSensor
+        }
     }
 }

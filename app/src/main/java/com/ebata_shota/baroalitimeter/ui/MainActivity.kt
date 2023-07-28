@@ -2,7 +2,6 @@ package com.ebata_shota.baroalitimeter.ui
 
 
 import android.content.Context
-import android.hardware.Sensor
 import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -32,11 +31,8 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
-
-
-        // TODO: センサーで切り替えたい
-        val hasTemperatureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null
 
         setContent {
             val uiState: MainViewModel.UiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -47,6 +43,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     when (val state = uiState) {
+                        is MainViewModel.UiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
                         is MainViewModel.UiState.ViewerMode -> {
                             ViewerModeContent(
                                 pressureText = state.pressureText,
@@ -57,7 +54,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        is MainViewModel.UiState.EditModeAltitude -> {
+                        is MainViewModel.UiState.EditAltitudeMode -> {
                             EditModeAltitudeContent(
                                 pressureText = state.pressureText,
                                 defaultAltitudeText = state.defaultAltitudeText,
@@ -66,7 +63,7 @@ class MainActivity : ComponentActivity() {
                             )
                         }
 
-                        is MainViewModel.UiState.EditModeTemperature -> {
+                        is MainViewModel.UiState.EditTemperatureMode -> {
                             EditModeTemperature(
                                 pressureText = state.pressureText,
                                 altitudeText = state.altitudeText,
