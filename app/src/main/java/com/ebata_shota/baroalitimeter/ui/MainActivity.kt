@@ -1,7 +1,6 @@
 package com.ebata_shota.baroalitimeter.ui
 
 
-import android.content.Context
 import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -25,14 +24,10 @@ import dagger.hilt.android.AndroidEntryPoint
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private lateinit var sensorManager: SensorManager
-
     private val viewModel: MainViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-        sensorManager = getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
         setContent {
             val uiState: MainViewModel.UiState by viewModel.uiState.collectAsStateWithLifecycle()
