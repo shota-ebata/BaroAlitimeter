@@ -4,7 +4,6 @@ import android.hardware.SensorManager
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -16,7 +15,6 @@ import com.ebata_shota.baroalitimeter.ui.parts.ClickableCard
 import com.ebata_shota.baroalitimeter.ui.parts.EditTextFieldRow
 import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EditModeTemperature(
     pressureText: String?,
