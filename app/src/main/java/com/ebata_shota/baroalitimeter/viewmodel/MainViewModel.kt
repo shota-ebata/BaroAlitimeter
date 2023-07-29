@@ -31,20 +31,20 @@ constructor(
 
         data class ViewerMode(
             val pressureText: String,
+            val temperatureText: String,
             val altitudeText: String,
-            val temperatureText: String,
-        ) : UiState()
-
-        data class EditAltitudeMode(
-            val pressureText: String,
-            val defaultAltitudeText: String,
-            val temperatureText: String,
         ) : UiState()
 
         data class EditTemperatureMode(
             val pressureText: String,
-            val altitudeText: String,
             val defaultTemperatureText: String,
+            val altitudeText: String,
+        ) : UiState()
+
+        data class EditAltitudeMode(
+            val pressureText: String,
+            val temperatureText: String,
+            val defaultAltitudeText: String,
         ) : UiState()
     }
 
@@ -63,8 +63,8 @@ constructor(
                     is Pressure.Success -> when (uiState.value) {
                         is UiState.Loading -> createViewMode(pressureSensorState)
                         is UiState.ViewerMode -> createViewMode(pressureSensorState)
-                        is UiState.EditAltitudeMode -> createEditModeAltitude(pressureSensorState)
                         is UiState.EditTemperatureMode -> createEditModeTemperature(pressureSensorState)
+                        is UiState.EditAltitudeMode -> createEditModeAltitude(pressureSensorState)
                     }
                 }
             }.distinctUntilChanged { old, new ->
@@ -78,18 +78,8 @@ constructor(
         pressureText = pressure.value.formattedString(1),
         altitudeText = calcRepository.calcAltitude(
             pressure = pressure.value,
-            seaLevelPressure = prefRepository.seaLevelPressure,
-            temperature = prefRepository.temperature
-        ).formattedString(0),
-        temperatureText = prefRepository.temperature.formattedString(1)
-    )
-
-    private suspend fun createEditModeAltitude(pressure: Pressure.Success) = UiState.EditAltitudeMode(
-        pressureText = pressure.value.formattedString(1),
-        defaultAltitudeText = calcRepository.calcAltitude(
-            pressure = pressure.value,
-            seaLevelPressure = prefRepository.seaLevelPressure,
-            temperature = prefRepository.temperature
+            temperature = prefRepository.temperature,
+            seaLevelPressure = prefRepository.seaLevelPressure
         ).formattedString(0),
         temperatureText = prefRepository.temperature.formattedString(1)
     )
@@ -98,10 +88,20 @@ constructor(
         pressureText = pressureState.value.formattedString(1),
         altitudeText = calcRepository.calcAltitude(
             pressure = pressureState.value,
-            seaLevelPressure = prefRepository.seaLevelPressure,
-            temperature = prefRepository.temperature
+            temperature = prefRepository.temperature,
+            seaLevelPressure = prefRepository.seaLevelPressure
         ).formattedString(0),
         defaultTemperatureText = prefRepository.temperature.formattedString(1)
+    )
+
+    private suspend fun createEditModeAltitude(pressure: Pressure.Success) = UiState.EditAltitudeMode(
+        pressureText = pressure.value.formattedString(1),
+        defaultAltitudeText = calcRepository.calcAltitude(
+            pressure = pressure.value,
+            temperature = prefRepository.temperature,
+            seaLevelPressure = prefRepository.seaLevelPressure
+        ).formattedString(0),
+        temperatureText = prefRepository.temperature.formattedString(1)
     )
 
     // FIXME: _uiState.valueをここで書き換えると
@@ -113,8 +113,8 @@ constructor(
         if (state is UiState.ViewerMode) {
             _uiState.value = UiState.EditTemperatureMode(
                 pressureText = state.pressureText,
-                altitudeText = state.altitudeText,
-                defaultTemperatureText = state.temperatureText
+                defaultTemperatureText = state.temperatureText,
+                altitudeText = state.altitudeText
             )
         }
     }
@@ -124,8 +124,8 @@ constructor(
         if (state is UiState.ViewerMode) {
             _uiState.value = UiState.EditAltitudeMode(
                 pressureText = state.pressureText,
-                defaultAltitudeText = state.altitudeText,
-                temperatureText = state.temperatureText
+                temperatureText = state.temperatureText,
+                defaultAltitudeText = state.altitudeText
             )
         }
     }
@@ -144,15 +144,15 @@ constructor(
                     prefRepository.temperature = temperature
                     _uiState.value = UiState.ViewerMode(
                         pressureText = currentPressure.formattedString(1),
-                        altitudeText = state.altitudeText,
-                        temperatureText = prefRepository.temperature.toString()
+                        temperatureText = prefRepository.temperature.toString(),
+                        altitudeText = state.altitudeText
                     )
                 }
             } catch (e: NumberFormatException) {
                 _uiState.value = UiState.ViewerMode(
                     pressureText = currentPressure.formattedString(1),
-                    altitudeText = state.altitudeText,
-                    temperatureText = prefRepository.temperature.toString()
+                    temperatureText = prefRepository.temperature.toString(),
+                    altitudeText = state.altitudeText
                 )
             }
         }
@@ -176,15 +176,15 @@ constructor(
                     )
                     _uiState.value = UiState.ViewerMode(
                         pressureText = currentPressure.formattedString(1),
-                        altitudeText = altitudeText,
-                        temperatureText = prefRepository.temperature.toString()
+                        temperatureText = prefRepository.temperature.toString(),
+                        altitudeText = altitudeText
                     )
                 }
             } catch (e: NumberFormatException) {
                 _uiState.value = UiState.ViewerMode(
                     pressureText = currentPressure.formattedString(1),
-                    altitudeText = altitudeText,
-                    temperatureText = prefRepository.temperature.toString()
+                    temperatureText = prefRepository.temperature.toString(),
+                    altitudeText = altitudeText
                 )
             }
         }
