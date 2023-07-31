@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.hardware.SensorManager
 import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.properties.ReadWriteProperty
@@ -29,11 +32,23 @@ constructor(
     // ユーザUID
     var userUid: String by pref(default = UUID.randomUUID().toString())
 
-    // 海面気圧
-    override var seaLevelPressure: Float by pref(default = SensorManager.PRESSURE_STANDARD_ATMOSPHERE)
+    // 海面気圧 デフォルトは1013.25f
+    private var seaLevelPressurePref: Float by pref(default = SensorManager.PRESSURE_STANDARD_ATMOSPHERE)
+    private val _seaLevelPressureState = MutableStateFlow(seaLevelPressurePref)
+    override val seaLevelPressureState: StateFlow<Float> = _seaLevelPressureState.asStateFlow()
+    override fun setSeaLevelPressure(newValue: Float) {
+        seaLevelPressurePref = newValue
+        _seaLevelPressureState.value = newValue
+    }
 
     // 気温
-    override var temperature: Float by pref(default = 15.0f)
+    private var temperaturePref: Float by pref(default = 15.0f)
+    private val _temperatureState = MutableStateFlow(temperaturePref)
+    override val temperatureState: StateFlow<Float> = _temperatureState.asStateFlow()
+    override fun setTemperature(newValue: Float) {
+        temperaturePref = newValue
+        _temperatureState.value = newValue
+    }
 
     // ---------------------------------------------------------------------------------------------
 

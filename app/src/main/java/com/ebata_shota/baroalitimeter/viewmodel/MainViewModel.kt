@@ -3,6 +3,7 @@ package com.ebata_shota.baroalitimeter.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
+import com.ebata_shota.baroalitimeter.domain.model.Temperature
 import com.ebata_shota.baroalitimeter.domain.repository.CalcRepository
 import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
 import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
@@ -48,23 +49,39 @@ constructor(
         ) : UiState()
     }
 
+    enum class Mode {
+        Viewer,
+        EditTemperature,
+        EditAltitude,
+    }
+
     private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
     val uiState: StateFlow<UiState> = _uiState.asStateFlow()
 
+    private val _modeState: MutableStateFlow<Mode> = MutableStateFlow(Mode.Viewer)
+    private val modeState: StateFlow<Mode> = _modeState.asStateFlow()
+
     init {
         viewModelScope.launch {
-
             combine(
+                modeState,
                 sensorRepository.pressureSensorState,
-                sensorRepository.temperatureSensorState
-            ) { pressureSensorState, temperatureSensorState -> // TODO: temperatureStateをうまく使う
+                sensorRepository.temperatureSensorState,
+                prefRepository.seaLevelPressureState,
+                prefRepository.temperatureState,
+            ) {
+                    mode: Mode,
+                    pressureSensorState: Pressure,
+                    temperatureSensorState: Temperature, // TODO: temperatureStateをうまく使う
+                    seaLevelPressure: Float,
+                    temperature: Float,
+                ->
                 when (pressureSensorState) {
                     is Pressure.Loading -> UiState.Loading
-                    is Pressure.Success -> when (uiState.value) {
-                        is UiState.Loading -> createViewMode(pressureSensorState)
-                        is UiState.ViewerMode -> createViewMode(pressureSensorState)
-                        is UiState.EditTemperatureMode -> createEditModeTemperature(pressureSensorState)
-                        is UiState.EditAltitudeMode -> createEditModeAltitude(pressureSensorState)
+                    is Pressure.Success -> when (mode) {
+                        Mode.Viewer -> createViewMode(pressureSensorState, seaLevelPressure, temperature)
+                        Mode.EditTemperature -> createEditModeTemperature(pressureSensorState, seaLevelPressure, temperature)
+                        Mode.EditAltitude -> createEditModeAltitude(pressureSensorState, seaLevelPressure, temperature)
                     }
                 }
             }.distinctUntilChanged { old, new ->
@@ -74,59 +91,45 @@ constructor(
         }
     }
 
-    private suspend fun createViewMode(pressure: Pressure.Success) = UiState.ViewerMode(
+    private suspend fun createViewMode(pressure: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.ViewerMode(
         pressureText = pressure.value.formattedString(1),
         altitudeText = calcRepository.calcAltitude(
             pressure = pressure.value,
-            temperature = prefRepository.temperature,
-            seaLevelPressure = prefRepository.seaLevelPressure
+            temperature = temperature,
+            seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        temperatureText = prefRepository.temperature.formattedString(1)
+        temperatureText = temperature.formattedString(1)
     )
 
-    private suspend fun createEditModeTemperature(pressureState: Pressure.Success) = UiState.EditTemperatureMode(
+    private suspend fun createEditModeTemperature(pressureState: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.EditTemperatureMode(
         pressureText = pressureState.value.formattedString(1),
         altitudeText = calcRepository.calcAltitude(
             pressure = pressureState.value,
-            temperature = prefRepository.temperature,
-            seaLevelPressure = prefRepository.seaLevelPressure
+            temperature = temperature,
+            seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        defaultTemperatureText = prefRepository.temperature.formattedString(1)
+        defaultTemperatureText = temperature.formattedString(1)
     )
 
-    private suspend fun createEditModeAltitude(pressure: Pressure.Success) = UiState.EditAltitudeMode(
+    private suspend fun createEditModeAltitude(pressure: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.EditAltitudeMode(
         pressureText = pressure.value.formattedString(1),
         defaultAltitudeText = calcRepository.calcAltitude(
             pressure = pressure.value,
-            temperature = prefRepository.temperature,
-            seaLevelPressure = prefRepository.seaLevelPressure
+            temperature = temperature,
+            seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        temperatureText = prefRepository.temperature.formattedString(1)
+        temperatureText = temperature.formattedString(1)
     )
 
-    // FIXME: _uiState.valueをここで書き換えると
-    //  タイミングによってはセンサー経由のイベントによってuiStateが上書きされる可能性があるのでよくない
-    //  つまり_uiState.valueを書き換えるのはinitで定義している一箇所にするべきで
-    //  ベースになる値を書き換えるようにしたほうがよい
-    fun changeToEditModeTemperature() {
-        val state = uiState.value
-        if (state is UiState.ViewerMode) {
-            _uiState.value = UiState.EditTemperatureMode(
-                pressureText = state.pressureText,
-                defaultTemperatureText = state.temperatureText,
-                altitudeText = state.altitudeText
-            )
+    fun changeModeToEditTemperature() {
+        if (uiState.value is UiState.ViewerMode) {
+            _modeState.value = Mode.EditTemperature
         }
     }
 
-    fun changeToEditModeAltitude() {
-        val state = uiState.value
-        if (state is UiState.ViewerMode) {
-            _uiState.value = UiState.EditAltitudeMode(
-                pressureText = state.pressureText,
-                temperatureText = state.temperatureText,
-                defaultAltitudeText = state.altitudeText
-            )
+    fun changeModeToEditAltitude() {
+        if (uiState.value is UiState.ViewerMode) {
+            _modeState.value = Mode.EditAltitude
         }
     }
 
@@ -137,23 +140,16 @@ constructor(
             state is UiState.EditTemperatureMode
             && pressureState is Pressure.Success
         ) {
-            val currentPressure = pressureState.value
-            try {
-                val temperature = temperatureText.toFloat()
-                viewModelScope.launch {
-                    prefRepository.temperature = temperature
-                    _uiState.value = UiState.ViewerMode(
-                        pressureText = currentPressure.formattedString(1),
-                        temperatureText = prefRepository.temperature.toString(),
-                        altitudeText = state.altitudeText
-                    )
+            viewModelScope.launch {
+                try {
+                    val temperature = temperatureText.toFloat()
+                    prefRepository.setTemperature(temperature)
+                } catch (e: NumberFormatException) {
+                    // 変換に失敗したら、特に何もない
+                } finally {
+                    // 最終的に編集モードを終了する
+                    _modeState.value = Mode.Viewer
                 }
-            } catch (e: NumberFormatException) {
-                _uiState.value = UiState.ViewerMode(
-                    pressureText = currentPressure.formattedString(1),
-                    temperatureText = prefRepository.temperature.toString(),
-                    altitudeText = state.altitudeText
-                )
             }
         }
     }
@@ -165,27 +161,21 @@ constructor(
             state is UiState.EditAltitudeMode
             && pressureState is Pressure.Success
         ) {
-            val currentPressure = pressureState.value
-            try {
-                val altitude = altitudeText.toFloat()
-                viewModelScope.launch {
-                    prefRepository.seaLevelPressure = calcRepository.calcSeaLevelPressure(
-                        pressure = currentPressure,
-                        temperature = prefRepository.temperature,
+            viewModelScope.launch {
+                try {
+                    val altitude = altitudeText.toFloat()
+                    val newSeaLevelPressure = calcRepository.calcSeaLevelPressure(
+                        pressure = pressureState.value,
+                        temperature = prefRepository.temperatureState.value,
                         altitude = altitude
                     )
-                    _uiState.value = UiState.ViewerMode(
-                        pressureText = currentPressure.formattedString(1),
-                        temperatureText = prefRepository.temperature.toString(),
-                        altitudeText = altitudeText
-                    )
+                    prefRepository.setSeaLevelPressure(newSeaLevelPressure)
+                } catch (e: NumberFormatException) {
+                    // 変換に失敗したら、特に何もない
+                } finally {
+                    // 最終的に編集モードを終了する
+                    _modeState.value = Mode.Viewer
                 }
-            } catch (e: NumberFormatException) {
-                _uiState.value = UiState.ViewerMode(
-                    pressureText = currentPressure.formattedString(1),
-                    temperatureText = prefRepository.temperature.toString(),
-                    altitudeText = altitudeText
-                )
             }
         }
     }

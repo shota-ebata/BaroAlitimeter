@@ -44,8 +44,8 @@ class MainActivity : ComponentActivity() {
                                 pressureText = state.pressureText,
                                 altitudeText = state.altitudeText,
                                 temperatureText = state.temperatureText,
-                                onClickTemperature = viewModel::changeToEditModeTemperature,
-                                onClickAltitude = viewModel::changeToEditModeAltitude
+                                onClickTemperature = viewModel::changeModeToEditTemperature,
+                                onClickAltitude = viewModel::changeModeToEditAltitude
                             )
                         }
 
