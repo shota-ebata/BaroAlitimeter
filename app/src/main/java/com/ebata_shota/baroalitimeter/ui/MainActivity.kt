@@ -45,7 +45,8 @@ class MainActivity : ComponentActivity() {
                                 altitudeText = state.altitudeText,
                                 temperatureText = state.temperatureText,
                                 onClickTemperature = viewModel::changeModeToEditTemperature,
-                                onClickAltitude = viewModel::changeModeToEditAltitude
+                                onClickAltitude = viewModel::changeModeToEditAltitude,
+                                seaLevelPressure = state.seaLevelPressure
                             )
                         }
 
@@ -87,7 +88,8 @@ fun ViewerModeContentPreview() {
             altitudeText = "1000",
             temperatureText = "15.0",
             onClickTemperature = {},
-            onClickAltitude = {}
+            onClickAltitude = {},
+            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString()
         )
     }
 }

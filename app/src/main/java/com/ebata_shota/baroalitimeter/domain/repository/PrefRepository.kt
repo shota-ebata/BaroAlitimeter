@@ -1,11 +1,12 @@
 package com.ebata_shota.baroalitimeter.domain.repository
 
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 
 interface PrefRepository {
-    val seaLevelPressureState: StateFlow<Float>
-    fun setSeaLevelPressure(newValue: Float)
+    val seaLevelPressureFlow: Flow<Float>
+    suspend fun setSeaLevelPressure(newValue: Float)
 
-    val temperatureState: StateFlow<Float>
-    fun setTemperature(newValue: Float)
+    val temperatureFlow: Flow<Float>
+    suspend fun getTemperature(): Result<Float>
+    suspend fun setTemperature(newValue: Float)
 }

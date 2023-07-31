@@ -16,9 +16,10 @@ import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 
 @Composable
 fun ViewerModeContent(
-    pressureText: String?,
-    altitudeText: String?,
-    temperatureText: String?,
+    pressureText: String,
+    altitudeText: String,
+    temperatureText: String,
+    seaLevelPressure: String,
     onClickTemperature: () -> Unit,
     onClickAltitude: () -> Unit,
     modifier: Modifier = Modifier,
@@ -52,6 +53,9 @@ fun ViewerModeContent(
                 onClick = onClickAltitude,
             )
         }
+        Row(modifier = modifier.padding(8.dp)) {
+            Text(text = "海面気圧 $seaLevelPressure hPa")
+        }
     }
 }
 
@@ -67,7 +71,8 @@ fun ViewerModeContentPreview() {
             altitudeText = "1000",
             temperatureText = "15.0",
             onClickTemperature = {},
-            onClickAltitude = {}
+            onClickAltitude = {},
+            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString()
         )
     }
 }

@@ -1,86 +1,69 @@
 package com.ebata_shota.baroalitimeter.infra.repository
 
-import android.content.Context
-import android.content.SharedPreferences
 import android.hardware.SensorManager
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.emptyPreferences
 import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import com.ebata_shota.baroalitimeter.infra.AppPreferencesKeys
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import java.io.IOException
 import java.util.UUID
 import javax.inject.Inject
-import kotlin.properties.ReadWriteProperty
-import kotlin.reflect.KProperty
+import kotlin.properties.ReadOnlyProperty
 
-
-/**
- * Only:
- * Int
- * Long
- * Float
- * String
- * Boolean
- * Set<String>
- */
 class PrefRepositoryImpl
 @Inject
 constructor(
-    context: Context
+    private val dataStore: DataStore<Preferences>,
 ) : PrefRepository {
-    private val appPref: SharedPreferences = context.getSharedPreferences("app_pref", Context.MODE_PRIVATE)
 
     // ユーザUID
-    var userUid: String by pref(default = UUID.randomUUID().toString())
+    val userUid: Flow<String> by prefFlow(AppPreferencesKeys.USER_UID, UUID.randomUUID().toString())
 
     // 海面気圧 デフォルトは1013.25f
-    private var seaLevelPressurePref: Float by pref(default = SensorManager.PRESSURE_STANDARD_ATMOSPHERE)
-    private val _seaLevelPressureState = MutableStateFlow(seaLevelPressurePref)
-    override val seaLevelPressureState: StateFlow<Float> = _seaLevelPressureState.asStateFlow()
-    override fun setSeaLevelPressure(newValue: Float) {
-        seaLevelPressurePref = newValue
-        _seaLevelPressureState.value = newValue
+    override val seaLevelPressureFlow: Flow<Float> by prefFlow(AppPreferencesKeys.SEA_LEVEL_PRESSURE, SensorManager.PRESSURE_STANDARD_ATMOSPHERE)
+
+    override suspend fun setSeaLevelPressure(newValue: Float) {
+        setPrefValue(AppPreferencesKeys.SEA_LEVEL_PRESSURE, newValue)
     }
 
     // 気温
-    private var temperaturePref: Float by pref(default = 15.0f)
-    private val _temperatureState = MutableStateFlow(temperaturePref)
-    override val temperatureState: StateFlow<Float> = _temperatureState.asStateFlow()
-    override fun setTemperature(newValue: Float) {
-        temperaturePref = newValue
-        _temperatureState.value = newValue
+    override val temperatureFlow: Flow<Float> by prefFlow(AppPreferencesKeys.TEMPERATURE, 15.0F)
+
+    override suspend fun getTemperature(): Result<Float> {
+        return Result.runCatching {
+            temperatureFlow.first()
+        }
+    }
+
+    override suspend fun setTemperature(newValue: Float) {
+        setPrefValue(AppPreferencesKeys.TEMPERATURE, newValue)
     }
 
     // ---------------------------------------------------------------------------------------------
 
-    private fun <T> pref(default: T): ReadWriteProperty<PrefRepositoryImpl, T> = object : ReadWriteProperty<PrefRepositoryImpl, T> {
-
-        @Suppress("UNCHECKED_CAST")
-        override fun getValue(thisRef: PrefRepositoryImpl, property: KProperty<*>): T {
-            val key = property.name
-            return (appPref.all[key] as? T) ?: run {
-                put(key, default)
-                default
+    private fun <T> prefFlow(key: Preferences.Key<T>, defaultValue: T) = ReadOnlyProperty<PrefRepositoryImpl, Flow<T>> { thisRef, _ ->
+        thisRef.dataStore
+            .data
+            .catch { throwable ->
+                if (throwable is IOException) {
+                    emit(emptyPreferences())
+                } else {
+                    throw throwable
+                }
+            }.map { preferences ->
+                preferences[key] ?: defaultValue
             }
-        }
-
-        override fun setValue(thisRef: PrefRepositoryImpl, property: KProperty<*>, value: T) {
-            val key = property.name
-            put(key, value)
-        }
     }
 
-    private fun <T : Any?> put(key: String, value: T?) {
-        val editor = appPref.edit()
-        when (value) {
-            is Int -> editor.putInt(key, value)
-            is Long -> editor.putLong(key, value)
-            is Float -> editor.putFloat(key, value)
-            is String -> editor.putString(key, value)
-            is Boolean -> editor.putBoolean(key, value)
-            is Set<*> -> editor.putStringSet(key, value.map { it as String }.toSet())
-            null -> editor.remove(key)
-            else -> throw IllegalArgumentException("用意されていない型")
+    private suspend fun <T> setPrefValue(key: Preferences.Key<T>, value: T) {
+        dataStore.edit { preferences ->
+            preferences[key] = value
         }
-        editor.apply()
     }
 }

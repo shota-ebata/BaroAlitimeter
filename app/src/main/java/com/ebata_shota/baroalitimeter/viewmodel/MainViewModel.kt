@@ -34,6 +34,7 @@ constructor(
             val pressureText: String,
             val temperatureText: String,
             val altitudeText: String,
+            val seaLevelPressure: String,
         ) : UiState()
 
         data class EditTemperatureMode(
@@ -67,8 +68,8 @@ constructor(
                 modeState,
                 sensorRepository.pressureSensorState,
                 sensorRepository.temperatureSensorState,
-                prefRepository.seaLevelPressureState,
-                prefRepository.temperatureState,
+                prefRepository.seaLevelPressureFlow,
+                prefRepository.temperatureFlow,
             ) {
                     mode: Mode,
                     pressureSensorState: Pressure,
@@ -98,7 +99,8 @@ constructor(
             temperature = temperature,
             seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        temperatureText = temperature.formattedString(1)
+        temperatureText = temperature.formattedString(1),
+        seaLevelPressure = seaLevelPressure.formattedString(2)
     )
 
     private suspend fun createEditModeTemperature(pressureState: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.EditTemperatureMode(
@@ -142,7 +144,7 @@ constructor(
         ) {
             viewModelScope.launch {
                 try {
-                    val temperature = temperatureText.toFloat()
+                    val temperature = temperatureText.toFloat() // FIXME: 入力制限をしていないので、Floatの範囲外に入ると問題になる
                     prefRepository.setTemperature(temperature)
                 } catch (e: NumberFormatException) {
                     // 変換に失敗したら、特に何もない
@@ -163,11 +165,11 @@ constructor(
         ) {
             viewModelScope.launch {
                 try {
-                    val altitude = altitudeText.toFloat()
+                    val temperature = prefRepository.getTemperature().getOrThrow()
                     val newSeaLevelPressure = calcRepository.calcSeaLevelPressure(
                         pressure = pressureState.value,
-                        temperature = prefRepository.temperatureState.value,
-                        altitude = altitude
+                        temperature = temperature,
+                        altitude = altitudeText.toFloat() // FIXME: 入力制限をしていないので、Floatの範囲外に入ると問題になる
                     )
                     prefRepository.setSeaLevelPressure(newSeaLevelPressure)
                 } catch (e: NumberFormatException) {
