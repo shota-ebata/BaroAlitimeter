@@ -17,9 +17,10 @@ import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 
 @Composable
 fun EditModeAltitudeContent(
-    pressureText: String?,
-    defaultAltitudeText: String?,
-    temperatureText: String?,
+    pressureText: String,
+    seaLevelPressure: String,
+    defaultAltitudeText: String,
+    temperatureText: String,
     onClickDone: (String) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -35,6 +36,15 @@ fun EditModeAltitudeContent(
                 fontSize = 40.sp,
                 text = "$pressureText hPa",
             )
+        }
+
+        Row(
+            modifier = modifier.padding(
+                top = 8.dp,
+                bottom = 16.dp
+            )
+        ) {
+            Text(text = "海面気圧 $seaLevelPressure hPa")
         }
 
         Row(
@@ -62,6 +72,7 @@ fun EditModeAltitudeContentPreview() {
     BaroAlitimeterTheme {
         EditModeAltitudeContent(
             pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
+            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
             defaultAltitudeText = "1000",
             temperatureText = "15.0",
             onClickDone = {}

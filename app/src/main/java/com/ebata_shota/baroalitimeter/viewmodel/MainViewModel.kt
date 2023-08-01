@@ -34,19 +34,21 @@ constructor(
             val pressureText: String,
             val temperatureText: String,
             val altitudeText: String,
-            val seaLevelPressure: String,
+            val seaLevelPressureText: String,
         ) : UiState()
 
         data class EditTemperatureMode(
             val pressureText: String,
             val defaultTemperatureText: String,
             val altitudeText: String,
+            val seaLevelPressureText: String,
         ) : UiState()
 
         data class EditAltitudeMode(
             val pressureText: String,
             val temperatureText: String,
             val defaultAltitudeText: String,
+            val seaLevelPressureText: String,
         ) : UiState()
     }
 
@@ -100,7 +102,7 @@ constructor(
             seaLevelPressure = seaLevelPressure
         ).formattedString(0),
         temperatureText = temperature.formattedString(1),
-        seaLevelPressure = seaLevelPressure.formattedString(2)
+        seaLevelPressureText = seaLevelPressure.formattedString(2)
     )
 
     private suspend fun createEditModeTemperature(pressureState: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.EditTemperatureMode(
@@ -110,7 +112,8 @@ constructor(
             temperature = temperature,
             seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        defaultTemperatureText = temperature.formattedString(1)
+        defaultTemperatureText = temperature.formattedString(1),
+        seaLevelPressureText = seaLevelPressure.formattedString(2)
     )
 
     private suspend fun createEditModeAltitude(pressure: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.EditAltitudeMode(
@@ -120,7 +123,8 @@ constructor(
             temperature = temperature,
             seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        temperatureText = temperature.formattedString(1)
+        temperatureText = temperature.formattedString(1),
+        seaLevelPressureText = seaLevelPressure.formattedString(2)
     )
 
     fun changeModeToEditTemperature() {

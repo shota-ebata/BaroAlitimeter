@@ -17,9 +17,9 @@ import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 @Composable
 fun ViewerModeContent(
     pressureText: String,
+    seaLevelPressure: String,
     altitudeText: String,
     temperatureText: String,
-    seaLevelPressure: String,
     onClickTemperature: () -> Unit,
     onClickAltitude: () -> Unit,
     modifier: Modifier = Modifier,
@@ -38,6 +38,14 @@ fun ViewerModeContent(
             )
         }
         Row(
+            modifier = modifier.padding(
+                top = 8.dp,
+                bottom = 16.dp
+            )
+        ) {
+            Text(text = "海面気圧 $seaLevelPressure hPa")
+        }
+        Row(
             modifier = modifier.padding(8.dp)
         ) {
             ClickableCard(
@@ -53,9 +61,6 @@ fun ViewerModeContent(
                 onClick = onClickAltitude,
             )
         }
-        Row(modifier = modifier.padding(8.dp)) {
-            Text(text = "海面気圧 $seaLevelPressure hPa")
-        }
     }
 }
 
@@ -68,11 +73,11 @@ fun ViewerModeContentPreview() {
     BaroAlitimeterTheme {
         ViewerModeContent(
             pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
+            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
             altitudeText = "1000",
             temperatureText = "15.0",
             onClickTemperature = {},
-            onClickAltitude = {},
-            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString()
+            onClickAltitude = {}
         )
     }
 }

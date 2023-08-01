@@ -46,13 +46,14 @@ class MainActivity : ComponentActivity() {
                                 temperatureText = state.temperatureText,
                                 onClickTemperature = viewModel::changeModeToEditTemperature,
                                 onClickAltitude = viewModel::changeModeToEditAltitude,
-                                seaLevelPressure = state.seaLevelPressure
+                                seaLevelPressure = state.seaLevelPressureText
                             )
                         }
 
                         is MainViewModel.UiState.EditAltitudeMode -> {
                             EditModeAltitudeContent(
                                 pressureText = state.pressureText,
+                                seaLevelPressure = state.seaLevelPressureText,
                                 defaultAltitudeText = state.defaultAltitudeText,
                                 temperatureText = state.temperatureText,
                                 onClickDone = viewModel::setAltitude
@@ -62,6 +63,7 @@ class MainActivity : ComponentActivity() {
                         is MainViewModel.UiState.EditTemperatureMode -> {
                             EditModeTemperature(
                                 pressureText = state.pressureText,
+                                seaLevelPressure = state.seaLevelPressureText,
                                 altitudeText = state.altitudeText,
                                 defaultTemperatureText = state.defaultTemperatureText,
                                 onClickDone = viewModel::setTemperature
@@ -85,11 +87,11 @@ fun ViewerModeContentPreview() {
     BaroAlitimeterTheme {
         ViewerModeContent(
             pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
+            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
             altitudeText = "1000",
             temperatureText = "15.0",
             onClickTemperature = {},
-            onClickAltitude = {},
-            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString()
+            onClickAltitude = {}
         )
     }
 }
@@ -103,6 +105,7 @@ fun EditModeAltitudeContentPreview() {
     BaroAlitimeterTheme {
         EditModeAltitudeContent(
             pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
+            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
             defaultAltitudeText = "1000",
             temperatureText = "15.0",
             onClickDone = {}
@@ -119,6 +122,7 @@ fun EditModeTemperaturePreview() {
     BaroAlitimeterTheme {
         EditModeTemperature(
             pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
+            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
             altitudeText = "1000",
             defaultTemperatureText = "15.0",
             onClickDone = {}
