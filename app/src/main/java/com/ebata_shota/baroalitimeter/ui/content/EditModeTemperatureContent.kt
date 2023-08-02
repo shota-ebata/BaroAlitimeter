@@ -76,7 +76,7 @@ fun EditModeTemperaturePreview() {
             pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
             seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
             altitudeText = "1000",
-            defaultTemperatureText = "15.0",
+            defaultTemperatureText = "15",
             onClickDone = {},
             onClickCancel = {}
         )

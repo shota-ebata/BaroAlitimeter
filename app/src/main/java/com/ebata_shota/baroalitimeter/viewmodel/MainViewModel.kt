@@ -33,23 +33,23 @@ constructor(
 
         data class ViewerMode(
             val pressureText: String,
+            val seaLevelPressureText: String,
             val temperatureText: String,
             val altitudeText: String,
-            val seaLevelPressureText: String,
         ) : UiState()
 
         data class EditTemperatureMode(
             val pressureText: String,
+            val seaLevelPressureText: String,
             val defaultTemperatureText: String,
             val altitudeText: String,
-            val seaLevelPressureText: String,
         ) : UiState()
 
         data class EditAltitudeMode(
             val pressureText: String,
+            val seaLevelPressureText: String,
             val temperatureText: String,
             val defaultAltitudeText: String,
-            val seaLevelPressureText: String,
         ) : UiState()
     }
 
@@ -95,35 +95,35 @@ constructor(
 
     private suspend fun createViewMode(pressure: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.ViewerMode(
         pressureText = pressure.value.formattedString(1),
+        seaLevelPressureText = seaLevelPressure.formattedString(2),
         altitudeText = calcRepository.calcAltitude(
             pressure = pressure.value,
             temperature = temperature,
             seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        temperatureText = temperature.formattedString(1),
-        seaLevelPressureText = seaLevelPressure.formattedString(2)
+        temperatureText = temperature.formattedString(0),
     )
 
     private suspend fun createEditModeTemperature(pressureState: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.EditTemperatureMode(
         pressureText = pressureState.value.formattedString(1),
+        seaLevelPressureText = seaLevelPressure.formattedString(2),
         altitudeText = calcRepository.calcAltitude(
             pressure = pressureState.value,
             temperature = temperature,
             seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        defaultTemperatureText = temperature.formattedString(1),
-        seaLevelPressureText = seaLevelPressure.formattedString(2)
+        defaultTemperatureText = temperature.formattedString(0),
     )
 
     private suspend fun createEditModeAltitude(pressure: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.EditAltitudeMode(
         pressureText = pressure.value.formattedString(1),
+        seaLevelPressureText = seaLevelPressure.formattedString(2),
         defaultAltitudeText = calcRepository.calcAltitude(
             pressure = pressure.value,
             temperature = temperature,
             seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        temperatureText = temperature.formattedString(1),
-        seaLevelPressureText = seaLevelPressure.formattedString(2)
+        temperatureText = temperature.formattedString(0),
     )
 
     fun changeModeToEditTemperature() {
