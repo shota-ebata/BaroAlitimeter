@@ -2,6 +2,7 @@ package com.ebata_shota.baroalitimeter.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.baroalitimeter.domain.extensions.collect
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
 import com.ebata_shota.baroalitimeter.domain.model.Temperature
 import com.ebata_shota.baroalitimeter.domain.repository.CalcRepository
@@ -65,33 +66,31 @@ constructor(
     private val modeState: StateFlow<Mode> = _modeState.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            combine(
-                modeState,
-                sensorRepository.pressureSensorState,
-                sensorRepository.temperatureSensorState,
-                prefRepository.seaLevelPressureFlow,
-                prefRepository.temperatureFlow,
-            ) {
-                    mode: Mode,
-                    pressureSensorState: Pressure,
-                    temperatureSensorState: Temperature, // TODO: temperatureStateをうまく使う
-                    seaLevelPressure: Float,
-                    temperature: Float,
-                ->
-                when (pressureSensorState) {
-                    is Pressure.Loading -> UiState.Loading
-                    is Pressure.Success -> when (mode) {
-                        Mode.Viewer -> createViewMode(pressureSensorState, seaLevelPressure, temperature)
-                        Mode.EditTemperature -> createEditModeTemperature(pressureSensorState, seaLevelPressure, temperature)
-                        Mode.EditAltitude -> createEditModeAltitude(pressureSensorState, seaLevelPressure, temperature)
-                    }
+        combine(
+            modeState,
+            sensorRepository.pressureSensorState,
+            sensorRepository.temperatureSensorState,
+            prefRepository.seaLevelPressureFlow,
+            prefRepository.temperatureFlow,
+        ) {
+                mode: Mode,
+                pressureSensorState: Pressure,
+                temperatureSensorState: Temperature, // TODO: temperatureStateをうまく使う
+                seaLevelPressure: Float,
+                temperature: Float,
+            ->
+            when (pressureSensorState) {
+                is Pressure.Loading -> UiState.Loading
+                is Pressure.Success -> when (mode) {
+                    Mode.Viewer -> createViewMode(pressureSensorState, seaLevelPressure, temperature)
+                    Mode.EditTemperature -> createEditModeTemperature(pressureSensorState, seaLevelPressure, temperature)
+                    Mode.EditAltitude -> createEditModeAltitude(pressureSensorState, seaLevelPressure, temperature)
                 }
-            }.distinctUntilChanged { old, new ->
-                // 重複を無視する
-                old == new
-            }.collect(_uiState)
-        }
+            }
+        }.distinctUntilChanged { old, new ->
+            // 重複を無視する
+            old == new
+        }.collect(viewModelScope, _uiState)
     }
 
     private suspend fun createViewMode(pressure: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.ViewerMode(
