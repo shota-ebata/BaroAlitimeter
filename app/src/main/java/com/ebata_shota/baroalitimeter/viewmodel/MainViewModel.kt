@@ -3,6 +3,7 @@ package com.ebata_shota.baroalitimeter.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.baroalitimeter.domain.extensions.collect
+import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
 import com.ebata_shota.baroalitimeter.domain.model.Temperature
 import com.ebata_shota.baroalitimeter.domain.repository.CalcRepository
@@ -66,25 +67,24 @@ constructor(
     private val modeState: StateFlow<Mode> = _modeState.asStateFlow()
 
     init {
+
         combine(
             modeState,
             sensorRepository.pressureSensorState,
             sensorRepository.temperatureSensorState,
-            prefRepository.seaLevelPressureFlow,
-            prefRepository.temperatureFlow,
+            prefRepository.preferencesFlow,
         ) {
                 mode: Mode,
                 pressureSensorState: Pressure,
-                temperatureSensorState: Temperature, // TODO: temperatureStateをうまく使う
-                seaLevelPressure: Float,
-                temperature: Float,
+                temperatureSensorState: Temperature, // TODO: temperatureSensorStateをうまく使う
+                preferencesModel: PreferencesModel,
             ->
             when (pressureSensorState) {
                 is Pressure.Loading -> UiState.Loading
                 is Pressure.Success -> when (mode) {
-                    Mode.Viewer -> createViewMode(pressureSensorState, seaLevelPressure, temperature)
-                    Mode.EditTemperature -> createEditModeTemperature(pressureSensorState, seaLevelPressure, temperature)
-                    Mode.EditAltitude -> createEditModeAltitude(pressureSensorState, seaLevelPressure, temperature)
+                    Mode.Viewer -> createViewMode(pressureSensorState, preferencesModel.seaLevelPressure, preferencesModel.temperature)
+                    Mode.EditTemperature -> createEditModeTemperature(pressureSensorState, preferencesModel.seaLevelPressure, preferencesModel.temperature)
+                    Mode.EditAltitude -> createEditModeAltitude(pressureSensorState, preferencesModel.seaLevelPressure, preferencesModel.temperature)
                 }
             }
         }.distinctUntilChanged { old, new ->

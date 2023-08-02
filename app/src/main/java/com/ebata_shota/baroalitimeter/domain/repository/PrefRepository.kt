@@ -1,12 +1,15 @@
 package com.ebata_shota.baroalitimeter.domain.repository
 
+import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
 import kotlinx.coroutines.flow.Flow
 
 interface PrefRepository {
-    val seaLevelPressureFlow: Flow<Float>
-    suspend fun setSeaLevelPressure(newValue: Float)
+    suspend fun setSeaLevelPressure(value: Float)
 
-    val temperatureFlow: Flow<Float>
     suspend fun getTemperature(): Result<Float>
-    suspend fun setTemperature(newValue: Float)
+    suspend fun setTemperature(value: Float)
+
+    suspend fun setUseTemperatureSensor(value: Boolean)
+
+    val preferencesFlow: Flow<PreferencesModel>
 }
