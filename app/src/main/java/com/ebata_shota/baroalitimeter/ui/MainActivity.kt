@@ -4,6 +4,7 @@ package com.ebata_shota.baroalitimeter.ui
 import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +15,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.lifecycleScope
+import com.ebata_shota.baroalitimeter.domain.extensions.collect
 import com.ebata_shota.baroalitimeter.ui.content.EditModeAltitudeContent
 import com.ebata_shota.baroalitimeter.ui.content.EditModeTemperature
 import com.ebata_shota.baroalitimeter.ui.content.ViewerModeContent
@@ -28,6 +31,19 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // FIXME: もう少しうまく隠せないか？
+        val onBackPressedCallback = object : OnBackPressedCallback(enabled = false) {
+            override fun handleOnBackPressed() {
+                viewModel.changeModeToViewer()
+            }
+        }
+        onBackPressedDispatcher.addCallback(owner = this, onBackPressedCallback)
+
+        viewModel.uiState.collect(lifecycleScope) { uiState ->
+            onBackPressedCallback.isEnabled =
+                uiState is MainViewModel.UiState.EditAltitudeMode || uiState is MainViewModel.UiState.EditTemperatureMode
+        }
 
         setContent {
             val uiState: MainViewModel.UiState by viewModel.uiState.collectAsStateWithLifecycle()

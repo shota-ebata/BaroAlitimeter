@@ -139,6 +139,10 @@ constructor(
         }
     }
 
+    fun changeModeToViewer() {
+        _modeState.value = Mode.Viewer
+    }
+
     fun setTemperature(temperatureText: String) {
         val state = uiState.value
         val pressureState = sensorRepository.pressureSensorState.value
@@ -154,7 +158,7 @@ constructor(
                     // 変換に失敗したら、特に何もない
                 } finally {
                     // 最終的に編集モードを終了する
-                    _modeState.value = Mode.Viewer
+                    changeModeToViewer()
                 }
             }
         }
@@ -180,7 +184,7 @@ constructor(
                     // 変換に失敗したら、特に何もない
                 } finally {
                     // 最終的に編集モードを終了する
-                    _modeState.value = Mode.Viewer
+                    changeModeToViewer()
                 }
             }
         }
