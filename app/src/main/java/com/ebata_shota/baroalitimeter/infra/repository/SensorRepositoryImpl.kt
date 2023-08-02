@@ -1,6 +1,5 @@
 package com.ebata_shota.baroalitimeter.infra.repository
 
-import android.content.Context
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
@@ -8,7 +7,6 @@ import android.hardware.SensorManager
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
 import com.ebata_shota.baroalitimeter.domain.model.Temperature
 import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -17,10 +15,8 @@ import javax.inject.Inject
 class SensorRepositoryImpl
 @Inject
 constructor(
-    @ApplicationContext
-    context: Context
+    sensorManager: SensorManager,
 ) : SensorRepository {
-    private val sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
     private val _pressureState: MutableStateFlow<Pressure> = MutableStateFlow(Pressure.Loading)
     override val pressureSensorState: StateFlow<Pressure> = _pressureState.asStateFlow()
