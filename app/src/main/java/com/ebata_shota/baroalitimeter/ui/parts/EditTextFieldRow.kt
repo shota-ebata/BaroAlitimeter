@@ -3,7 +3,6 @@ package com.ebata_shota.baroalitimeter.ui.parts
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -67,7 +66,7 @@ fun EditTextFieldRow(
         }
         TextField(
             modifier = modifier
-                .width(150.dp)
+                .weight(weight = 1.0f)
                 .focusRequester(focusRequester),
             textStyle = TextStyle(fontSize = 40.sp),
             value = textFieldValue,
