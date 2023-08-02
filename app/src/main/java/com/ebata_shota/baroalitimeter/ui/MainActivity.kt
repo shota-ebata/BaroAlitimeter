@@ -45,47 +45,40 @@ class MainActivity : ComponentActivity() {
         setContent {
             val uiState: MainViewModel.UiState by viewModel.uiState.collectAsStateWithLifecycle()
             BaroAlitimeterTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    when (val state = uiState) {
-                        is MainViewModel.UiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
-                        is MainViewModel.UiState.ViewerMode -> {
-                            ViewerModeContent(
-                                pressureText = state.pressureText,
-                                altitudeText = state.altitudeText,
-                                temperatureText = state.temperatureText,
-                                onClickTemperature = viewModel::changeModeToEditTemperature,
-                                onClickAltitude = viewModel::changeModeToEditAltitude,
-                                seaLevelPressure = state.seaLevelPressureText
-                            )
-                        }
-
-                        is MainViewModel.UiState.EditAltitudeMode -> {
-                            EditModeAltitudeContent(
-                                pressureText = state.pressureText,
-                                seaLevelPressure = state.seaLevelPressureText,
-                                defaultAltitudeText = state.defaultAltitudeText,
-                                temperatureText = state.temperatureText,
-                                onClickDone = viewModel::setAltitude,
-                                onClickCancel = viewModel::changeModeToViewer
-                            )
-                        }
-
-                        is MainViewModel.UiState.EditTemperatureMode -> {
-                            EditModeTemperature(
-                                pressureText = state.pressureText,
-                                seaLevelPressure = state.seaLevelPressureText,
-                                altitudeText = state.altitudeText,
-                                defaultTemperatureText = state.defaultTemperatureText,
-                                onClickDone = viewModel::setTemperature,
-                                onClickCancel = viewModel::changeModeToViewer
-                            )
-                        }
+                when (val state = uiState) {
+                    is MainViewModel.UiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
+                    is MainViewModel.UiState.ViewerMode -> {
+                        ViewerModeContent(
+                            pressureText = state.pressureText,
+                            altitudeText = state.altitudeText,
+                            temperatureText = state.temperatureText,
+                            onClickTemperature = viewModel::changeModeToEditTemperature,
+                            onClickAltitude = viewModel::changeModeToEditAltitude,
+                            seaLevelPressure = state.seaLevelPressureText
+                        )
                     }
 
+                    is MainViewModel.UiState.EditAltitudeMode -> {
+                        EditModeAltitudeContent(
+                            pressureText = state.pressureText,
+                            seaLevelPressure = state.seaLevelPressureText,
+                            defaultAltitudeText = state.defaultAltitudeText,
+                            temperatureText = state.temperatureText,
+                            onClickDone = viewModel::setAltitude,
+                            onClickCancel = viewModel::changeModeToViewer
+                        )
+                    }
+
+                    is MainViewModel.UiState.EditTemperatureMode -> {
+                        EditModeTemperature(
+                            pressureText = state.pressureText,
+                            seaLevelPressure = state.seaLevelPressureText,
+                            altitudeText = state.altitudeText,
+                            defaultTemperatureText = state.defaultTemperatureText,
+                            onClickDone = viewModel::setTemperature,
+                            onClickCancel = viewModel::changeModeToViewer
+                        )
+                    }
                 }
             }
         }
