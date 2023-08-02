@@ -1,7 +1,6 @@
 package com.ebata_shota.baroalitimeter.ui
 
 
-import android.hardware.SensorManager
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
@@ -10,10 +9,8 @@ import androidx.activity.viewModels
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.ebata_shota.baroalitimeter.domain.extensions.collect
@@ -92,24 +89,5 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-    }
-}
-
-
-@Preview(
-    showBackground = true,
-    widthDp = 360
-)
-@Composable
-fun ViewerModeContentPreview() {
-    BaroAlitimeterTheme {
-        ViewerModeContent(
-            pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            altitudeText = "1000",
-            temperatureText = "15.0",
-            onClickTemperature = {},
-            onClickAltitude = {}
-        )
     }
 }
