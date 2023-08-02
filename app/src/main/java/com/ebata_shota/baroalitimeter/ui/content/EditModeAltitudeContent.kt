@@ -22,6 +22,7 @@ fun EditModeAltitudeContent(
     defaultAltitudeText: String,
     temperatureText: String,
     onClickDone: (String) -> Unit,
+    onClickCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -58,7 +59,8 @@ fun EditModeAltitudeContent(
 
         EditTextFieldRow(
             text = defaultAltitudeText,
-            onClickDone = onClickDone
+            onClickDone = onClickDone,
+            onClickCancel = onClickCancel
         )
     }
 }
@@ -75,7 +77,8 @@ fun EditModeAltitudeContentPreview() {
             seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
             defaultAltitudeText = "1000",
             temperatureText = "15.0",
-            onClickDone = {}
+            onClickDone = {},
+            onClickCancel = {}
         )
     }
 }

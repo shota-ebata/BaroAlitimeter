@@ -22,6 +22,7 @@ fun EditModeTemperature(
     altitudeText: String,
     defaultTemperatureText: String,
     onClickDone: (String) -> Unit,
+    onClickCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -49,7 +50,8 @@ fun EditModeTemperature(
 
         EditTextFieldRow(
             text = defaultTemperatureText,
-            onClickDone = onClickDone
+            onClickDone = onClickDone,
+            onClickCancel = onClickCancel
         )
 
         Row(
@@ -75,7 +77,8 @@ fun EditModeTemperaturePreview() {
             seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
             altitudeText = "1000",
             defaultTemperatureText = "15.0",
-            onClickDone = {}
+            onClickDone = {},
+            onClickCancel = {}
         )
     }
 }

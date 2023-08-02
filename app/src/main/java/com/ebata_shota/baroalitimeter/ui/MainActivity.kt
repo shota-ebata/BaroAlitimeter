@@ -72,7 +72,8 @@ class MainActivity : ComponentActivity() {
                                 seaLevelPressure = state.seaLevelPressureText,
                                 defaultAltitudeText = state.defaultAltitudeText,
                                 temperatureText = state.temperatureText,
-                                onClickDone = viewModel::setAltitude
+                                onClickDone = viewModel::setAltitude,
+                                onClickCancel = viewModel::changeModeToViewer
                             )
                         }
 
@@ -82,7 +83,8 @@ class MainActivity : ComponentActivity() {
                                 seaLevelPressure = state.seaLevelPressureText,
                                 altitudeText = state.altitudeText,
                                 defaultTemperatureText = state.defaultTemperatureText,
-                                onClickDone = viewModel::setTemperature
+                                onClickDone = viewModel::setTemperature,
+                                onClickCancel = viewModel::changeModeToViewer
                             )
                         }
                     }
@@ -108,40 +110,6 @@ fun ViewerModeContentPreview() {
             temperatureText = "15.0",
             onClickTemperature = {},
             onClickAltitude = {}
-        )
-    }
-}
-
-@Preview(
-    showBackground = true,
-    widthDp = 360
-)
-@Composable
-fun EditModeAltitudeContentPreview() {
-    BaroAlitimeterTheme {
-        EditModeAltitudeContent(
-            pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            defaultAltitudeText = "1000",
-            temperatureText = "15.0",
-            onClickDone = {}
-        )
-    }
-}
-
-@Preview(
-    showBackground = true,
-    widthDp = 360
-)
-@Composable
-fun EditModeTemperaturePreview() {
-    BaroAlitimeterTheme {
-        EditModeTemperature(
-            pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            altitudeText = "1000",
-            defaultTemperatureText = "15.0",
-            onClickDone = {}
         )
     }
 }

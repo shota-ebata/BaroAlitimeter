@@ -35,7 +35,8 @@ import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 fun EditTextFieldRow(
     text: String?,
     onClickDone: (String) -> Unit,
-    modifier: Modifier = Modifier
+    onClickCancel: () -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
@@ -43,6 +44,14 @@ fun EditTextFieldRow(
             .height(100.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        Button(
+            modifier = modifier
+                .padding(end = 8.dp)
+                .height(48.dp),
+            onClick = onClickCancel,
+        ) {
+            Text(text = "キャンセル")
+        }
         val focusRequester = remember {
             FocusRequester()
         }
@@ -78,7 +87,9 @@ fun EditTextFieldRow(
             focusRequester.requestFocus()
         }
         Button(
-            modifier = modifier.padding(start = 8.dp),
+            modifier = modifier
+                .padding(start = 8.dp)
+                .height(48.dp),
             onClick = {
                 onClickDone(textFieldValue.text)
             },
@@ -94,7 +105,8 @@ fun EditTextFieldPreview() {
     BaroAlitimeterTheme {
         EditTextFieldRow(
             text = "1000",
-            onClickDone = {}
+            onClickDone = {},
+            onClickCancel = {}
         )
     }
 }
