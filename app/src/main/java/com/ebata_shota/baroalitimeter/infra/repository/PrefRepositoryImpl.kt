@@ -32,12 +32,24 @@ constructor(
     // 海面気圧 デフォルトは1013.25f
     private val seaLevelPressureFlow: Flow<Float> by prefFlow(AppPreferencesKeys.SEA_LEVEL_PRESSURE, SensorManager.PRESSURE_STANDARD_ATMOSPHERE)
 
-    override suspend fun setSeaLevelPressure(value: Float) {
-        setPrefValue(AppPreferencesKeys.SEA_LEVEL_PRESSURE, value)
-    }
-
     // 気温
     private val temperatureFlow: Flow<Float> by prefFlow(AppPreferencesKeys.TEMPERATURE, 15.0F)
+
+    // 一つ前の海面気圧
+    private val oldSeaLevelPressureFlow: Flow<Float?> by prefFlow(AppPreferencesKeys.OLD_SEA_LEVEL_PRESSURE, null)
+
+    // 一つ前の気温
+    private val oldTemperatureFlow: Flow<Float?> by prefFlow(AppPreferencesKeys.OLD_TEMPERATURE, null)
+
+    // 気温センサーを使うか
+    private val useTemperatureSensorFlow: Flow<Boolean> by prefFlow(AppPreferencesKeys.USE_TEMPERATURE_SENSOR, sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null)
+
+    override suspend fun setSeaLevelPressure(value: Float) {
+        getSeaLevelPressure().getOrNull()?.let {
+            setPrefValue(AppPreferencesKeys.OLD_SEA_LEVEL_PRESSURE, it)
+        }
+        setPrefValue(AppPreferencesKeys.SEA_LEVEL_PRESSURE, value)
+    }
 
     override suspend fun getTemperature(): Result<Float> {
         return Result.runCatching {
@@ -46,11 +58,24 @@ constructor(
     }
 
     override suspend fun setTemperature(value: Float) {
+        getTemperature().getOrNull()?.let {
+            setPrefValue(AppPreferencesKeys.OLD_TEMPERATURE, it)
+        }
         setPrefValue(AppPreferencesKeys.TEMPERATURE, value)
     }
 
-    // 気温センサーを使うか
-    private val useTemperatureSensorFlow: Flow<Boolean> by prefFlow(AppPreferencesKeys.USE_TEMPERATURE_SENSOR, sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null)
+    override suspend fun undoSeaLevelPressure() {
+        getOldSeaLevelPressure().getOrNull()?.let { oldSeaLevelPressure ->
+            setSeaLevelPressure(oldSeaLevelPressure)
+        }
+    }
+
+    override suspend fun undoTemperature() {
+        getOldTemperature().getOrNull()?.let { oldTemperature ->
+            setTemperature(oldTemperature)
+        }
+    }
+
     override suspend fun setUseTemperatureSensor(value: Boolean) {
         setPrefValue(AppPreferencesKeys.USE_TEMPERATURE_SENSOR, value)
     }
@@ -67,9 +92,28 @@ constructor(
         )
     }
 
+    private suspend fun getOldTemperature(): Result<Float?> {
+        return Result.runCatching {
+            oldTemperatureFlow.first()
+        }
+    }
+
+    private suspend fun getOldSeaLevelPressure(): Result<Float?> {
+        return Result.runCatching {
+            oldSeaLevelPressureFlow.first()
+        }
+    }
+
+    private suspend fun getSeaLevelPressure(): Result<Float> {
+        return Result.runCatching {
+            seaLevelPressureFlow.first()
+        }
+    }
+
     // ---------------------------------------------------------------------------------------------
 
-    private fun <T> prefFlow(key: Preferences.Key<T>, defaultValue: T) = ReadOnlyProperty<PrefRepositoryImpl, Flow<T>> { thisRef, _ ->
+    @Suppress("UNCHECKED_CAST")
+    private fun <T> prefFlow(key: Preferences.Key<T>, defaultValue: T?) = ReadOnlyProperty<PrefRepositoryImpl, Flow<T>> { thisRef, _ ->
         thisRef.dataStore
             .data
             .catch { throwable ->
@@ -79,7 +123,7 @@ constructor(
                     throw throwable
                 }
             }.map { preferences ->
-                preferences[key] ?: defaultValue
+                preferences[key] ?: defaultValue as T
             }
     }
 

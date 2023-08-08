@@ -190,11 +190,15 @@ constructor(
     }
 
     fun undoTemperature() {
-
+        viewModelScope.launch {
+            prefRepository.undoTemperature()
+        }
     }
 
     fun undoAltitude() {
-
+        viewModelScope.launch {
+            prefRepository.undoSeaLevelPressure()
+        }
     }
 
     private fun Float?.formattedString(fractionDigits: Int, usesGroupingSeparator: Boolean = false): String {

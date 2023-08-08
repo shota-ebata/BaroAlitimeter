@@ -7,6 +7,8 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 object AppPreferencesKeys {
     val USER_UID = stringPreferencesKey("userUid")
     val SEA_LEVEL_PRESSURE = floatPreferencesKey("seaLevelPressure")
+    val OLD_SEA_LEVEL_PRESSURE = floatPreferencesKey("oldSeaLevelPressure")
     val TEMPERATURE = floatPreferencesKey("temperature")
+    val OLD_TEMPERATURE = floatPreferencesKey("oldTemperature")
     val USE_TEMPERATURE_SENSOR = booleanPreferencesKey("useTemperatureSensor")
 }
