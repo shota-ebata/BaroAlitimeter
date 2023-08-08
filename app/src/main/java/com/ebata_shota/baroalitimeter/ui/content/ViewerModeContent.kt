@@ -28,47 +28,42 @@ fun ViewerModeContent(
     onClickAltitude: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Column(
+        modifier = modifier.padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            modifier = modifier.padding(8.dp)
         ) {
-            Row(
-                modifier = modifier.padding(8.dp)
-            ) {
-                Text(
-                    modifier = modifier,
-                    fontSize = 40.sp,
-                    text = "$pressureText hPa",
-                )
-            }
-            Row(
-                modifier = modifier.padding(
-                    top = 8.dp,
-                    bottom = 16.dp
-                )
-            ) {
-                Text(text = "海面気圧 $seaLevelPressure hPa")
-            }
-            Row(
-                modifier = modifier.padding(8.dp)
-            ) {
-                ClickableCard(
-                    text = "$temperatureText ℃",
-                    onClick = onClickTemperature,
-                )
-            }
-            Row(
-                modifier = modifier.padding(8.dp)
-            ) {
-                ClickableCard(
-                    text = "$altitudeText m",
-                    onClick = onClickAltitude,
-                )
-            }
+            Text(
+                modifier = modifier,
+                fontSize = 40.sp,
+                text = "$pressureText hPa",
+            )
+        }
+        Row(
+            modifier = modifier.padding(
+                top = 8.dp,
+                bottom = 16.dp
+            )
+        ) {
+            Text(text = "海面気圧 $seaLevelPressure hPa")
+        }
+        Row(
+            modifier = modifier.padding(8.dp)
+        ) {
+            ClickableCard(
+                text = "$temperatureText ℃",
+                onClick = onClickTemperature,
+            )
+        }
+        Row(
+            modifier = modifier.padding(8.dp)
+        ) {
+            ClickableCard(
+                text = "$altitudeText m",
+                onClick = onClickAltitude,
+            )
         }
     }
 }
@@ -87,13 +82,18 @@ fun ViewerModeContent(
 @Composable
 fun ViewerModeContentPreview() {
     BaroAlitimeterTheme {
-        ViewerModeContent(
-            pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            altitudeText = "1000",
-            temperatureText = "15.0",
-            onClickTemperature = {},
-            onClickAltitude = {}
-        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            ViewerModeContent(
+                pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
+                seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
+                altitudeText = "1000",
+                temperatureText = "15.0",
+                onClickTemperature = {},
+                onClickAltitude = {}
+            )
+        }
     }
 }

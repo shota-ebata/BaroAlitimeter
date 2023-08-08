@@ -189,6 +189,14 @@ constructor(
         }
     }
 
+    fun undoTemperature() {
+
+    }
+
+    fun undoAltitude() {
+
+    }
+
     private fun Float?.formattedString(fractionDigits: Int, usesGroupingSeparator: Boolean = false): String {
         // nullの場合は空文字
         if (this == null) return ""

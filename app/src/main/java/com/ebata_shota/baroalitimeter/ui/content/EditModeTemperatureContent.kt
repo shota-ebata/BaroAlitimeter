@@ -29,47 +29,42 @@ fun EditModeTemperature(
     onClickCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Surface(
-        modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+    Column(
+        modifier = modifier.padding(16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(
-            modifier = modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+        Row(
+            modifier = modifier.padding(8.dp)
         ) {
-            Row(
-                modifier = modifier.padding(8.dp)
-            ) {
-                Text(
-                    modifier = modifier,
-                    fontSize = 40.sp,
-                    text = "$pressureText hPa",
-                )
-            }
-
-            Row(
-                modifier = modifier.padding(
-                    top = 8.dp,
-                    bottom = 16.dp
-                )
-            ) {
-                Text(text = "海面気圧 $seaLevelPressure hPa")
-            }
-
-            EditTextFieldRow(
-                text = defaultTemperatureText,
-                onClickDone = onClickDone,
-                onClickCancel = onClickCancel
+            Text(
+                modifier = modifier,
+                fontSize = 40.sp,
+                text = "$pressureText hPa",
             )
+        }
 
-            Row(
-                modifier = modifier.padding(8.dp)
-            ) {
-                ClickableCard(
-                    text = "$altitudeText m",
-                    onClick = null,
-                )
-            }
+        Row(
+            modifier = modifier.padding(
+                top = 8.dp,
+                bottom = 16.dp
+            )
+        ) {
+            Text(text = "海面気圧 $seaLevelPressure hPa")
+        }
+
+        EditTextFieldRow(
+            text = defaultTemperatureText,
+            onClickDone = onClickDone,
+            onClickCancel = onClickCancel
+        )
+
+        Row(
+            modifier = modifier.padding(8.dp)
+        ) {
+            ClickableCard(
+                text = "$altitudeText m",
+                onClick = null,
+            )
         }
     }
 }
@@ -88,13 +83,18 @@ fun EditModeTemperature(
 @Composable
 fun EditModeTemperaturePreview() {
     BaroAlitimeterTheme {
-        EditModeTemperature(
-            pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-            altitudeText = "1000",
-            defaultTemperatureText = "15",
-            onClickDone = {},
-            onClickCancel = {}
-        )
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            EditModeTemperature(
+                pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
+                seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
+                altitudeText = "1000",
+                defaultTemperatureText = "15",
+                onClickDone = {},
+                onClickCancel = {}
+            )
+        }
     }
 }
