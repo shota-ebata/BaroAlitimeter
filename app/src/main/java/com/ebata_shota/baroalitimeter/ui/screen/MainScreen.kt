@@ -1,4 +1,4 @@
-package com.ebata_shota.baroalitimeter.ui.content
+package com.ebata_shota.baroalitimeter.ui.screen
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -14,12 +14,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import com.ebata_shota.baroalitimeter.ui.content.EditModeAltitudeContent
+import com.ebata_shota.baroalitimeter.ui.content.EditModeTemperature
+import com.ebata_shota.baroalitimeter.ui.content.ViewerModeContent
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainContent(
+fun MainScreen(
     modifier: Modifier = Modifier,
     uiState: MainViewModel.UiState,
     onClickTemperature: () -> Unit,
