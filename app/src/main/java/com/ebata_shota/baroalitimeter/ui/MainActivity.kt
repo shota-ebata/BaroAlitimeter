@@ -10,7 +10,6 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.ebata_shota.baroalitimeter.domain.extensions.collect
-import com.ebata_shota.baroalitimeter.domain.model.content.UserActionEvent
 import com.ebata_shota.baroalitimeter.ui.content.MainContent
 import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
@@ -27,8 +26,7 @@ class MainActivity : ComponentActivity() {
         // FIXME: もう少しうまく隠せないか？
         val onBackPressedCallback = object : OnBackPressedCallback(enabled = false) {
             override fun handleOnBackPressed() {
-                viewModel.logUserActionEvent(UserActionEvent.OnBackPressedCallback)
-                viewModel.changeModeToViewer()
+                viewModel.onBackPressedCallback()
             }
         }
         onBackPressedDispatcher.addCallback(owner = this, onBackPressedCallback)
@@ -45,12 +43,14 @@ class MainActivity : ComponentActivity() {
                     uiState = uiState,
                     onClickTemperature = viewModel::changeModeToEditTemperature,
                     onClickAltitude = viewModel::changeModeToEditAltitude,
-                    onClickCancel = viewModel::changeModeToViewer,
-                    setAltitude = viewModel::setAltitude,
-                    setTemperature = viewModel::setTemperature,
+                    onClickCancelTemperature = viewModel::cancelEditTemperature,
+                    onClickCancelAltitude = viewModel::cancelEditAltitude,
+                    setAltitude = viewModel::setAltitude, // TODO: setTemperatureと書くべきか、onDoneEditTemperatureと書くべきか？
+                    setTemperature = viewModel::setTemperature, // TODO: setAltitudeと書くべきか、onDoneEditAltitudeと書くべきか？
                     undoAltitude = viewModel::undoAltitude,
                     undoTemperature = viewModel::undoTemperature,
-                    logUserActionEvent = viewModel::logUserActionEvent
+                    onDismissedAltitudeSnackbar = viewModel::onDismissedAltitudeSnackbar,
+                    onDismissedTemperatureSnackBar = viewModel::onDismissedTemperatureSnackBar,
                 )
             }
         }

@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import com.ebata_shota.baroalitimeter.domain.model.content.UserActionEvent
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -25,12 +24,14 @@ fun MainContent(
     uiState: MainViewModel.UiState,
     onClickTemperature: () -> Unit,
     onClickAltitude: () -> Unit,
-    onClickCancel: () -> Unit,
+    onClickCancelTemperature: () -> Unit,
+    onClickCancelAltitude: () -> Unit,
     setAltitude: (String) -> Unit,
     setTemperature: (String) -> Unit,
     undoAltitude: () -> Unit,
     undoTemperature: () -> Unit,
-    logUserActionEvent: (UserActionEvent) -> Unit,
+    onDismissedAltitudeSnackbar: () -> Unit,
+    onDismissedTemperatureSnackBar: () -> Unit,
 ) {
     val snackbarHostState: SnackbarHostState = remember {
         SnackbarHostState()
@@ -56,14 +57,8 @@ fun MainContent(
                         pressureText = uiState.pressureText,
                         altitudeText = uiState.altitudeText,
                         temperatureText = uiState.temperatureText,
-                        onClickTemperature = {
-                            logUserActionEvent(UserActionEvent.EditTemperature)
-                            onClickTemperature()
-                        },
-                        onClickAltitude = {
-                            logUserActionEvent(UserActionEvent.EditAltitude)
-                            onClickAltitude()
-                        },
+                        onClickTemperature = onClickTemperature,
+                        onClickAltitude = onClickAltitude,
                         seaLevelPressure = uiState.seaLevelPressureText
                     )
                 }
@@ -75,7 +70,6 @@ fun MainContent(
                         defaultAltitudeText = uiState.defaultAltitudeText,
                         temperatureText = uiState.temperatureText,
                         onClickDone = {
-                            logUserActionEvent(UserActionEvent.DoneEditAltitude)
                             setAltitude(it) // FIXME: suspendにしたほうがよいか？
                             scope.launch {
                                 val snackbarResult = snackbarHostState.showSnackbar(
@@ -84,21 +78,13 @@ fun MainContent(
                                     withDismissAction = true,
                                     duration = SnackbarDuration.Short
                                 )
-                                when(snackbarResult) {
-                                    SnackbarResult.Dismissed -> {
-                                        logUserActionEvent(UserActionEvent.DismissedUndoAltitude)
-                                    }
-                                    SnackbarResult.ActionPerformed -> {
-                                        logUserActionEvent(UserActionEvent.UndoAltitude)
-                                        undoAltitude()
-                                    }
+                                when (snackbarResult) {
+                                    SnackbarResult.Dismissed -> onDismissedAltitudeSnackbar()
+                                    SnackbarResult.ActionPerformed -> undoAltitude()
                                 }
                             }
                         },
-                        onClickCancel = {
-                            logUserActionEvent(UserActionEvent.CancelEditAltitudeByButton)
-                            onClickCancel()
-                        }
+                        onClickCancel = onClickCancelAltitude
                     )
                 }
 
@@ -109,8 +95,7 @@ fun MainContent(
                         altitudeText = uiState.altitudeText,
                         defaultTemperatureText = uiState.defaultTemperatureText,
                         onClickDone = {
-                            logUserActionEvent(UserActionEvent.DoneEditTemperature)
-                            setTemperature(it)
+                            setTemperature(it) // FIXME: suspendにしたほうがよいか？
                             scope.launch {
                                 val snackbarResult = snackbarHostState.showSnackbar(
                                     message = "気温を変更",
@@ -118,21 +103,13 @@ fun MainContent(
                                     withDismissAction = true,
                                     duration = SnackbarDuration.Short
                                 )
-                                when(snackbarResult) {
-                                    SnackbarResult.Dismissed -> {
-                                        logUserActionEvent(UserActionEvent.DismissedUndoTemperature)
-                                    }
-                                    SnackbarResult.ActionPerformed -> {
-                                        logUserActionEvent(UserActionEvent.UndoTemperature)
-                                        undoTemperature()
-                                    }
+                                when (snackbarResult) {
+                                    SnackbarResult.Dismissed -> onDismissedTemperatureSnackBar()
+                                    SnackbarResult.ActionPerformed -> undoTemperature()
                                 }
                             }
                         },
-                        onClickCancel = {
-                            logUserActionEvent(UserActionEvent.CancelEditTemperatureByButton)
-                            onClickCancel()
-                        }
+                        onClickCancel = onClickCancelTemperature
                     )
                 }
             }

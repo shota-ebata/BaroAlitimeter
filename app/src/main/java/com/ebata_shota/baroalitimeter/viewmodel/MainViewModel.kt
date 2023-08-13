@@ -132,21 +132,43 @@ constructor(
 
     fun changeModeToEditTemperature() {
         if (uiState.value is UiState.ViewerMode) {
+            logUserActionEvent(UserActionEvent.EditTemperature)
             _modeState.value = Mode.EditTemperature
         }
     }
 
     fun changeModeToEditAltitude() {
         if (uiState.value is UiState.ViewerMode) {
+            logUserActionEvent(UserActionEvent.EditAltitude)
             _modeState.value = Mode.EditAltitude
         }
     }
 
-    fun changeModeToViewer() {
+    fun cancelEditTemperature() {
+        logUserActionEvent(UserActionEvent.CancelEditTemperatureByButton)
+        changeModeToViewer()
+    }
+
+    fun cancelEditAltitude() {
+        logUserActionEvent(UserActionEvent.CancelEditAltitudeByButton)
+        changeModeToViewer()
+    }
+
+    fun onBackPressedCallback() {
+        when (uiState.value) {
+            is UiState.EditAltitudeMode -> logUserActionEvent(UserActionEvent.CancelEditAltitudeByOnBackPressedCallback)
+            is UiState.EditTemperatureMode -> logUserActionEvent(UserActionEvent.CancelEditTemperatureByOnBackPressedCallback)
+            else -> Unit
+        }
+        changeModeToViewer()
+    }
+
+    private fun changeModeToViewer() {
         _modeState.value = Mode.Viewer
     }
 
     fun setTemperature(temperatureText: String) {
+        logUserActionEvent(UserActionEvent.DoneEditTemperature)
         val state = uiState.value
         val pressureState = sensorRepository.pressureSensorState.value
         if (
@@ -166,8 +188,8 @@ constructor(
             }
         }
     }
-
     fun setAltitude(altitudeText: String) {
+        logUserActionEvent(UserActionEvent.DoneEditAltitude)
         val state = uiState.value
         val pressureState = sensorRepository.pressureSensorState.value
         if (
@@ -194,18 +216,28 @@ constructor(
     }
 
     fun undoTemperature() {
+        logUserActionEvent(UserActionEvent.UndoTemperature)
         viewModelScope.launch {
             prefRepository.undoTemperature()
         }
     }
 
     fun undoAltitude() {
+        logUserActionEvent(UserActionEvent.UndoAltitude)
         viewModelScope.launch {
             prefRepository.undoSeaLevelPressure()
         }
     }
 
-    fun logUserActionEvent(userActionEvent: UserActionEvent) {
+    fun onDismissedAltitudeSnackbar() {
+        logUserActionEvent(UserActionEvent.DismissedUndoAltitude)
+    }
+
+    fun onDismissedTemperatureSnackBar() {
+        logUserActionEvent(UserActionEvent.DismissedUndoTemperature)
+    }
+
+    private fun logUserActionEvent(userActionEvent: UserActionEvent) {
         firebaseAnalytics.logUserActionEvent(userActionEvent)
     }
 

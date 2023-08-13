@@ -42,9 +42,15 @@ enum class UserActionEvent(
             putString(ACTION_TYPE, "Button")
         }
     ),
-    OnBackPressedCallback(
+    CancelEditTemperatureByOnBackPressedCallback(
         param = {
-            putString(ACTION_NAME, "CancelEditChangeModeToViewer")
+            putString(ACTION_NAME, "CancelEditTemperature")
+            putString(ACTION_TYPE, "OnBackPressedCallback")
+        }
+    ),
+    CancelEditAltitudeByOnBackPressedCallback(
+        param = {
+            putString(ACTION_NAME, "CancelEditAltitude")
             putString(ACTION_TYPE, "OnBackPressedCallback")
         }
     ),
