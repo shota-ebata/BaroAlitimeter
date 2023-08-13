@@ -10,6 +10,7 @@ import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.ebata_shota.baroalitimeter.domain.extensions.collect
+import com.ebata_shota.baroalitimeter.domain.model.content.UserActionEvent
 import com.ebata_shota.baroalitimeter.ui.content.MainContent
 import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
@@ -26,6 +27,7 @@ class MainActivity : ComponentActivity() {
         // FIXME: もう少しうまく隠せないか？
         val onBackPressedCallback = object : OnBackPressedCallback(enabled = false) {
             override fun handleOnBackPressed() {
+                viewModel.logUserActionEvent(UserActionEvent.OnBackPressedCallback)
                 viewModel.changeModeToViewer()
             }
         }
@@ -48,6 +50,7 @@ class MainActivity : ComponentActivity() {
                     setTemperature = viewModel::setTemperature,
                     undoAltitude = viewModel::undoAltitude,
                     undoTemperature = viewModel::undoTemperature,
+                    logUserActionEvent = viewModel::logUserActionEvent
                 )
             }
         }

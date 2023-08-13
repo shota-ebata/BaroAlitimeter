@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import com.ebata_shota.baroalitimeter.domain.model.content.UserActionEvent
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 import kotlinx.coroutines.launch
 
@@ -29,6 +30,7 @@ fun MainContent(
     setTemperature: (String) -> Unit,
     undoAltitude: () -> Unit,
     undoTemperature: () -> Unit,
+    logUserActionEvent: (UserActionEvent) -> Unit,
 ) {
     val snackbarHostState: SnackbarHostState = remember {
         SnackbarHostState()
@@ -54,8 +56,14 @@ fun MainContent(
                         pressureText = uiState.pressureText,
                         altitudeText = uiState.altitudeText,
                         temperatureText = uiState.temperatureText,
-                        onClickTemperature = onClickTemperature,
-                        onClickAltitude = onClickAltitude,
+                        onClickTemperature = {
+                            logUserActionEvent(UserActionEvent.EditTemperature)
+                            onClickTemperature()
+                        },
+                        onClickAltitude = {
+                            logUserActionEvent(UserActionEvent.EditAltitude)
+                            onClickAltitude()
+                        },
                         seaLevelPressure = uiState.seaLevelPressureText
                     )
                 }
@@ -67,7 +75,8 @@ fun MainContent(
                         defaultAltitudeText = uiState.defaultAltitudeText,
                         temperatureText = uiState.temperatureText,
                         onClickDone = {
-                            setAltitude(it)
+                            logUserActionEvent(UserActionEvent.DoneEditAltitude)
+                            setAltitude(it) // FIXME: suspendにしたほうがよいか？
                             scope.launch {
                                 val snackbarResult = snackbarHostState.showSnackbar(
                                     message = "高度を変更",
@@ -76,12 +85,20 @@ fun MainContent(
                                     duration = SnackbarDuration.Short
                                 )
                                 when(snackbarResult) {
-                                    SnackbarResult.Dismissed -> Unit
-                                    SnackbarResult.ActionPerformed -> undoAltitude()
+                                    SnackbarResult.Dismissed -> {
+                                        logUserActionEvent(UserActionEvent.DismissedUndoAltitude)
+                                    }
+                                    SnackbarResult.ActionPerformed -> {
+                                        logUserActionEvent(UserActionEvent.UndoAltitude)
+                                        undoAltitude()
+                                    }
                                 }
                             }
                         },
-                        onClickCancel = onClickCancel
+                        onClickCancel = {
+                            logUserActionEvent(UserActionEvent.CancelEditAltitudeByButton)
+                            onClickCancel()
+                        }
                     )
                 }
 
@@ -92,6 +109,7 @@ fun MainContent(
                         altitudeText = uiState.altitudeText,
                         defaultTemperatureText = uiState.defaultTemperatureText,
                         onClickDone = {
+                            logUserActionEvent(UserActionEvent.DoneEditTemperature)
                             setTemperature(it)
                             scope.launch {
                                 val snackbarResult = snackbarHostState.showSnackbar(
@@ -101,12 +119,20 @@ fun MainContent(
                                     duration = SnackbarDuration.Short
                                 )
                                 when(snackbarResult) {
-                                    SnackbarResult.Dismissed -> Unit
-                                    SnackbarResult.ActionPerformed -> undoTemperature()
+                                    SnackbarResult.Dismissed -> {
+                                        logUserActionEvent(UserActionEvent.DismissedUndoTemperature)
+                                    }
+                                    SnackbarResult.ActionPerformed -> {
+                                        logUserActionEvent(UserActionEvent.UndoTemperature)
+                                        undoTemperature()
+                                    }
                                 }
                             }
                         },
-                        onClickCancel = onClickCancel
+                        onClickCancel = {
+                            logUserActionEvent(UserActionEvent.CancelEditTemperatureByButton)
+                            onClickCancel()
+                        }
                     )
                 }
             }

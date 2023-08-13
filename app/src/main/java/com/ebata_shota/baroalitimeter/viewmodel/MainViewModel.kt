@@ -3,12 +3,15 @@ package com.ebata_shota.baroalitimeter.viewmodel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.baroalitimeter.domain.extensions.collect
+import com.ebata_shota.baroalitimeter.domain.extensions.logUserActionEvent
 import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
 import com.ebata_shota.baroalitimeter.domain.model.Temperature
+import com.ebata_shota.baroalitimeter.domain.model.content.UserActionEvent
 import com.ebata_shota.baroalitimeter.domain.repository.CalcRepository
 import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
 import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
+import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -26,6 +29,7 @@ constructor(
     private val sensorRepository: SensorRepository,
     private val prefRepository: PrefRepository,
     private val calcRepository: CalcRepository,
+    private val firebaseAnalytics: FirebaseAnalytics,
 ) : ViewModel() {
 
     sealed class UiState {
@@ -199,6 +203,10 @@ constructor(
         viewModelScope.launch {
             prefRepository.undoSeaLevelPressure()
         }
+    }
+
+    fun logUserActionEvent(userActionEvent: UserActionEvent) {
+        firebaseAnalytics.logUserActionEvent(userActionEvent)
     }
 
     private fun Float?.formattedString(fractionDigits: Int, usesGroupingSeparator: Boolean = false): String {
