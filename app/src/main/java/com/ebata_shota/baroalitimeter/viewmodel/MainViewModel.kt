@@ -2,7 +2,6 @@ package com.ebata_shota.baroalitimeter.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ebata_shota.baroalitimeter.domain.extensions.collect
 import com.ebata_shota.baroalitimeter.domain.extensions.logUserActionEvent
 import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
@@ -14,10 +13,12 @@ import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -64,38 +65,36 @@ constructor(
         EditAltitude,
     }
 
-    private val _uiState: MutableStateFlow<UiState> = MutableStateFlow(UiState.Loading)
-    val uiState: StateFlow<UiState> = _uiState.asStateFlow()
-
     private val _modeState: MutableStateFlow<Mode> = MutableStateFlow(Mode.Viewer)
     private val modeState: StateFlow<Mode> = _modeState.asStateFlow()
 
-    init {
-
-        combine(
-            modeState,
-            sensorRepository.pressureSensorState,
-            sensorRepository.temperatureSensorState,
-            prefRepository.preferencesFlow,
-        ) {
-                mode: Mode,
-                pressureSensorState: Pressure,
-                temperatureSensorState: Temperature, // TODO: temperatureSensorStateをうまく使う
-                preferencesModel: PreferencesModel,
-            ->
-            when (pressureSensorState) {
-                is Pressure.Loading -> UiState.Loading
-                is Pressure.Success -> when (mode) {
-                    Mode.Viewer -> createViewMode(pressureSensorState, preferencesModel.seaLevelPressure, preferencesModel.temperature)
-                    Mode.EditTemperature -> createEditModeTemperature(pressureSensorState, preferencesModel.seaLevelPressure, preferencesModel.temperature)
-                    Mode.EditAltitude -> createEditModeAltitude(pressureSensorState, preferencesModel.seaLevelPressure, preferencesModel.temperature)
-                }
+    val uiState: StateFlow<UiState> = combine(
+        modeState,
+        sensorRepository.pressureSensorState,
+        sensorRepository.temperatureSensorState,
+        prefRepository.preferencesFlow,
+    ) {
+            mode: Mode,
+            pressureSensorState: Pressure,
+            temperatureSensorState: Temperature, // TODO: temperatureSensorStateをうまく使う
+            preferencesModel: PreferencesModel,
+        ->
+        when (pressureSensorState) {
+            is Pressure.Loading -> UiState.Loading
+            is Pressure.Success -> when (mode) {
+                Mode.Viewer -> createViewMode(pressureSensorState, preferencesModel.seaLevelPressure, preferencesModel.temperature)
+                Mode.EditTemperature -> createEditModeTemperature(pressureSensorState, preferencesModel.seaLevelPressure, preferencesModel.temperature)
+                Mode.EditAltitude -> createEditModeAltitude(pressureSensorState, preferencesModel.seaLevelPressure, preferencesModel.temperature)
             }
-        }.distinctUntilChanged { old, new ->
-            // 重複を無視する
-            old == new
-        }.collect(viewModelScope, _uiState)
-    }
+        }
+    }.distinctUntilChanged { old, new ->
+        // 重複を無視する
+        old == new
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(),
+        initialValue = UiState.Loading
+    )
 
     private suspend fun createViewMode(pressure: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.ViewerMode(
         pressureText = pressure.value.formattedString(1),
