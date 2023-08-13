@@ -55,7 +55,7 @@ fun EditTextFieldRow(
         val focusRequester = remember {
             FocusRequester()
         }
-        var textFieldValue by remember {
+        var textFieldValue by remember { // TODO: viewModelのStateFlowで保持したほうか良いのか？
             val altitudeEditTextValue = text.toString()
             mutableStateOf(
                 TextFieldValue(
