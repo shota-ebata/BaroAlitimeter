@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
+import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
 import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
 import com.ebata_shota.baroalitimeter.infra.AppPreferencesKeys
 import kotlinx.coroutines.flow.Flow
@@ -25,8 +26,8 @@ constructor(
     sensorManager: SensorManager,
 ) : PrefRepository {
 
-    // ダークテーマフラグ
-    private val darkThemeFlow: Flow<Boolean?> by prefFlow(AppPreferencesKeys.DARK_THERE, null)
+    // テーマモード
+    private val themeFlow: Flow<String> by prefFlow(AppPreferencesKeys.THEME_MODE, ThemeMode.SYSTEM.name)
 
     // 海面気圧 デフォルトは1013.25f
     private val seaLevelPressureFlow: Flow<Float> by prefFlow(AppPreferencesKeys.SEA_LEVEL_PRESSURE, SensorManager.PRESSURE_STANDARD_ATMOSPHERE)
@@ -43,12 +44,8 @@ constructor(
     // 気温センサーを使うか
     private val useTemperatureSensorFlow: Flow<Boolean> by prefFlow(AppPreferencesKeys.USE_TEMPERATURE_SENSOR, sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null)
 
-    override suspend fun setDarkTheme(value: Boolean?) {
-        if (value != null) {
-            setPrefValue(AppPreferencesKeys.DARK_THERE, value)
-        } else {
-            removePref(AppPreferencesKeys.DARK_THERE)
-        }
+    override suspend fun setThemeMode(value: ThemeMode) {
+        setPrefValue(AppPreferencesKeys.THEME_MODE, value.name)
     }
 
     override suspend fun setSeaLevelPressure(value: Float) {
@@ -88,16 +85,16 @@ constructor(
     }
 
     override val preferencesFlow: Flow<PreferencesModel> = combine(
-        darkThemeFlow,
+        themeFlow,
         seaLevelPressureFlow,
         temperatureFlow,
         useTemperatureSensorFlow
-    ) { darkTheme, seaLevelPressure, temperature, useTemperatureSensor ->
+    ) { theme, seaLevelPressure, temperature, useTemperatureSensor ->
         PreferencesModel(
-            darkTheme,
-            seaLevelPressure,
-            temperature,
-            useTemperatureSensor
+            themeMode = ThemeMode.values().find { it.valueName == theme } ?: throw IllegalStateException("PrefのThemeMode がありえない値になっている"),
+            seaLevelPressure = seaLevelPressure,
+            temperature = temperature,
+            useTemperatureSensor = useTemperatureSensor
         )
     }
 

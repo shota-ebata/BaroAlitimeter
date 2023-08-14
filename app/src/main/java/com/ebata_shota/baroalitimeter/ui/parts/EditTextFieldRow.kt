@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -24,6 +25,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.ebata_shota.baroalitimeter.R
 import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 
 @Composable
@@ -47,7 +49,7 @@ fun EditTextFieldRow(
                 .height(48.dp),
             onClick = onClickCancel,
         ) {
-            Text(text = "キャンセル")
+            Text(text = stringResource(id = R.string.cancel))
         }
         val focusRequester = remember {
             FocusRequester()
@@ -76,7 +78,7 @@ fun EditTextFieldRow(
                 .height(48.dp),
             onClick = onClickDone,
         ) {
-            Text(text = "完了")
+            Text(text = stringResource(id = R.string.done))
         }
     }
 }

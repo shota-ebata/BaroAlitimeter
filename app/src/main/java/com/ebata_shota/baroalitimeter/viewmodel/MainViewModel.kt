@@ -11,6 +11,7 @@ import com.ebata_shota.baroalitimeter.domain.extensions.logUserActionEvent
 import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
 import com.ebata_shota.baroalitimeter.domain.model.Temperature
+import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
 import com.ebata_shota.baroalitimeter.domain.model.content.UserActionEvent
 import com.ebata_shota.baroalitimeter.domain.repository.CalcRepository
 import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
@@ -72,14 +73,20 @@ constructor(
     private val _modeState: MutableStateFlow<Mode> = MutableStateFlow(Mode.Viewer)
     private val modeState: StateFlow<Mode> = _modeState.asStateFlow()
 
-    val darkThemeState: StateFlow<Boolean?> = prefRepository
+    val themeState: StateFlow<ThemeMode?> = prefRepository
         .preferencesFlow
-        .map { it.darkTheme }
+        .map { it.themeMode }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),
             initialValue = null
         )
+
+    fun onSelectedThemeMode(themeMode: ThemeMode) {
+        viewModelScope.launch {
+            prefRepository.setThemeMode(themeMode)
+        }
+    }
 
     var temperatureTextFieldValue: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
