@@ -12,15 +12,11 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
@@ -33,8 +29,9 @@ import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 @Composable
 @OptIn(ExperimentalMaterial3Api::class)
 fun EditTextFieldRow(
-    text: String?,
-    onClickDone: (String) -> Unit,
+    textFieldValue: TextFieldValue,
+    updateTextFieldValue: (TextFieldValue) -> Unit,
+    onClickDone: () -> Unit,
     onClickCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -55,32 +52,19 @@ fun EditTextFieldRow(
         val focusRequester = remember {
             FocusRequester()
         }
-        var textFieldValue by remember { // TODO: viewModelのStateFlowで保持したほうか良いのか？
-            val altitudeEditTextValue = text.toString()
-            mutableStateOf(
-                TextFieldValue(
-                    text = altitudeEditTextValue,
-                    selection = TextRange(altitudeEditTextValue.length)
-                )
-            )
-        }
         OutlinedTextField(
             modifier = modifier
                 .weight(weight = 1.0f)
                 .focusRequester(focusRequester),
             textStyle = TextStyle(fontSize = 40.sp),
             value = textFieldValue,
-            onValueChange = {
-                textFieldValue = it
-            },
+            onValueChange = updateTextFieldValue,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
             ),
             keyboardActions = KeyboardActions(
-                onDone = {
-                    onClickDone(textFieldValue.text)
-                }
+                onDone = { onClickDone() }
             )
         )
         LaunchedEffect(Unit) {
@@ -90,9 +74,7 @@ fun EditTextFieldRow(
             modifier = modifier
                 .padding(start = 8.dp)
                 .height(48.dp),
-            onClick = {
-                onClickDone(textFieldValue.text)
-            },
+            onClick = onClickDone,
         ) {
             Text(text = "完了")
         }
@@ -104,7 +86,8 @@ fun EditTextFieldRow(
 fun EditTextFieldPreview() {
     BaroAlitimeterTheme {
         EditTextFieldRow(
-            text = "1000",
+            textFieldValue = TextFieldValue("1000"),
+            updateTextFieldValue = {},
             onClickDone = {},
             onClickCancel = {}
         )

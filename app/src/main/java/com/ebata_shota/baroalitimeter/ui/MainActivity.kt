@@ -41,12 +41,16 @@ class MainActivity : ComponentActivity() {
             BaroAlitimeterTheme {
                 MainScreen(
                     uiState = uiState,
+                    temperatureTextFieldValue = viewModel.temperatureTextFieldValue,
+                    updateTemperatureTextFieldValue = viewModel::updateTemperatureTextFieldValue,
+                    altitudeTextFieldValue = viewModel.altitudeTextFieldValue,
+                    updateAltitudeTextFieldValue = viewModel::updateAltitudeTextFieldValue,
                     onClickTemperature = viewModel::changeModeToEditTemperature,
                     onClickAltitude = viewModel::changeModeToEditAltitude,
                     onClickCancelTemperature = viewModel::cancelEditTemperature,
                     onClickCancelAltitude = viewModel::cancelEditAltitude,
-                    setAltitude = viewModel::setAltitude, // TODO: setTemperatureと書くべきか、onDoneEditTemperatureと書くべきか？
-                    setTemperature = viewModel::setTemperature, // TODO: setAltitudeと書くべきか、onDoneEditAltitudeと書くべきか？
+                    onCompletedEditTemperature = viewModel::onCompletedEditTemperature,
+                    onCompletedEditAltitude = viewModel::onCompletedEditAltitude,
                     undoAltitude = viewModel::undoAltitude,
                     undoTemperature = viewModel::undoTemperature,
                     onDismissedAltitudeSnackbar = viewModel::onDismissedAltitudeSnackbar,

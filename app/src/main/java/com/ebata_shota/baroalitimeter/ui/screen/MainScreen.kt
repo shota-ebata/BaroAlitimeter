@@ -14,6 +14,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import com.ebata_shota.baroalitimeter.ui.content.EditModeAltitudeContent
 import com.ebata_shota.baroalitimeter.ui.content.EditModeTemperature
 import com.ebata_shota.baroalitimeter.ui.content.ViewerModeContent
@@ -25,12 +26,16 @@ import kotlinx.coroutines.launch
 fun MainScreen(
     modifier: Modifier = Modifier,
     uiState: MainViewModel.UiState,
+    temperatureTextFieldValue: TextFieldValue,
+    updateTemperatureTextFieldValue: (TextFieldValue) -> Unit,
+    altitudeTextFieldValue: TextFieldValue,
+    updateAltitudeTextFieldValue: (TextFieldValue) -> Unit,
     onClickTemperature: () -> Unit,
     onClickAltitude: () -> Unit,
     onClickCancelTemperature: () -> Unit,
     onClickCancelAltitude: () -> Unit,
-    setAltitude: (String) -> Unit,
-    setTemperature: (String) -> Unit,
+    onCompletedEditTemperature: () -> Unit,
+    onCompletedEditAltitude: () -> Unit,
     undoAltitude: () -> Unit,
     undoTemperature: () -> Unit,
     onDismissedAltitudeSnackbar: () -> Unit,
@@ -70,10 +75,11 @@ fun MainScreen(
                     EditModeAltitudeContent(
                         pressureText = uiState.pressureText,
                         seaLevelPressure = uiState.seaLevelPressureText,
-                        defaultAltitudeText = uiState.defaultAltitudeText,
+                        altitudeTextFieldValue = altitudeTextFieldValue,
+                        updateAltitudeTextFieldValue = updateAltitudeTextFieldValue,
                         temperatureText = uiState.temperatureText,
                         onClickDone = {
-                            setAltitude(it) // FIXME: suspendにしたほうがよいか？
+                            onCompletedEditAltitude()
                             scope.launch {
                                 val snackbarResult = snackbarHostState.showSnackbar(
                                     message = "高度を変更",
@@ -95,10 +101,11 @@ fun MainScreen(
                     EditModeTemperature(
                         pressureText = uiState.pressureText,
                         seaLevelPressure = uiState.seaLevelPressureText,
+                        temperatureTextFieldValue = temperatureTextFieldValue,
+                        updateTemperatureTextFieldValue = updateTemperatureTextFieldValue,
                         altitudeText = uiState.altitudeText,
-                        defaultTemperatureText = uiState.defaultTemperatureText,
                         onClickDone = {
-                            setTemperature(it) // FIXME: suspendにしたほうがよいか？
+                            onCompletedEditTemperature()
                             scope.launch {
                                 val snackbarResult = snackbarHostState.showSnackbar(
                                     message = "気温を変更",

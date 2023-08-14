@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -23,9 +24,10 @@ import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 fun EditModeAltitudeContent(
     pressureText: String,
     seaLevelPressure: String,
-    defaultAltitudeText: String,
+    altitudeTextFieldValue: TextFieldValue,
+    updateAltitudeTextFieldValue: (TextFieldValue) -> Unit,
     temperatureText: String,
-    onClickDone: (String) -> Unit,
+    onClickDone: () -> Unit,
     onClickCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -62,7 +64,8 @@ fun EditModeAltitudeContent(
         }
 
         EditTextFieldRow(
-            text = defaultAltitudeText,
+            textFieldValue = altitudeTextFieldValue,
+            updateTextFieldValue = updateAltitudeTextFieldValue,
             onClickDone = onClickDone,
             onClickCancel = onClickCancel
         )
@@ -90,7 +93,8 @@ fun EditModeAltitudeContentPreview() {
             EditModeAltitudeContent(
                 pressureText = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
                 seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE.toString(),
-                defaultAltitudeText = "1000",
+                altitudeTextFieldValue = TextFieldValue("1000"),
+                updateAltitudeTextFieldValue = {},
                 temperatureText = "15",
                 onClickDone = {},
                 onClickCancel = {}

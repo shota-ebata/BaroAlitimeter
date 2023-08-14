@@ -1,5 +1,10 @@
 package com.ebata_shota.baroalitimeter.viewmodel
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.baroalitimeter.domain.extensions.logUserActionEvent
@@ -47,7 +52,6 @@ constructor(
         data class EditTemperatureMode(
             val pressureText: String,
             val seaLevelPressureText: String,
-            val defaultTemperatureText: String,
             val altitudeText: String,
         ) : UiState()
 
@@ -55,7 +59,6 @@ constructor(
             val pressureText: String,
             val seaLevelPressureText: String,
             val temperatureText: String,
-            val defaultAltitudeText: String,
         ) : UiState()
     }
 
@@ -67,6 +70,20 @@ constructor(
 
     private val _modeState: MutableStateFlow<Mode> = MutableStateFlow(Mode.Viewer)
     private val modeState: StateFlow<Mode> = _modeState.asStateFlow()
+
+    var temperatureTextFieldValue: TextFieldValue by mutableStateOf(TextFieldValue(""))
+        private set
+
+    fun updateTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
+        temperatureTextFieldValue = textFieldValue
+    }
+
+    var altitudeTextFieldValue: TextFieldValue by mutableStateOf(TextFieldValue(""))
+        private set
+
+    fun updateAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
+        altitudeTextFieldValue = textFieldValue
+    }
 
     val uiState: StateFlow<UiState> = combine(
         modeState,
@@ -115,30 +132,38 @@ constructor(
             temperature = temperature,
             seaLevelPressure = seaLevelPressure
         ).formattedString(0),
-        defaultTemperatureText = temperature.formattedString(0),
     )
 
-    private suspend fun createEditModeAltitude(pressure: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.EditAltitudeMode(
+    private fun createEditModeAltitude(pressure: Pressure.Success, seaLevelPressure: Float, temperature: Float) = UiState.EditAltitudeMode(
         pressureText = pressure.value.formattedString(1),
         seaLevelPressureText = seaLevelPressure.formattedString(2),
-        defaultAltitudeText = calcRepository.calcAltitude(
-            pressure = pressure.value,
-            temperature = temperature,
-            seaLevelPressure = seaLevelPressure
-        ).formattedString(0),
         temperatureText = temperature.formattedString(0),
     )
 
     fun changeModeToEditTemperature() {
-        if (uiState.value is UiState.ViewerMode) {
+        val state = uiState.value
+        if (state is UiState.ViewerMode) {
             logUserActionEvent(UserActionEvent.EditTemperature)
+            updateTemperatureTextFieldValue(
+                TextFieldValue(
+                    text = state.temperatureText,
+                    selection = TextRange(state.temperatureText.length)
+                )
+            )
             _modeState.value = Mode.EditTemperature
         }
     }
 
     fun changeModeToEditAltitude() {
-        if (uiState.value is UiState.ViewerMode) {
+        val state = uiState.value
+        if (state is UiState.ViewerMode) {
             logUserActionEvent(UserActionEvent.EditAltitude)
+            updateAltitudeTextFieldValue(
+                TextFieldValue(
+                    text = state.altitudeText,
+                    selection = TextRange((state.altitudeText.length))
+                )
+            )
             _modeState.value = Mode.EditAltitude
         }
     }
@@ -166,7 +191,7 @@ constructor(
         _modeState.value = Mode.Viewer
     }
 
-    fun setTemperature(temperatureText: String) {
+    fun onCompletedEditTemperature() {
         logUserActionEvent(UserActionEvent.DoneEditTemperature)
         val state = uiState.value
         val pressureState = sensorRepository.pressureSensorState.value
@@ -176,7 +201,7 @@ constructor(
         ) {
             viewModelScope.launch {
                 try {
-                    val temperature = temperatureText.toFloat() // FIXME: 入力制限をしていないので、Floatの範囲外に入ると問題になる
+                    val temperature = temperatureTextFieldValue.text.toFloat() // FIXME: 入力制限をしていないので、Floatの範囲外に入ると問題になる
                     prefRepository.setTemperature(temperature)
                 } catch (e: NumberFormatException) {
                     // 変換に失敗したら、特に何もない
@@ -187,7 +212,8 @@ constructor(
             }
         }
     }
-    fun setAltitude(altitudeText: String) {
+
+    fun onCompletedEditAltitude() {
         logUserActionEvent(UserActionEvent.DoneEditAltitude)
         val state = uiState.value
         val pressureState = sensorRepository.pressureSensorState.value
@@ -201,7 +227,7 @@ constructor(
                     val newSeaLevelPressure = calcRepository.calcSeaLevelPressure(
                         pressure = pressureState.value,
                         temperature = temperature,
-                        altitude = altitudeText.toFloat() // FIXME: 入力制限をしていないので、Floatの範囲外に入ると問題になる
+                        altitude = altitudeTextFieldValue.text.toFloat() // FIXME: 入力制限をしていないので、Floatの範囲外に入ると問題になる
                     )
                     prefRepository.setSeaLevelPressure(newSeaLevelPressure)
                 } catch (e: NumberFormatException) {
