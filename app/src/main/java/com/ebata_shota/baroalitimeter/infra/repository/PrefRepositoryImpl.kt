@@ -15,7 +15,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.io.IOException
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.properties.ReadOnlyProperty
 
@@ -26,8 +25,8 @@ constructor(
     sensorManager: SensorManager,
 ) : PrefRepository {
 
-    // ユーザUID
-    val userUid: Flow<String> by prefFlow(AppPreferencesKeys.USER_UID, UUID.randomUUID().toString())
+    // ダークテーマフラグ
+    private val darkThemeFlow: Flow<Boolean?> by prefFlow(AppPreferencesKeys.DARK_THERE, null)
 
     // 海面気圧 デフォルトは1013.25f
     private val seaLevelPressureFlow: Flow<Float> by prefFlow(AppPreferencesKeys.SEA_LEVEL_PRESSURE, SensorManager.PRESSURE_STANDARD_ATMOSPHERE)
@@ -43,6 +42,14 @@ constructor(
 
     // 気温センサーを使うか
     private val useTemperatureSensorFlow: Flow<Boolean> by prefFlow(AppPreferencesKeys.USE_TEMPERATURE_SENSOR, sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE) != null)
+
+    override suspend fun setDarkTheme(value: Boolean?) {
+        if (value != null) {
+            setPrefValue(AppPreferencesKeys.DARK_THERE, value)
+        } else {
+            removePref(AppPreferencesKeys.DARK_THERE)
+        }
+    }
 
     override suspend fun setSeaLevelPressure(value: Float) {
         getSeaLevelPressure().getOrNull()?.let {
@@ -81,11 +88,13 @@ constructor(
     }
 
     override val preferencesFlow: Flow<PreferencesModel> = combine(
+        darkThemeFlow,
         seaLevelPressureFlow,
         temperatureFlow,
         useTemperatureSensorFlow
-    ) { seaLevelPressure, temperature, useTemperatureSensor ->
+    ) { darkTheme, seaLevelPressure, temperature, useTemperatureSensor ->
         PreferencesModel(
+            darkTheme,
             seaLevelPressure,
             temperature,
             useTemperatureSensor
@@ -130,6 +139,12 @@ constructor(
     private suspend fun <T> setPrefValue(key: Preferences.Key<T>, value: T) {
         dataStore.edit { preferences ->
             preferences[key] = value
+        }
+    }
+
+    private suspend fun <T> removePref(key: Preferences.Key<T>) {
+        dataStore.edit { preferences ->
+            preferences.remove(key)
         }
     }
 }

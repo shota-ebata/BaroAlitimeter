@@ -6,6 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.getValue
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
@@ -38,7 +39,10 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val uiState: MainViewModel.UiState by viewModel.uiState.collectAsStateWithLifecycle()
-            BaroAlitimeterTheme {
+            val darkTheme: Boolean? by viewModel.darkThemeState.collectAsStateWithLifecycle()
+            BaroAlitimeterTheme(
+                darkTheme = darkTheme ?: isSystemInDarkTheme()
+            ) {
                 MainScreen(
                     uiState = uiState,
                     temperatureTextFieldValue = viewModel.temperatureTextFieldValue,

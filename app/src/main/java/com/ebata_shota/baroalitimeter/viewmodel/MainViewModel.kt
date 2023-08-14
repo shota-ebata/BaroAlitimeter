@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -70,6 +71,15 @@ constructor(
 
     private val _modeState: MutableStateFlow<Mode> = MutableStateFlow(Mode.Viewer)
     private val modeState: StateFlow<Mode> = _modeState.asStateFlow()
+
+    val darkThemeState: StateFlow<Boolean?> = prefRepository
+        .preferencesFlow
+        .map { it.darkTheme }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = null
+        )
 
     var temperatureTextFieldValue: TextFieldValue by mutableStateOf(TextFieldValue(""))
         private set
