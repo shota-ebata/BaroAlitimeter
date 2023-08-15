@@ -13,4 +13,5 @@
     <string name="sea_level_pressure">海面気圧 %1$s hPa</string>
     <string name="temperature">%1$s ℃</string>
     <string name="altitude">%1$s m</string>
+    <string name="oss">オープンソースライブラリ</string>
 </resources>

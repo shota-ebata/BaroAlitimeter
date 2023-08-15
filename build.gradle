@@ -1,4 +1,12 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
+buildscript {
+    dependencies {
+        // oss-licenses-pluginはpluginsを使えないっぽい
+        // https://stackoverflow.com/questions/32352816/what-the-difference-in-applying-gradle-plugin
+        classpath 'com.google.android.gms:oss-licenses-plugin:0.10.6'
+    }
+}
+
 plugins {
     id 'com.android.application' version '8.0.2' apply false
     id 'com.android.library' version '8.0.2' apply false
