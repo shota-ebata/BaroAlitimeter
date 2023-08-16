@@ -1,6 +1,7 @@
 package com.ebata_shota.baroalitimeter.ui.parts
 
 import android.content.Intent
+import android.content.res.Configuration
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentSize
@@ -21,8 +22,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.ebata_shota.baroalitimeter.R
+import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 @Composable
@@ -84,6 +87,29 @@ fun MainTopAppBar(
                     }
                 }
             }
+        )
+    }
+}
+
+@Preview(
+    showBackground = true,
+    name = "Light Mode",
+    widthDp = 360
+)
+@Preview(
+    uiMode = Configuration.UI_MODE_NIGHT_YES,
+    showBackground = true,
+    name = "Dark Mode",
+    widthDp = 360
+)
+@Composable
+fun MainTopAppBarPreview() {
+    BaroAlitimeterTheme {
+        MainTopAppBar(
+            expanded = false,
+            showTopAppBarDropdownMenu = {},
+            hideTopAppBarDropdownMenu = {},
+            onClickTheme = {}
         )
     }
 }
