@@ -32,6 +32,7 @@ import com.ebata_shota.baroalitimeter.ui.content.EditModeAltitudeContent
 import com.ebata_shota.baroalitimeter.ui.content.EditModeTemperature
 import com.ebata_shota.baroalitimeter.ui.content.RadioListContent
 import com.ebata_shota.baroalitimeter.ui.content.ViewerModeContent
+import com.ebata_shota.baroalitimeter.ui.model.ThemeModeRadioOption
 import com.ebata_shota.baroalitimeter.ui.parts.MainTopAppBar
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
@@ -69,12 +70,12 @@ fun MainScreen(
         sheetState = themeModalBottomSheetState,
         sheetContent = {
             RadioListContent(
-                radioOptions = ThemeMode.values(),
-                selectedOption = selectedThemeMode,
-                onOptionSelected = { themeMode ->
+                radioOptions = ThemeModeRadioOption.values(),
+                selectedOption = ThemeModeRadioOption.of(selectedThemeMode),
+                onOptionSelected = { themeModeRadioOption ->
                     coroutineScope.launch {
                         themeModalBottomSheetState.hide()
-                        onSelectedThemeMode(themeMode)
+                        onSelectedThemeMode(themeModeRadioOption.themeMode)
                     }
                 }
             )

@@ -14,4 +14,7 @@
     <string name="temperature">%1$s ℃</string>
     <string name="altitude">%1$s m</string>
     <string name="oss">オープンソースライブラリ</string>
+    <string name="theme_light">Light テーマ</string>
+    <string name="theme_dark">Dark テーマ</string>
+    <string name="theme_system">端末に合わせる</string>
 </resources>
