@@ -13,3 +13,4 @@
 .externalNativeBuild
 .cxx
 local.properties
+/key_store_info.properties

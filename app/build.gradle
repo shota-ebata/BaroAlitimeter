@@ -25,13 +25,33 @@ android {
         }
     }
 
+    signingConfigs {
+        def signFile = file("./../key_store_info.properties")
+        def signingProps = new Properties()
+        signingProps.load(new FileInputStream(signFile))
+        def storeFilePathValue = signingProps['storeFilePathValue']
+        def storePasswordValue = signingProps['storePasswordValue']
+        def keyAliasValue = signingProps['keyAliasValue']
+        def keyPasswordValue = signingProps['keyPasswordValue']
+
+        release {
+            storeFile file(storeFilePathValue)
+            storePassword storePasswordValue
+            keyAlias keyAliasValue
+            keyPassword keyPasswordValue
+        }
+    }
+
     buildTypes {
         debug {
             applicationIdSuffix ".debug"
+            manifestPlaceholders = [appName: "@string/app_name_debug"]
         }
         release {
-            minifyEnabled false
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+            manifestPlaceholders = [appName: "@string/app_name"]
         }
     }
     compileOptions {
