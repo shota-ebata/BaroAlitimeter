@@ -1,6 +1,5 @@
 package com.ebata_shota.baroalitimeter.ui.screen
 
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
@@ -22,7 +21,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
@@ -61,36 +59,19 @@ fun MainScreen(
     onDismissedTemperatureSnackBar: () -> Unit,
 ) {
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
+
+    var shouldShowTopAppBarDropdownMenu: Boolean by remember {
+        mutableStateOf(false)
+    }
+    val snackbarHostState: SnackbarHostState = remember {
+        SnackbarHostState()
+    }
     val themeModalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
         skipHalfExpanded = true
     )
-    ModalBottomSheetLayout(
-        modifier = modifier,
-        sheetState = themeModalBottomSheetState,
-        sheetContent = {
-            RadioListContent(
-                radioOptions = ThemeModeRadioOption.values(),
-                selectedOption = ThemeModeRadioOption.of(selectedThemeMode),
-                onOptionSelected = { themeModeRadioOption ->
-                    coroutineScope.launch {
-                        themeModalBottomSheetState.hide()
-                        onSelectedThemeMode(themeModeRadioOption.themeMode)
-                    }
-                }
-            )
-        }
-    ) {
-        Column(
-            modifier = modifier,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            var shouldShowTopAppBarDropdownMenu: Boolean by remember {
-                mutableStateOf(false)
-            }
-            val snackbarHostState: SnackbarHostState = remember {
-                SnackbarHostState()
-            }
+    Scaffold(
+        topBar = {
             MainTopAppBar(
                 expanded = shouldShowTopAppBarDropdownMenu,
                 showTopAppBarDropdownMenu = { shouldShowTopAppBarDropdownMenu = true },
@@ -101,89 +82,105 @@ fun MainScreen(
                     }
                 }
             )
-            Scaffold(
-                snackbarHost = {
-                    SnackbarHost(
-                        hostState = snackbarHostState
-                    )
-                }
-            ) { innerPadding ->
-                Surface(
-                    modifier = modifier
-                        .padding(innerPadding)
-                        .fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    when (uiState) {
-                        is MainViewModel.UiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
-                        is MainViewModel.UiState.ViewerMode -> {
-                            ViewerModeContent(
-                                pressureText = uiState.pressureText,
-                                altitudeText = uiState.altitudeText,
-                                temperatureText = uiState.temperatureText,
-                                onClickTemperature = onClickTemperature,
-                                onClickAltitude = onClickAltitude,
-                                seaLevelPressure = uiState.seaLevelPressureText
-                            )
+        },
+        snackbarHost = {
+            SnackbarHost(
+                hostState = snackbarHostState
+            )
+        }
+    ) { innerPadding ->
+        ModalBottomSheetLayout(
+            modifier = modifier
+                .padding(innerPadding)
+                .fillMaxSize(),
+            sheetState = themeModalBottomSheetState,
+            sheetContent = {
+                RadioListContent(
+                    radioOptions = ThemeModeRadioOption.values(),
+                    selectedOption = ThemeModeRadioOption.of(selectedThemeMode),
+                    onOptionSelected = { themeModeRadioOption ->
+                        coroutineScope.launch {
+                            themeModalBottomSheetState.hide()
+                            onSelectedThemeMode(themeModeRadioOption.themeMode)
                         }
+                    }
+                )
+            }
+        ) {
+            Surface(
+                modifier = modifier
+                    .fillMaxSize(),
+                color = MaterialTheme.colorScheme.background
+            ) {
+                when (uiState) {
+                    is MainViewModel.UiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
+                    is MainViewModel.UiState.ViewerMode -> {
+                        ViewerModeContent(
+                            pressureText = uiState.pressureText,
+                            altitudeText = uiState.altitudeText,
+                            temperatureText = uiState.temperatureText,
+                            onClickTemperature = onClickTemperature,
+                            onClickAltitude = onClickAltitude,
+                            seaLevelPressure = uiState.seaLevelPressureText
+                        )
+                    }
 
-                        is MainViewModel.UiState.EditAltitudeMode -> {
-                            // FIXME: stringResourceがComposable内部でしか呼び出せなくて、適切な場所に自信がない
-                            val snackBarMessage = stringResource(id = R.string.snack_bar_message_change_altitude)
-                            val snackBarActionLabel = stringResource(id = R.string.snack_bar_action_label_undo)
-                            EditModeAltitudeContent(
-                                pressureText = uiState.pressureText,
-                                seaLevelPressure = uiState.seaLevelPressureText,
-                                altitudeTextFieldValue = altitudeTextFieldValue,
-                                updateAltitudeTextFieldValue = updateAltitudeTextFieldValue,
-                                temperatureText = uiState.temperatureText,
-                                onClickDone = {
-                                    onCompletedEditAltitude()
-                                    coroutineScope.launch {
-                                        val snackbarResult = snackbarHostState.showSnackbar(
-                                            message = snackBarMessage,
-                                            actionLabel = snackBarActionLabel,
-                                            withDismissAction = true,
-                                            duration = SnackbarDuration.Short
-                                        )
-                                        when (snackbarResult) {
-                                            SnackbarResult.Dismissed -> onDismissedAltitudeSnackbar()
-                                            SnackbarResult.ActionPerformed -> undoAltitude()
-                                        }
+                    is MainViewModel.UiState.EditAltitudeMode -> {
+                        // FIXME: stringResourceがComposable内部でしか呼び出せなくて、適切な場所に自信がない
+                        val snackBarMessage = stringResource(id = R.string.snack_bar_message_change_altitude)
+                        val snackBarActionLabel = stringResource(id = R.string.snack_bar_action_label_undo)
+                        EditModeAltitudeContent(
+                            pressureText = uiState.pressureText,
+                            seaLevelPressure = uiState.seaLevelPressureText,
+                            altitudeTextFieldValue = altitudeTextFieldValue,
+                            updateAltitudeTextFieldValue = updateAltitudeTextFieldValue,
+                            temperatureText = uiState.temperatureText,
+                            onClickDone = {
+                                onCompletedEditAltitude()
+                                coroutineScope.launch {
+                                    val snackbarResult = snackbarHostState.showSnackbar(
+                                        message = snackBarMessage,
+                                        actionLabel = snackBarActionLabel,
+                                        withDismissAction = true,
+                                        duration = SnackbarDuration.Short
+                                    )
+                                    when (snackbarResult) {
+                                        SnackbarResult.Dismissed -> onDismissedAltitudeSnackbar()
+                                        SnackbarResult.ActionPerformed -> undoAltitude()
                                     }
-                                },
-                                onClickCancel = onClickCancelAltitude
-                            )
-                        }
+                                }
+                            },
+                            onClickCancel = onClickCancelAltitude
+                        )
+                    }
 
-                        is MainViewModel.UiState.EditTemperatureMode -> {
-                            // FIXME: stringResourceがComposable内部でしか呼び出せなくて、適切な場所に自信がない
-                            val snackBarMessage = stringResource(id = R.string.snack_bar_message_change_temperature)
-                            val snackBarActionLabel = stringResource(id = R.string.snack_bar_action_label_undo)
-                            EditModeTemperature(
-                                pressureText = uiState.pressureText,
-                                seaLevelPressure = uiState.seaLevelPressureText,
-                                temperatureTextFieldValue = temperatureTextFieldValue,
-                                updateTemperatureTextFieldValue = updateTemperatureTextFieldValue,
-                                altitudeText = uiState.altitudeText,
-                                onClickDone = {
-                                    onCompletedEditTemperature()
-                                    coroutineScope.launch {
-                                        val snackbarResult = snackbarHostState.showSnackbar(
-                                            message = snackBarMessage,
-                                            actionLabel = snackBarActionLabel,
-                                            withDismissAction = true,
-                                            duration = SnackbarDuration.Short
-                                        )
-                                        when (snackbarResult) {
-                                            SnackbarResult.Dismissed -> onDismissedTemperatureSnackBar()
-                                            SnackbarResult.ActionPerformed -> undoTemperature()
-                                        }
+                    is MainViewModel.UiState.EditTemperatureMode -> {
+                        // FIXME: stringResourceがComposable内部でしか呼び出せなくて、適切な場所に自信がない
+                        val snackBarMessage = stringResource(id = R.string.snack_bar_message_change_temperature)
+                        val snackBarActionLabel = stringResource(id = R.string.snack_bar_action_label_undo)
+                        EditModeTemperature(
+                            pressureText = uiState.pressureText,
+                            seaLevelPressure = uiState.seaLevelPressureText,
+                            temperatureTextFieldValue = temperatureTextFieldValue,
+                            updateTemperatureTextFieldValue = updateTemperatureTextFieldValue,
+                            altitudeText = uiState.altitudeText,
+                            onClickDone = {
+                                onCompletedEditTemperature()
+                                coroutineScope.launch {
+                                    val snackbarResult = snackbarHostState.showSnackbar(
+                                        message = snackBarMessage,
+                                        actionLabel = snackBarActionLabel,
+                                        withDismissAction = true,
+                                        duration = SnackbarDuration.Short
+                                    )
+                                    when (snackbarResult) {
+                                        SnackbarResult.Dismissed -> onDismissedTemperatureSnackBar()
+                                        SnackbarResult.ActionPerformed -> undoTemperature()
                                     }
-                                },
-                                onClickCancel = onClickCancelTemperature
-                            )
-                        }
+                                }
+                            },
+                            onClickCancel = onClickCancelTemperature
+                        )
                     }
                 }
             }
