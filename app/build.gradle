@@ -44,12 +44,16 @@ android {
 
     buildTypes {
         debug {
+            shrinkResources false
+            minifyEnabled false
+            debuggable true
             applicationIdSuffix ".debug"
             manifestPlaceholders = [appName: "@string/app_name_debug"]
         }
         release {
             shrinkResources true
             minifyEnabled true
+            debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             signingConfig signingConfigs.release
             manifestPlaceholders = [appName: "@string/app_name"]
