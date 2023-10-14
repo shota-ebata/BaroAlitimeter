@@ -24,6 +24,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ebata_shota.baroalitimeter.R
 import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
 import com.ebata_shota.baroalitimeter.ui.content.EditModeAltitudeContent
@@ -40,12 +43,10 @@ import kotlinx.coroutines.launch
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    uiState: MainViewModel.UiState,
+    viewModel: MainViewModel = viewModel(),
     selectedThemeMode: ThemeMode,
     onSelectedThemeMode: (ThemeMode) -> Unit,
-    temperatureTextFieldValue: TextFieldValue,
     updateTemperatureTextFieldValue: (TextFieldValue) -> Unit,
-    altitudeTextFieldValue: TextFieldValue,
     updateAltitudeTextFieldValue: (TextFieldValue) -> Unit,
     onClickTemperature: () -> Unit,
     onClickAltitude: () -> Unit,
@@ -58,6 +59,7 @@ fun MainScreen(
     onDismissedAltitudeSnackbar: () -> Unit,
     onDismissedTemperatureSnackBar: () -> Unit,
 ) {
+    val uiState: MainViewModel.UiState by viewModel.uiState.collectAsStateWithLifecycle()
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     var shouldShowTopAppBarDropdownMenu: Boolean by remember {
@@ -112,7 +114,7 @@ fun MainScreen(
                     .fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                when (uiState) {
+                when (val uiState = uiState) {
                     is MainViewModel.UiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
                     is MainViewModel.UiState.ViewerMode -> {
                         ViewerModeContent(
@@ -132,7 +134,7 @@ fun MainScreen(
                         EditModeAltitudeContent(
                             pressureText = uiState.pressureText,
                             seaLevelPressure = uiState.seaLevelPressureText,
-                            altitudeTextFieldValue = altitudeTextFieldValue,
+                            altitudeTextFieldValue = uiState.altitudeTextFieldValue,
                             updateAltitudeTextFieldValue = updateAltitudeTextFieldValue,
                             temperatureText = uiState.temperatureText,
                             onClickDone = {
@@ -161,7 +163,7 @@ fun MainScreen(
                         EditModeTemperature(
                             pressureText = uiState.pressureText,
                             seaLevelPressure = uiState.seaLevelPressureText,
-                            temperatureTextFieldValue = temperatureTextFieldValue,
+                            temperatureTextFieldValue = uiState.temperatureTextFieldValue,
                             updateTemperatureTextFieldValue = updateTemperatureTextFieldValue,
                             altitudeText = uiState.altitudeText,
                             onClickDone = {

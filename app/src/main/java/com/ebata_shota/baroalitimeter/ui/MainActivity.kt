@@ -45,18 +45,16 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val uiState: MainViewModel.UiState by viewModel.uiState.collectAsStateWithLifecycle()
             val themeMode: ThemeMode? by viewModel.themeState.collectAsStateWithLifecycle()
             themeMode?.let { // FIXME: nullableなのなーんかイケてない
-                MainContent(it, uiState)
+                MainContent(it)
             }
         }
     }
 
     @Composable
     private fun MainContent(
-        themeMode: ThemeMode,
-        uiState: MainViewModel.UiState
+        themeMode: ThemeMode
     ) {
         BaroAlitimeterTheme(
             darkTheme = when (themeMode) {
@@ -66,12 +64,9 @@ class MainActivity : ComponentActivity() {
             }
         ) {
             MainScreen(
-                uiState = uiState,
                 selectedThemeMode = themeMode,
                 onSelectedThemeMode = viewModel::onSelectedThemeMode,
-                temperatureTextFieldValue = viewModel.temperatureTextFieldValue,
                 updateTemperatureTextFieldValue = viewModel::updateTemperatureTextFieldValue,
-                altitudeTextFieldValue = viewModel.altitudeTextFieldValue,
                 updateAltitudeTextFieldValue = viewModel::updateAltitudeTextFieldValue,
                 onClickTemperature = viewModel::changeModeToEditTemperature,
                 onClickAltitude = viewModel::changeModeToEditAltitude,
