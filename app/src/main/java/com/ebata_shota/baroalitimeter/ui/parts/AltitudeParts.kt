@@ -13,10 +13,7 @@ import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 @Composable
 fun AltitudeParts(
     uiState: MainViewModel.MainUiState.AltitudeUiState,
-    onChangeTextFieldValue: (TextFieldValue) -> Unit,
-    onClickAltitude: () -> Unit,
-    onClickDoneEditAltitude: () -> Unit,
-    onClickCancelAltitude: () -> Unit,
+    events: AltitudePartsEvents,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
@@ -26,7 +23,7 @@ fun AltitudeParts(
             ) {
                 ClickableCard(
                     text = stringResource(id = R.string.altitude, uiState.altitudeText),
-                    onClick = onClickAltitude,
+                    onClick = events::onClickAltitude,
                 )
             }
         }
@@ -34,10 +31,17 @@ fun AltitudeParts(
         is MainViewModel.MainUiState.AltitudeUiState.EditMode -> {
             EditTextFieldRow(
                 textFieldValue = uiState.altitudeTextFieldValue,
-                onChangeTextFieldValue = onChangeTextFieldValue,
-                onClickDone = onClickDoneEditAltitude,
-                onClickCancel = onClickCancelAltitude
+                onChangeTextFieldValue = events::onChangeAltitudeTextFieldValue,
+                onClickDone = events::onClickDoneEditAltitude,
+                onClickCancel = events::onClickCancelAltitude
             )
         }
     }
+}
+
+interface AltitudePartsEvents {
+    fun onChangeAltitudeTextFieldValue(textFieldValue: TextFieldValue)
+    fun onClickAltitude()
+    fun onClickDoneEditAltitude()
+    fun onClickCancelAltitude()
 }

@@ -10,17 +10,14 @@ import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 @Composable
 fun TemperatureParts(
     uiState: MainViewModel.MainUiState.TemperatureUiState,
-    onChangeTextFieldValue: (TextFieldValue) -> Unit,
-    onClickTemperature: () -> Unit,
-    onClickDoneEditTemperature: () -> Unit,
-    onClickCancelEditTemperature: () -> Unit,
+    events: TemperaturePartsEvents,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
         is MainViewModel.MainUiState.TemperatureUiState.ViewerMode -> {
             ClickableCard(
                 text = stringResource(id = R.string.temperature, uiState.temperatureText),
-                onClick = onClickTemperature,
+                onClick = events::onClickTemperature,
                 modifier = modifier
             )
         }
@@ -28,11 +25,18 @@ fun TemperatureParts(
         is MainViewModel.MainUiState.TemperatureUiState.EditMode -> {
             EditTextFieldRow(
                 textFieldValue = uiState.temperatureTextFieldValue,
-                onChangeTextFieldValue = onChangeTextFieldValue,
-                onClickDone = onClickDoneEditTemperature,
-                onClickCancel = onClickCancelEditTemperature,
+                onChangeTextFieldValue = events::onChangeTemperatureTextFieldValue,
+                onClickDone = events::onClickDoneEditTemperature,
+                onClickCancel = events::onClickCancelEditTemperature,
                 modifier = modifier
             )
         }
     }
+}
+
+interface TemperaturePartsEvents {
+    fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue)
+    fun onClickTemperature()
+    fun onClickDoneEditTemperature()
+    fun onClickCancelEditTemperature()
 }

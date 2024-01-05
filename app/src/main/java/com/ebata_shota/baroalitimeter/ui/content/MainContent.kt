@@ -18,21 +18,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.ebata_shota.baroalitimeter.R
 import com.ebata_shota.baroalitimeter.ui.parts.AltitudeParts
+import com.ebata_shota.baroalitimeter.ui.parts.AltitudePartsEvents
 import com.ebata_shota.baroalitimeter.ui.parts.TemperatureParts
+import com.ebata_shota.baroalitimeter.ui.parts.TemperaturePartsEvents
 import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 
 @Composable
 fun MainContent(
     uiState: MainViewModel.MainUiState.UiState,
-    onChangeTemperatureTextFieldValue: (TextFieldValue) -> Unit,
-    onClickTemperature: () -> Unit,
-    onClickDoneEditTemperature: () -> Unit,
-    onClickCancelEditTemperature: () -> Unit,
-    onChangeAltitudeTextFieldValue: (TextFieldValue) -> Unit,
-    onClickAltitude: () -> Unit,
-    onClickDoneEditAltitude: () -> Unit,
-    onClickCancelAltitude: () -> Unit,
+    temperaturePartsEvents: TemperaturePartsEvents,
+    altitudePartsEvents: AltitudePartsEvents,
     modifier: Modifier = Modifier,
 ) {
     val pressureText = uiState.pressureText
@@ -72,17 +68,11 @@ fun MainContent(
 
         TemperatureParts(
             uiState = temperatureUiState,
-            onChangeTextFieldValue = onChangeTemperatureTextFieldValue,
-            onClickTemperature = onClickTemperature,
-            onClickDoneEditTemperature = onClickDoneEditTemperature,
-            onClickCancelEditTemperature = onClickCancelEditTemperature
+            events = temperaturePartsEvents,
         )
         AltitudeParts(
             uiState = altitudeUiSate,
-            onChangeTextFieldValue = onChangeAltitudeTextFieldValue,
-            onClickAltitude = onClickAltitude,
-            onClickDoneEditAltitude = onClickDoneEditAltitude,
-            onClickCancelAltitude = onClickCancelAltitude
+            events = altitudePartsEvents
         )
     }
 }
@@ -113,14 +103,24 @@ fun MainContentPreview() {
                     temperatureUiState = MainViewModel.MainUiState.TemperatureUiState.ViewerMode("12"),
                     altitudeUiState = MainViewModel.MainUiState.AltitudeUiState.ViewerMode("24"),
                 ),
-                onChangeTemperatureTextFieldValue = {},
-                onClickTemperature = {},
-                onClickDoneEditTemperature = {},
-                onClickCancelEditTemperature = {},
-                onChangeAltitudeTextFieldValue = {},
-                onClickAltitude = {},
-                onClickDoneEditAltitude = {},
-                onClickCancelAltitude = {}
+                temperaturePartsEvents = object : TemperaturePartsEvents {
+                    override fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue) {}
+
+                    override fun onClickTemperature() {}
+
+                    override fun onClickDoneEditTemperature() {}
+
+                    override fun onClickCancelEditTemperature() {}
+                },
+                altitudePartsEvents = object : AltitudePartsEvents {
+                    override fun onChangeAltitudeTextFieldValue(textFieldValue: TextFieldValue) {}
+
+                    override fun onClickAltitude() {}
+
+                    override fun onClickDoneEditAltitude() {}
+
+                    override fun onClickCancelAltitude() {}
+                }
             )
         }
     }

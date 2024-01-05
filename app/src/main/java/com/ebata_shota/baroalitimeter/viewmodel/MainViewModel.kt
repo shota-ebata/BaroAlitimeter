@@ -1,9 +1,11 @@
 package com.ebata_shota.baroalitimeter.viewmodel
 
+import androidx.annotation.StringRes
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ebata_shota.baroalitimeter.R
 import com.ebata_shota.baroalitimeter.domain.extensions.collect
 import com.ebata_shota.baroalitimeter.domain.extensions.logUserActionEvent
 import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
@@ -17,9 +19,12 @@ import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
 import com.ebata_shota.baroalitimeter.ui.model.SensorAndPrefModel
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -62,6 +67,13 @@ constructor(
         }
     }
 
+    enum class ShowUndoSnackBarEvent(
+        @StringRes val snackBarText: Int
+    ) {
+        Temperature(R.string.snack_bar_message_change_temperature),
+        Altitude(R.string.snack_bar_message_change_altitude)
+    }
+
     enum class Mode {
         Viewer,
         EditTemperature,
@@ -87,12 +99,12 @@ constructor(
     }
 
     private val _mainUiState = MutableStateFlow<MainUiState>(MainUiState.Loading)
-    val mainUiState: StateFlow<MainUiState>
-        get() = _mainUiState.asStateFlow()
+    val mainUiState: StateFlow<MainUiState> = _mainUiState.asStateFlow()
 
+    private val _showUndoSnackBarEvent = MutableSharedFlow<ShowUndoSnackBarEvent>()
+    val showUndoSnackBarEvent: SharedFlow<ShowUndoSnackBarEvent> = _showUndoSnackBarEvent.asSharedFlow()
 
     init {
-
         combine(
             modeState,
             sensorRepository.pressureSensorState,
@@ -118,8 +130,6 @@ constructor(
                 currentUiState.nextUiState(it)
             }
         }
-
-
     }
 
 
@@ -206,7 +216,11 @@ constructor(
     }
 
 
-    fun changeModeToEditTemperature() {
+    fun onClickTemperature() {
+        changeModeToEditTemperature()
+    }
+
+    private fun changeModeToEditTemperature() {
         _modeState.update { mode ->
             val state = mainUiState.value
             if (state is MainUiState.UiState && state.temperatureUiState is MainUiState.TemperatureUiState.ViewerMode) {
@@ -216,7 +230,11 @@ constructor(
         }
     }
 
-    fun changeModeToEditAltitude() {
+    fun onClickAltitude() {
+        changeModeToEditAltitude()
+    }
+
+    private fun changeModeToEditAltitude() {
         _modeState.update { mode ->
             val state = mainUiState.value
             if (state is MainUiState.UiState && state.altitudeUiState is MainUiState.AltitudeUiState.ViewerMode) {
@@ -226,7 +244,11 @@ constructor(
         }
     }
 
-    fun updateTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
+    fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
+        updateTemperatureTextFieldValue(textFieldValue)
+    }
+
+    private fun updateTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
         _mainUiState.update { currentMainUiState ->
             // 表示できるUiStateじゃないなら無視
             if (currentMainUiState !is MainUiState.UiState) return@update currentMainUiState
@@ -244,7 +266,11 @@ constructor(
         }
     }
 
-    fun updateAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
+    fun onChangeAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
+        updateAltitudeTextFieldValue(textFieldValue)
+    }
+
+    private fun updateAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
         _mainUiState.update { currentMainUiState ->
             // 表示できるUiStateじゃないなら無視
             if (currentMainUiState !is MainUiState.UiState) return@update currentMainUiState
@@ -262,12 +288,20 @@ constructor(
         }
     }
 
-    fun cancelEditTemperature() {
+    fun onClickCancelEditTemperature() {
+        cancelEditTemperature()
+    }
+
+    private fun cancelEditTemperature() {
         logUserActionEvent(UserActionEvent.CancelEditTemperatureByButton)
         changeModeToViewer()
     }
 
-    fun cancelEditAltitude() {
+    fun onClickCancelAltitude() {
+        cancelEditAltitude()
+    }
+
+    private fun cancelEditAltitude() {
         logUserActionEvent(UserActionEvent.CancelEditAltitudeByButton)
         changeModeToViewer()
     }
@@ -287,7 +321,12 @@ constructor(
         }
     }
 
-    fun onCompletedEditTemperature() {
+    fun onClickDoneEditTemperature() {
+        onCompletedEditTemperature()
+        showTemperatureUndoSnackBar()
+    }
+
+    private fun onCompletedEditTemperature() {
         viewModelScope.launch {
             logUserActionEvent(UserActionEvent.DoneEditTemperature)
             val currentMainUiState = mainUiState.value
@@ -315,7 +354,18 @@ constructor(
         }
     }
 
-    fun onCompletedEditAltitude() {
+    private fun showTemperatureUndoSnackBar() {
+        viewModelScope.launch {
+            _showUndoSnackBarEvent.emit(ShowUndoSnackBarEvent.Temperature)
+        }
+    }
+
+    fun onClickDoneEditAltitude() {
+        onCompletedEditAltitude()
+        showAltitudeUndoSnackbar()
+    }
+
+    private fun onCompletedEditAltitude() {
         viewModelScope.launch {
             logUserActionEvent(UserActionEvent.DoneEditAltitude)
             val currentMainUiState = mainUiState.value
@@ -348,25 +398,45 @@ constructor(
         }
     }
 
-    fun undoTemperature() {
+    private fun showAltitudeUndoSnackbar() {
+        viewModelScope.launch {
+            _showUndoSnackBarEvent.emit(ShowUndoSnackBarEvent.Altitude)
+        }
+    }
+
+    fun onDismissedSnackBar(event: ShowUndoSnackBarEvent) {
+        when (event) {
+            ShowUndoSnackBarEvent.Temperature -> onDismissedTemperatureSnackBar()
+            ShowUndoSnackBarEvent.Altitude -> onDismissedAltitudeSnackbar()
+        }
+    }
+
+    fun onActionPerformedSnackBar(event: ShowUndoSnackBarEvent) {
+        when (event) {
+            ShowUndoSnackBarEvent.Temperature -> undoTemperature()
+            ShowUndoSnackBarEvent.Altitude -> undoAltitude()
+        }
+    }
+
+    private fun undoTemperature() {
         logUserActionEvent(UserActionEvent.UndoTemperature)
         viewModelScope.launch {
             prefRepository.undoTemperature()
         }
     }
 
-    fun undoAltitude() {
+    private fun undoAltitude() {
         logUserActionEvent(UserActionEvent.UndoAltitude)
         viewModelScope.launch {
             prefRepository.undoSeaLevelPressure()
         }
     }
 
-    fun onDismissedAltitudeSnackbar() {
+    private fun onDismissedAltitudeSnackbar() {
         logUserActionEvent(UserActionEvent.DismissedUndoAltitude)
     }
 
-    fun onDismissedTemperatureSnackBar() {
+    private fun onDismissedTemperatureSnackBar() {
         logUserActionEvent(UserActionEvent.DismissedUndoTemperature)
     }
 
@@ -382,10 +452,5 @@ constructor(
             format = "%,.${fractionDigits}f"
         }
         return format.format(this)
-    }
-
-    companion object {
-
-
     }
 }
