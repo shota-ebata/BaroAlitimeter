@@ -23,16 +23,12 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.TextFieldValue
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ebata_shota.baroalitimeter.R
 import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
-import com.ebata_shota.baroalitimeter.ui.content.EditModeAltitudeContent
-import com.ebata_shota.baroalitimeter.ui.content.EditModeTemperature
+import com.ebata_shota.baroalitimeter.ui.content.MainContent
 import com.ebata_shota.baroalitimeter.ui.content.RadioListContent
-import com.ebata_shota.baroalitimeter.ui.content.ViewerModeContent
 import com.ebata_shota.baroalitimeter.ui.model.ThemeModeRadioOption
 import com.ebata_shota.baroalitimeter.ui.parts.MainTopAppBar
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
@@ -45,21 +41,9 @@ fun MainScreen(
     modifier: Modifier = Modifier,
     viewModel: MainViewModel = viewModel(),
     selectedThemeMode: ThemeMode,
-    onSelectedThemeMode: (ThemeMode) -> Unit,
-    updateTemperatureTextFieldValue: (TextFieldValue) -> Unit,
-    updateAltitudeTextFieldValue: (TextFieldValue) -> Unit,
-    onClickTemperature: () -> Unit,
-    onClickAltitude: () -> Unit,
-    onClickCancelTemperature: () -> Unit,
-    onClickCancelAltitude: () -> Unit,
-    onCompletedEditTemperature: () -> Unit,
-    onCompletedEditAltitude: () -> Unit,
-    undoAltitude: () -> Unit,
-    undoTemperature: () -> Unit,
-    onDismissedAltitudeSnackbar: () -> Unit,
-    onDismissedTemperatureSnackBar: () -> Unit,
 ) {
-    val uiState: MainViewModel.UiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState: MainViewModel.MainUiState by viewModel.mainUiState.collectAsStateWithLifecycle()
+    val mode: MainViewModel.Mode by viewModel.modeState.collectAsStateWithLifecycle()
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     var shouldShowTopAppBarDropdownMenu: Boolean by remember {
@@ -103,7 +87,7 @@ fun MainScreen(
                     onOptionSelected = { themeModeRadioOption ->
                         coroutineScope.launch {
                             themeModalBottomSheetState.hide()
-                            onSelectedThemeMode(themeModeRadioOption.themeMode)
+                            viewModel.onSelectedThemeMode(themeModeRadioOption.themeMode)
                         }
                     }
                 )
@@ -114,31 +98,22 @@ fun MainScreen(
                     .fillMaxSize(),
                 color = MaterialTheme.colorScheme.background
             ) {
-                when (val uiState = uiState) {
-                    is MainViewModel.UiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
-                    is MainViewModel.UiState.ViewerMode -> {
-                        ViewerModeContent(
-                            pressureText = uiState.pressureText,
-                            altitudeText = uiState.altitudeText,
-                            temperatureText = uiState.temperatureText,
-                            onClickTemperature = onClickTemperature,
-                            onClickAltitude = onClickAltitude,
-                            seaLevelPressure = uiState.seaLevelPressureText
-                        )
-                    }
-
-                    is MainViewModel.UiState.EditAltitudeMode -> {
-                        // FIXME: stringResourceがComposable内部でしか呼び出せなくて、適切な場所に自信がない
-                        val snackBarMessage = stringResource(id = R.string.snack_bar_message_change_altitude)
-                        val snackBarActionLabel = stringResource(id = R.string.snack_bar_action_label_undo)
-                        EditModeAltitudeContent(
-                            pressureText = uiState.pressureText,
-                            seaLevelPressure = uiState.seaLevelPressureText,
-                            altitudeTextFieldValue = uiState.altitudeTextFieldValue,
-                            updateAltitudeTextFieldValue = updateAltitudeTextFieldValue,
-                            temperatureText = uiState.temperatureText,
-                            onClickDone = {
-                                onCompletedEditAltitude()
+                // FIXME: stringResourceがComposable内部でしか呼び出せなくて、適切な場所に自信がない
+                val snackBarMessage = when (mode) {
+                    MainViewModel.Mode.Viewer -> "" // この状態で表示する想定がないので空文字だが・・・
+                    MainViewModel.Mode.EditTemperature -> stringResource(id = R.string.snack_bar_message_change_temperature)
+                    MainViewModel.Mode.EditAltitude -> stringResource(id = R.string.snack_bar_message_change_altitude)
+                }
+                val snackBarActionLabel = stringResource(id = R.string.snack_bar_action_label_undo)
+                when (val currentUiState = uiState) {
+                    MainViewModel.MainUiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
+                    is MainViewModel.MainUiState.UiState -> {
+                        MainContent(
+                            uiState = currentUiState,
+                            onChangeTemperatureTextFieldValue = viewModel::updateTemperatureTextFieldValue,
+                            onClickTemperature = viewModel::changeModeToEditTemperature,
+                            onClickDoneEditTemperature = {
+                                viewModel.onCompletedEditTemperature()
                                 coroutineScope.launch {
                                     val snackbarResult = snackbarHostState.showSnackbar(
                                         message = snackBarMessage,
@@ -147,27 +122,16 @@ fun MainScreen(
                                         duration = SnackbarDuration.Short
                                     )
                                     when (snackbarResult) {
-                                        SnackbarResult.Dismissed -> onDismissedAltitudeSnackbar()
-                                        SnackbarResult.ActionPerformed -> undoAltitude()
+                                        SnackbarResult.Dismissed -> viewModel.onDismissedTemperatureSnackBar()
+                                        SnackbarResult.ActionPerformed -> viewModel.undoTemperature()
                                     }
                                 }
                             },
-                            onClickCancel = onClickCancelAltitude
-                        )
-                    }
-
-                    is MainViewModel.UiState.EditTemperatureMode -> {
-                        // FIXME: stringResourceがComposable内部でしか呼び出せなくて、適切な場所に自信がない
-                        val snackBarMessage = stringResource(id = R.string.snack_bar_message_change_temperature)
-                        val snackBarActionLabel = stringResource(id = R.string.snack_bar_action_label_undo)
-                        EditModeTemperature(
-                            pressureText = uiState.pressureText,
-                            seaLevelPressure = uiState.seaLevelPressureText,
-                            temperatureTextFieldValue = uiState.temperatureTextFieldValue,
-                            updateTemperatureTextFieldValue = updateTemperatureTextFieldValue,
-                            altitudeText = uiState.altitudeText,
-                            onClickDone = {
-                                onCompletedEditTemperature()
+                            onClickCancelEditTemperature = viewModel::cancelEditTemperature,
+                            onChangeAltitudeTextFieldValue = viewModel::updateAltitudeTextFieldValue,
+                            onClickAltitude = viewModel::changeModeToEditAltitude,
+                            onClickDoneEditAltitude = {
+                                viewModel.onCompletedEditAltitude()
                                 coroutineScope.launch {
                                     val snackbarResult = snackbarHostState.showSnackbar(
                                         message = snackBarMessage,
@@ -176,17 +140,17 @@ fun MainScreen(
                                         duration = SnackbarDuration.Short
                                     )
                                     when (snackbarResult) {
-                                        SnackbarResult.Dismissed -> onDismissedTemperatureSnackBar()
-                                        SnackbarResult.ActionPerformed -> undoTemperature()
+                                        SnackbarResult.Dismissed -> viewModel.onDismissedAltitudeSnackbar()
+                                        SnackbarResult.ActionPerformed -> viewModel.undoAltitude()
                                     }
                                 }
                             },
-                            onClickCancel = onClickCancelTemperature
+                            onClickCancelAltitude = viewModel::cancelEditAltitude,
+                            modifier = Modifier,
                         )
                     }
                 }
             }
         }
     }
-
 }

@@ -39,9 +39,9 @@ class MainActivity : ComponentActivity() {
         }
         onBackPressedDispatcher.addCallback(owner = this, onBackPressedCallback)
 
-        viewModel.uiState.collect(lifecycleScope) { uiState ->
+        viewModel.modeState.collect(lifecycleScope) { mode ->
             onBackPressedCallback.isEnabled =
-                uiState is MainViewModel.UiState.EditAltitudeMode || uiState is MainViewModel.UiState.EditTemperatureMode
+                mode == MainViewModel.Mode.EditTemperature || mode == MainViewModel.Mode.EditAltitude
         }
 
         setContent {
@@ -64,20 +64,7 @@ class MainActivity : ComponentActivity() {
             }
         ) {
             MainScreen(
-                selectedThemeMode = themeMode,
-                onSelectedThemeMode = viewModel::onSelectedThemeMode,
-                updateTemperatureTextFieldValue = viewModel::updateTemperatureTextFieldValue,
-                updateAltitudeTextFieldValue = viewModel::updateAltitudeTextFieldValue,
-                onClickTemperature = viewModel::changeModeToEditTemperature,
-                onClickAltitude = viewModel::changeModeToEditAltitude,
-                onClickCancelTemperature = viewModel::cancelEditTemperature,
-                onClickCancelAltitude = viewModel::cancelEditAltitude,
-                onCompletedEditTemperature = viewModel::onCompletedEditTemperature,
-                onCompletedEditAltitude = viewModel::onCompletedEditAltitude,
-                undoAltitude = viewModel::undoAltitude,
-                undoTemperature = viewModel::undoTemperature,
-                onDismissedAltitudeSnackbar = viewModel::onDismissedAltitudeSnackbar,
-                onDismissedTemperatureSnackBar = viewModel::onDismissedTemperatureSnackBar,
+                selectedThemeMode = themeMode
             )
         }
     }

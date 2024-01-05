@@ -34,7 +34,7 @@ import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 @OptIn(ExperimentalMaterial3Api::class)
 fun EditTextFieldRow(
     textFieldValue: TextFieldValue,
-    updateTextFieldValue: (TextFieldValue) -> Unit,
+    onChangeTextFieldValue: (TextFieldValue) -> Unit,
     onClickDone: () -> Unit,
     onClickCancel: () -> Unit,
     modifier: Modifier = Modifier,
@@ -62,7 +62,7 @@ fun EditTextFieldRow(
                 .focusRequester(focusRequester),
             textStyle = TextStyle(fontSize = 40.sp),
             value = textFieldValue,
-            onValueChange = updateTextFieldValue,
+            onValueChange = onChangeTextFieldValue,
             keyboardOptions = KeyboardOptions.Default.copy(
                 keyboardType = KeyboardType.Number,
                 imeAction = ImeAction.Done
@@ -102,7 +102,7 @@ fun EditTextFieldPreview() {
         Surface {
             EditTextFieldRow(
                 textFieldValue = TextFieldValue("1000"),
-                updateTextFieldValue = {},
+                onChangeTextFieldValue = {},
                 onClickDone = {},
                 onClickCancel = {}
             )
