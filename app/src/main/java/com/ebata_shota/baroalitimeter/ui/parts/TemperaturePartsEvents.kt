@@ -34,6 +34,10 @@ fun TemperatureParts(
     }
 }
 
+/**
+ * Composable関数が深くなるごとに、だんだん細かいイベントをすべて引数に設定するのは手間になってくる。
+ * それを解消するために、Eventをinterfaceにまとめてみた。
+ */
 interface TemperaturePartsEvents {
     fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue)
     fun onClickTemperature()

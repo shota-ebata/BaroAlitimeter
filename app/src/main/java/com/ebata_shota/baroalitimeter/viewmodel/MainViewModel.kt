@@ -17,6 +17,8 @@ import com.ebata_shota.baroalitimeter.domain.repository.CalcRepository
 import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
 import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
 import com.ebata_shota.baroalitimeter.ui.model.SensorAndPrefModel
+import com.ebata_shota.baroalitimeter.ui.parts.AltitudePartsEvents
+import com.ebata_shota.baroalitimeter.ui.parts.TemperaturePartsEvents
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -43,7 +45,10 @@ constructor(
     private val prefRepository: PrefRepository,
     private val calcRepository: CalcRepository,
     private val firebaseAnalytics: FirebaseAnalytics,
-) : ViewModel() {
+) : ViewModel(),
+    TemperaturePartsEvents,
+    AltitudePartsEvents
+{
 
     sealed interface MainUiState {
 
@@ -216,7 +221,7 @@ constructor(
     }
 
 
-    fun onClickTemperature() {
+    override fun onClickTemperature() {
         changeModeToEditTemperature()
     }
 
@@ -230,7 +235,7 @@ constructor(
         }
     }
 
-    fun onClickAltitude() {
+    override fun onClickAltitude() {
         changeModeToEditAltitude()
     }
 
@@ -244,7 +249,7 @@ constructor(
         }
     }
 
-    fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
+    override fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
         updateTemperatureTextFieldValue(textFieldValue)
     }
 
@@ -266,7 +271,7 @@ constructor(
         }
     }
 
-    fun onChangeAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
+    override fun onChangeAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
         updateAltitudeTextFieldValue(textFieldValue)
     }
 
@@ -288,7 +293,7 @@ constructor(
         }
     }
 
-    fun onClickCancelEditTemperature() {
+    override fun onClickCancelEditTemperature() {
         cancelEditTemperature()
     }
 
@@ -297,7 +302,7 @@ constructor(
         changeModeToViewer()
     }
 
-    fun onClickCancelAltitude() {
+    override fun onClickCancelAltitude() {
         cancelEditAltitude()
     }
 
@@ -321,7 +326,7 @@ constructor(
         }
     }
 
-    fun onClickDoneEditTemperature() {
+    override fun onClickDoneEditTemperature() {
         onCompletedEditTemperature()
         showTemperatureUndoSnackBar()
     }
@@ -360,7 +365,7 @@ constructor(
         }
     }
 
-    fun onClickDoneEditAltitude() {
+    override fun onClickDoneEditAltitude() {
         onCompletedEditAltitude()
         showAltitudeUndoSnackbar()
     }
