@@ -140,6 +140,15 @@ fun MainScreen(
                              * FIXME: objectを毎回インスタンス生成するの馬鹿馬鹿しい
                              *  ViewModelにinterfaceを実装するのって微妙かな？
                              *  interfaceとはいえ子のComposable関数にViewModelを渡すのは微妙か？
+                             *  参考：https://developer.android.com/jetpack/compose/state-hoisting?hl=ja
+                             *    注: ViewModel インスタンスを他のコンポーザブルに渡さないでください。詳細については、アーキテクチャ状態ホルダーのドキュメントをご覧ください。
+                             *    https://developer.android.com/topic/architecture/ui-layer/stateholders?hl=ja#business-logic
+                             *    警告: ViewModel インスタンスを他のコンポーズ可能な関数に渡さないでください。
+                             *    そのようにすると、コンポーズ可能な関数と ViewModel 型が結合されるため、再利用性が低くなり、テストとプレビューが難しくなります。
+                             *    また、ViewModel インスタンスを管理する明確な SSOT（信頼できる単一の情報源）がなくなります。
+                             *    ViewModel を渡すと、複数のコンポーザブルが ViewModel 関数を呼び出して状態を変更できるようになり、バグのデバッグが難しくなります。
+                             *    代わりに、UDF ベスト プラクティスに沿って、必要な状態のみを渡します。同様に、ViewModel のコンポーザブルの SSOT に達するまで、伝播イベントを渡します。
+                             *    これは、イベントを処理し、対応する ViewModel メソッドを呼び出す SSOT です。
                              */
                             temperaturePartsEvents = object : TemperaturePartsEvents {
                                 override fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
