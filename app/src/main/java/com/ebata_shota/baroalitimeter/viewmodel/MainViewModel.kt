@@ -110,29 +110,31 @@ constructor(
     val showUndoSnackBarEvent: SharedFlow<ShowUndoSnackBarEvent> = _showUndoSnackBarEvent.asSharedFlow()
 
     init {
-        combine(
-            modeState,
-            sensorRepository.pressureSensorState,
-            sensorRepository.temperatureSensorState,
-            prefRepository.preferencesFlow,
-        ) {
-                mode: Mode,
-                pressureSensorState: Pressure,
-                temperatureSensorState: Temperature, // TODO: temperatureSensorStateをうまく使う
-                preferencesModel: PreferencesModel,
-            ->
-            SensorAndPrefModel(
-                mode = mode,
-                pressureSensorState = pressureSensorState,
-                temperatureSensorState = temperatureSensorState,
-                preferencesModel = preferencesModel
-            )
-        }.distinctUntilChanged { old, new ->
-            // 重複を無視する
-            old == new
-        }.collect(viewModelScope) {
-            _mainUiState.update { currentUiState ->
-                currentUiState.nextUiState(it)
+        viewModelScope.launch {
+            combine(
+                modeState,
+                sensorRepository.pressureSensorState,
+                sensorRepository.temperatureSensorState,
+                prefRepository.preferencesFlow,
+            ) {
+                    mode: Mode,
+                    pressureSensorState: Pressure,
+                    temperatureSensorState: Temperature, // TODO: temperatureSensorStateをうまく使う
+                    preferencesModel: PreferencesModel,
+                ->
+                SensorAndPrefModel(
+                    mode = mode,
+                    pressureSensorState = pressureSensorState,
+                    temperatureSensorState = temperatureSensorState,
+                    preferencesModel = preferencesModel
+                )
+            }.distinctUntilChanged { old, new ->
+                // 重複を無視する
+                old == new
+            }.collect {
+                _mainUiState.update { currentUiState ->
+                    currentUiState.nextUiState(it)
+                }
             }
         }
     }
