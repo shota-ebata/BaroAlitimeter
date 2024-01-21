@@ -68,6 +68,7 @@ fun MainScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     val context = LocalContext.current
     LaunchedEffect(Unit) {
+        // FIXME: Composeでcoroutine使うのがなぁ・・・なるべく使いたくないが・・・しかたないよなぁ
         lifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
             // memo: immediateって？ https://qiita.com/dowa/items/8f05a92c7f5f59da5cb1
             withContext(Dispatchers.Main.immediate) {
