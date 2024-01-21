@@ -3,10 +3,9 @@ package com.ebata_shota.baroalitimeter.infra.repository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -15,7 +14,7 @@ class CalcRepositoryImplTest {
 
     private lateinit var repository: CalcRepositoryImpl
 
-    @BeforeEach
+    @Before
     fun setup() {
         repository = CalcRepositoryImpl(
             dispatcher = UnconfinedTestDispatcher()
@@ -23,7 +22,6 @@ class CalcRepositoryImplTest {
     }
 
     @Test
-    @DisplayName("calcAltitude() 1013.83m")
     fun calcAltitude() {
         runTest {
             val result: Float = repository.calcAltitude(

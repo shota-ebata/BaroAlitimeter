@@ -15,16 +15,14 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.setMain
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
+import org.junit.Assert.assertEquals
+import org.junit.Before
+import org.junit.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 
 
 class MainViewModelTest {
-
 
     private val sensorRepository: SensorRepository = mock()
     private val prefRepository: PrefRepository = mock()
@@ -35,7 +33,7 @@ class MainViewModelTest {
     private lateinit var viewModel: MainViewModel
 
     @OptIn(ExperimentalCoroutinesApi::class)
-    @BeforeEach
+    @Before
     fun setup() {
         val dispatcher = UnconfinedTestDispatcher()
         Dispatchers.setMain(dispatcher)
@@ -73,9 +71,11 @@ class MainViewModelTest {
     }
 
 
+    /**
+     * 初期のモードはViewer
+     */
     @Test
-    @DisplayName("初期のモードはMode.Viewer")
-    fun modeViewer() {
+    fun defaultMode() {
         assertEquals(MainViewModel.Mode.Viewer, viewModel.modeState.value)
     }
 }

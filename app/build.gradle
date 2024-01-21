@@ -79,14 +79,6 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
-
-    // 参考：
-    // https://qiita.com/Mouto9/items/83b1cfe52927d4d78f35#%E5%A4%89%E3%81%88%E3%81%9F%E3%81%A8%E3%81%93%E3%82%8D
-    testOptions {
-        unitTests.all {
-            useJUnitPlatform()
-        }
-    }
 }
 
 dependencies {
@@ -113,7 +105,7 @@ dependencies {
     implementation 'androidx.compose.material3:material3'
     implementation 'androidx.compose.material:material'
 
-    testImplementation "org.junit.jupiter:junit-jupiter:5.8.0"
+    testImplementation 'junit:junit:4.13.2'
     testImplementation "org.mockito.kotlin:mockito-kotlin:5.2.1"
 
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
