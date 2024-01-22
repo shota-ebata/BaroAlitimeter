@@ -82,6 +82,13 @@ android {
 
     testOptions {
         unitTests.includeAndroidResources = true
+        // unitTests.returnDefaultValues = true
+        // 参考: https://developer.android.com/training/testing/unit-testing/local-unit-tests?hl=ja
+        //  android.jarの中を呼んだ場合に、例外ではなくデフォルト値を返すようにする。
+        // 注意: returnDefaultValues プロパティを true に設定する場合は注意が必要です。
+        //  戻り値を null やゼロにすることで、テストの有効性が落ちる場合があります。
+        //  この場合、デバッグが難しくなり、失敗するはずのテストが成功する可能性もあります。
+        //  最終手段としてのみ使用してください。
     }
 }
 
