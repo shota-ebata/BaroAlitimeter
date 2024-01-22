@@ -25,10 +25,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ebata_shota.baroalitimeter.R
 import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
 import com.ebata_shota.baroalitimeter.ui.content.MainContent
@@ -45,9 +45,9 @@ import kotlinx.coroutines.withContext
 @Composable
 fun MainScreen(
     modifier: Modifier = Modifier,
-    viewModel: MainViewModel = viewModel(),
     selectedThemeMode: ThemeMode,
 ) {
+    val viewModel : MainViewModel by hiltViewModel()
     val uiState: MainViewModel.MainUiState by viewModel.mainUiState.collectAsStateWithLifecycle()
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
