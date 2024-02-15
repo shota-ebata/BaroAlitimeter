@@ -8,7 +8,6 @@ import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -47,25 +46,18 @@ class MainActivity : ComponentActivity() {
         setContent {
             val themeMode: ThemeMode? by viewModel.themeState.collectAsStateWithLifecycle()
             themeMode?.let { // FIXME: nullableなのなーんかイケてない
-                MainContent(it)
+                BaroAlitimeterTheme(
+                    darkTheme = when (it) {
+                        ThemeMode.LIGHT -> false
+                        ThemeMode.DARK -> true
+                        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+                    }
+                ) {
+                    MainScreen(
+                        selectedThemeMode = it
+                    )
+                }
             }
-        }
-    }
-
-    @Composable
-    private fun MainContent(
-        themeMode: ThemeMode
-    ) {
-        BaroAlitimeterTheme(
-            darkTheme = when (themeMode) {
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-                ThemeMode.SYSTEM -> isSystemInDarkTheme()
-            }
-        ) {
-            MainScreen(
-                selectedThemeMode = themeMode
-            )
         }
     }
 }

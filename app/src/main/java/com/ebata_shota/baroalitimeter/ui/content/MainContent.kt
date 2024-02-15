@@ -29,7 +29,7 @@ fun MainContent(
     uiState: MainViewModel.MainUiState.UiState,
     temperaturePartsEvents: TemperaturePartsEvents,
     altitudePartsEvents: AltitudePartsEvents,
-    modifier: Modifier = Modifier,
+    modifier: Modifier = Modifier
 ) {
     val pressureText = uiState.pressureText
     val seaLevelPressure = uiState.seaLevelPressureText
