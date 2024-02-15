@@ -1,19 +1,69 @@
-name: Pull Request Check
+# This workflow uses actions that are not certified by GitHub.
+# They are provided by a third-party and are governed by
+# separate terms of service, privacy policy, and support
+# documentation.
+# This workflow will build a Java project with Gradle and cache/restore any dependencies to improve the workflow execution time
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-gradle
+
+name: Check pull request
 
 on: pull_request
 
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  GRADLE_KTLINT_TASK: 'ktlint'
+  GRADLE_ANDROID_LINT_TASK: 'lintDebug'
+  GRADLE_UNIT_TEST_TASK: 'testDebugUnitTest'
+
 jobs:
   check:
-    name: Check
-    runs-on: ubuntu-latest
+    name: Check pull request
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out
-        uses: actions/checkout@v4
-      - name: Set up Java 17
+        uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          distribution: "SateSate"
-          java-version: 17
-          cache: "gradle"
-      - name: Run unit Test
-        run: ./gradlew testDebugUnitTest
+          java-version: '17'
+          distribution: 'temurin'
+      - name: Restore gradle cache # Gradle のキャッシュをRestore
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/*.gradle.kts') }}
+#      - name: Set/
+#      - name: Get gem info
+#        env: # Danger で利用する gem をここで列挙
+#          PACKAGES: danger:9.0.0 danger-checkstyle_format:0.1.1 danger-android_lint:0.0.11 danger-junit:1.0.2
+#        id: gem-info
+#        run: |
+#          echo "dir=$(gem environment gemdir)" >> $GITHUB_ENV # キャッシュするgemのディレクトリ
+#          echo "packages=$PACKAGES" >> $GITHUB_ENV # install 用の文字列
+#          echo "key=$(echo $PACKAGES | tr ' ' '-')" >> $GITHUB_ENV # キャッシュのキー文字列
+#      - name: Restroe gem cache # gem のキャッシュをRestore
+#        uses: actions/cache@v3
+#        with:
+#          path: ${{ env.dir }}
+#          key: ${{ runner.os }}-gem-${{ env.key }}
+      #      - name: ktlint
+      #          run: ./gradlew $GRADLE_KTLINT_TASK
+#      - name: Run Android Lint
+#        run: ./gradlew $GRADLE_ANDROID_LINT_TASK
+      - name: Run Unit Test
+        run: ./gradlew $GRADLE_UNIT_TEST_TASK
+#      - name: Set up and run Danger
+#        if: cancelled() != true #中断されない限り、エラーでも実行
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 標準で利用できるトークンを利用
+#          JOB_STATUS: ${{ job.status }} # jobのステータスを Danger へ受け渡す
+#        run: |
+#          gem install ${{ env.packages }}
+#          danger --dangerfile='Dangerfile' --remove-previous-comments --fail-on-errors=true
