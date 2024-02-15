@@ -51,6 +51,7 @@ android {
             minifyEnabled false
             debuggable true
             applicationIdSuffix ".debug"
+            signingConfig signingConfigs.debug
             manifestPlaceholders = [appName: "@string/app_name_debug"]
         }
         release {
