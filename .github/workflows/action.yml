@@ -59,6 +59,11 @@ jobs:
 #        run: ./gradlew $GRADLE_ANDROID_LINT_TASK
       - name: Run Unit Test
         run: ./gradlew $GRADLE_UNIT_TEST_TASK
+      - name: Publish Test Report
+        if: cancelled() != true
+        uses: mikepenz/action-junit-report@v2
+        with:
+          report_paths: "**/build/test-results/*/TEST-*.xml"
 #      - name: Set up and run Danger
 #        if: cancelled() != true #中断されない限り、エラーでも実行
 #        env:
