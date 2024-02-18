@@ -42,10 +42,10 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/*.gradle.kts') }}
-      - name: Set up Ruby # gem を利用するので Ruby をセットアップ
+      - name: Set up Ruby 3.0.0 # gem を利用するので Ruby をセットアップ
         uses: ruby/setup-ruby@v1
         with:
-          ruby-version: '2.7'
+          ruby-version: '3.0.0'
       - name: Get gem info
         env: # Danger で利用する gem をここで列挙
           PACKAGES: danger:9.1.0 danger-checkstyle_format:0.1.1 danger-android_lint:0.0.11 danger-junit:1.0.2
