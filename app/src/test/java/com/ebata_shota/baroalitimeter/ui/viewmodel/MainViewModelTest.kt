@@ -24,15 +24,12 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.spy
 import org.mockito.kotlin.whenever
 
-
 class MainViewModelTest {
 
     private val sensorRepository: SpySensorRepository = spy(SpySensorRepository())
     private val prefRepository: PrefRepository = mock()
     private lateinit var calcRepository: CalcRepository
     private val firebaseAnalytics: FirebaseAnalytics = mock()
-
-
     private lateinit var viewModel: MainViewModel
 
     @OptIn(ExperimentalCoroutinesApi::class)
@@ -73,7 +70,6 @@ class MainViewModelTest {
             firebaseAnalytics = firebaseAnalytics
         )
     }
-
 
     /**
      * 初期のモードはViewer

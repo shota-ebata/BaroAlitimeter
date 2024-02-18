@@ -84,4 +84,3 @@ object FirebaseAnalyticsCustomParam {
     const val ACTION_NAME = "action_name"
     const val ACTION_TYPE = "action_type"
 }
-
