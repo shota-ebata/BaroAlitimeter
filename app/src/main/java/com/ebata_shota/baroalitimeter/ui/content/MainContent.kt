@@ -77,7 +77,6 @@ fun MainContent(
     }
 }
 
-
 @Preview(
     showBackground = true,
     name = "Light Mode",

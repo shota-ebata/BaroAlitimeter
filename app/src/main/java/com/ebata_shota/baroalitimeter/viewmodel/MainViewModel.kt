@@ -6,7 +6,6 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.baroalitimeter.R
-import com.ebata_shota.baroalitimeter.domain.extensions.collect
 import com.ebata_shota.baroalitimeter.domain.extensions.logUserActionEvent
 import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
@@ -36,7 +35,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-
 @HiltViewModel
 class MainViewModel
 @Inject
@@ -47,8 +45,7 @@ constructor(
     private val firebaseAnalytics: FirebaseAnalytics,
 ) : ViewModel(),
     TemperaturePartsEvents,
-    AltitudePartsEvents
-{
+    AltitudePartsEvents {
 
     sealed interface MainUiState {
 
@@ -73,7 +70,7 @@ constructor(
     }
 
     enum class ShowUndoSnackBarEvent(
-        @StringRes val snackBarText: Int
+        @StringRes val snackBarText: Int,
     ) {
         Temperature(R.string.snack_bar_message_change_temperature),
         Altitude(R.string.snack_bar_message_change_altitude)
@@ -110,6 +107,7 @@ constructor(
     val showUndoSnackBarEvent: SharedFlow<ShowUndoSnackBarEvent> = _showUndoSnackBarEvent.asSharedFlow()
 
     init {
+        @Suppress("UnexpectedIndentation")
         viewModelScope.launch {
             combine(
                 modeState,
@@ -138,7 +136,6 @@ constructor(
             }
         }
     }
-
 
     private suspend fun MainUiState.nextUiState(sensorAndPrefModel: SensorAndPrefModel): MainUiState {
         val pressureSensorState: Pressure = sensorAndPrefModel.pressureSensorState
@@ -221,7 +218,6 @@ constructor(
             }
         }
     }
-
 
     override fun onClickTemperature() {
         changeModeToEditTemperature()
@@ -451,7 +447,10 @@ constructor(
         firebaseAnalytics.logUserActionEvent(userActionEvent)
     }
 
-    private fun Float?.formattedString(fractionDigits: Int, usesGroupingSeparator: Boolean = false): String {
+    private fun Float?.formattedString(
+        fractionDigits: Int,
+        usesGroupingSeparator: Boolean = false,
+    ): String {
         // nullの場合は空文字
         if (this == null) return ""
         var format = "%.${fractionDigits}f"
