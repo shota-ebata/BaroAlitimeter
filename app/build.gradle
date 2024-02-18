@@ -96,6 +96,10 @@ android {
     }
 }
 
+configurations {
+    ktlint
+}
+
 dependencies {
 
     implementation 'androidx.core:core-ktx:1.12.0'
@@ -146,6 +150,24 @@ dependencies {
 
     // OSS Licenses
     implementation "com.google.android.gms:play-services-oss-licenses:17.0.1"
+
+    // ktlint
+    ktlint "com.pinterest:ktlint:0.40.0"
+}
+
+tasks.register('ktlint', JavaExec) {
+    description = "Check Kotlin code style."
+    classpath = configurations.ktlint
+    main = "com.pinterest.ktlint.Main"
+    args "src/**/*.kt"
+}
+check.dependsOn ktlint
+
+tasks.register('ktlintFormat', JavaExec) {
+    description = "Fix Kotlin code style deviations."
+    classpath = configurations.ktlint
+    main = "com.pinterest.ktlint.Main"
+    args "-F", "src/**/*.kt"
 }
 
 kapt {
