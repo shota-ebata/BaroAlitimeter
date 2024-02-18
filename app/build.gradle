@@ -26,20 +26,23 @@ android {
     }
 
     signingConfigs {
-        def signFile = file("./../key_store_info.properties")
-        def signingProps = new Properties()
-        signingProps.load(new FileInputStream(signFile))
-        def storeFilePathValue = signingProps['storeFilePathValue']
-        def storePasswordValue = signingProps['storePasswordValue']
-        def keyAliasValue = signingProps['keyAliasValue']
-        def keyPasswordValue = signingProps['keyPasswordValue']
-
-        release {
-            storeFile file(storeFilePathValue)
-            storePassword storePasswordValue
-            keyAlias keyAliasValue
-            keyPassword keyPasswordValue
+        debug {
+            storeFile = file("./keystore/debug.keystore")
+            storePassword "qwer1234"
+            keyAlias "debug"
+            keyPassword "qwer1234"
         }
+//        release {
+//            def signFileBase = file("./../key_store_info.properties")
+//            def signingProps = new Properties()
+//            signingProps.load(new FileInputStream(signFileBase))
+//            def storeFilePathValue = signingProps['storeFilePathValue']
+//
+//            storeFile file(storeFilePathValue)
+//            storePassword System.getenv("SHOTA_EBATA_KEY_STORE_PASSWORD")
+//            keyAlias System.getenv("KEY_ALIAS_VALUE")
+//            keyPassword System.getenv("KEY_PASSWORD_VALUE")
+//        }
     }
 
     buildTypes {
@@ -48,6 +51,7 @@ android {
             minifyEnabled false
             debuggable true
             applicationIdSuffix ".debug"
+            signingConfig signingConfigs.debug
             manifestPlaceholders = [appName: "@string/app_name_debug"]
         }
         release {
@@ -55,7 +59,7 @@ android {
             minifyEnabled true
             debuggable false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
+//            signingConfig signingConfigs.release
             manifestPlaceholders = [appName: "@string/app_name"]
         }
     }
@@ -142,6 +146,7 @@ dependencies {
 
     // OSS Licenses
     implementation "com.google.android.gms:play-services-oss-licenses:17.0.1"
+
 }
 
 kapt {

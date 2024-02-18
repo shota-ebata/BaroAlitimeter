@@ -1,0 +1,68 @@
+{
+  "project_info": {
+    "project_number": "699909231329",
+    "project_id": "baroalitimeter",
+    "storage_bucket": "baroalitimeter.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:699909231329:android:d51033a1ccc92954c5dda0",
+        "android_client_info": {
+          "package_name": "com.ebata_shota.baroalitimeter"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "699909231329-5eaqtnolf2a5hmvuoncgd6mp3uidtn3s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa2IPDRcvfWqrNcXMEvnnAUkcd1mDiaP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "699909231329-5eaqtnolf2a5hmvuoncgd6mp3uidtn3s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:699909231329:android:6c381a1b2a410cbac5dda0",
+        "android_client_info": {
+          "package_name": "com.ebata_shota.baroalitimeter.debug"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "699909231329-5eaqtnolf2a5hmvuoncgd6mp3uidtn3s.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCa2IPDRcvfWqrNcXMEvnnAUkcd1mDiaP4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "699909231329-5eaqtnolf2a5hmvuoncgd6mp3uidtn3s.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
