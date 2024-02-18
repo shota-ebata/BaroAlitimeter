@@ -27,5 +27,4 @@ interface RepositoryModule {
     @Binds
     @Singleton
     fun bindCalcRepository(repository: CalcRepositoryImpl): CalcRepository
-
 }
