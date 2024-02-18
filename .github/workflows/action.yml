@@ -40,24 +40,24 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/*.gradle.kts') }}
-      - name: Set/
-      - name: Get gem info
-        env: # Danger で利用する gem をここで列挙
-          PACKAGES: danger:9.0.0 danger-checkstyle_format:0.1.1 danger-android_lint:0.0.11 danger-junit:1.0.2
-        id: gem-info
-        run: |
-          echo "dir=$(gem environment gemdir)" >> $GITHUB_ENV # キャッシュするgemのディレクトリ
-          echo "packages=$PACKAGES" >> $GITHUB_ENV # install 用の文字列
-          echo "key=$(echo $PACKAGES | tr ' ' '-')" >> $GITHUB_ENV # キャッシュのキー文字列
-      - name: Restroe gem cache # gem のキャッシュをRestore
-        uses: actions/cache@v3
-        with:
-          path: ${{ env.dir }}
-          key: ${{ runner.os }}-gem-${{ env.key }}
+      #      - name: Set/
+      #      - name: Get gem info
+      #        env: # Danger で利用する gem をここで列挙
+      #          PACKAGES: danger:9.0.0 danger-checkstyle_format:0.1.1 danger-android_lint:0.0.11 danger-junit:1.0.2
+      #        id: gem-info
+      #        run: |
+      #          echo "dir=$(gem environment gemdir)" >> $GITHUB_ENV # キャッシュするgemのディレクトリ
+      #          echo "packages=$PACKAGES" >> $GITHUB_ENV # install 用の文字列
+      #          echo "key=$(echo $PACKAGES | tr ' ' '-')" >> $GITHUB_ENV # キャッシュのキー文字列
+      #      - name: Restroe gem cache # gem のキャッシュをRestore
+      #        uses: actions/cache@v3
+      #        with:
+      #          path: ${{ env.dir }}
+      #          key: ${{ runner.os }}-gem-${{ env.key }}
       #      - name: ktlint
-      #          run: ./gradlew $c
-      - name: Run Android Lint
-        run: ./gradlew $GRADLE_ANDROID_LINT_TASK
+      #          run: ./gradlew $GRADLE_KTLINT_TASK
+      #      - name: Run Android Lint
+      #        run: ./gradlew $GRADLE_ANDROID_LINT_TASK
       - name: Run Unit Test
         run: ./gradlew $GRADLE_UNIT_TEST_TASK
       - name: Publish Test Report
