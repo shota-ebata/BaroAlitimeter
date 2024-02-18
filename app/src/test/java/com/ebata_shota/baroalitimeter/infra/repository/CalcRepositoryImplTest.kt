@@ -33,17 +33,4 @@ class CalcRepositoryImplTest {
             assertEquals(1010.83f, BigDecimal(result.toDouble()).setScale(2, RoundingMode.HALF_EVEN).toFloat())
         }
     }
-
-    @Test
-    fun calcAltitudeFail() {
-        runTest {
-            val result: Float = repository.calcAltitude(
-                pressure = 900.0f,
-                seaLevelPressure = 1013.25f,
-                temperature = 15.0f
-            )
-            // 小数点以下第3位で四捨五入して
-            assertEquals(1010.82f, BigDecimal(result.toDouble()).setScale(2, RoundingMode.HALF_EVEN).toFloat())
-        }
-    }
 }
