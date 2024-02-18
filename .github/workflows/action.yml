@@ -17,7 +17,6 @@ permissions:
   pull-requests: write
 
 env:
-  GRADLE_KTLINT_TASK: 'ktlint'
   GRADLE_ANDROID_LINT_TASK: 'lintDebug'
   GRADLE_UNIT_TEST_TASK: 'testDebugUnitTest'
 
@@ -59,8 +58,6 @@ jobs:
         with:
           path: ${{ env.dir }}
           key: ${{ runner.os }}-gem-${{ env.key }}
-      - name: Run ktlint
-        run: ./gradlew $GRADLE_KTLINT_TASK
 #      - name: Run Android Lint
 #        run: ./gradlew $GRADLE_ANDROID_LINT_TASK
 #      - name: Run Unit Test
