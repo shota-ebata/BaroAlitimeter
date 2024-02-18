@@ -15,10 +15,14 @@ github.dismiss_out_of_range_messages({
 
 message "call 3"
 # Android Lintの結果ファイルの解析とコメント
-android_lint.skip_gradle_task = true # すでにある結果ファイルを利用する
-android_lint.report_file = "app/build/reports/lint-results-debug.html"
-android_lint.filtering = false # エラーは追加・変更したファイルでなくてもコメント
-android_lint.lint(inline_mode: true) # コードにインラインでコメントする
+Dir.glob("app/build/reports/lint-results-debug.html").each { |report|
+    message "call Dir.glob start"
+    android_lint.skip_gradle_task = true # すでにある結果ファイルを利用する
+    android_lint.report_file = report.to_s
+    android_lint.filtering = false # エラーは追加・変更したファイルでなくてもコメント
+    android_lint.lint(inline_mode: true) # コードにインラインでコメントする
+    message "call Dir.glob end"
+}
 
 message "call 4"
 
