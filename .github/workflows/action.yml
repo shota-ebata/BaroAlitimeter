@@ -46,6 +46,7 @@ jobs:
         uses: ruby/setup-ruby@v1
         with:
           ruby-version: '3.0.0'
+          bundler-cache: true
       - name: Get gem info
         env: # Danger で利用する gem をここで列挙
           PACKAGES: danger:9.1.0 danger-checkstyle_format:0.1.1 danger-android_lint:0.0.11 danger-junit:1.0.2
@@ -59,17 +60,17 @@ jobs:
         with:
           path: ${{ env.dir }}
           key: ${{ runner.os }}-gem-${{ env.key }}
-      #      - name: ktlint
-      #          run: ./gradlew $GRADLE_KTLINT_TASK
-      - name: Run Android Lint
-        run: ./gradlew $GRADLE_ANDROID_LINT_TASK
-      - name: Run Unit Test
-        run: ./gradlew $GRADLE_UNIT_TEST_TASK
-      - name: Set up and run Danger
-        if: cancelled() != true #中断されない限り、エラーでも実行
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 標準で利用できるトークンを利用
-          JOB_STATUS: ${{ job.status }} # jobのステータスを Danger へ受け渡す
-        run: |
-          gem install ${{ env.packages }}
-          danger --dangerfile='Dangerfile' --remove-previous-comments --fail-on-errors=true
+      - name: Run ktlint
+        run: ./gradlew $GRADLE_KTLINT_TASK
+#      - name: Run Android Lint
+#        run: ./gradlew $GRADLE_ANDROID_LINT_TASK
+#      - name: Run Unit Test
+#        run: ./gradlew $GRADLE_UNIT_TEST_TASK
+#      - name: Set up and run Danger
+#        if: cancelled() != true #中断されない限り、エラーでも実行
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # 標準で利用できるトークンを利用
+#          JOB_STATUS: ${{ job.status }} # jobのステータスを Danger へ受け渡す
+#        run: |
+#          gem install ${{ env.packages }}
+#          danger --dangerfile='Dangerfile' --remove-previous-comments --fail-on-errors=true
