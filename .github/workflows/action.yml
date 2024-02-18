@@ -60,8 +60,8 @@ jobs:
           key: ${{ runner.os }}-gem-${{ env.key }}
       - name: Run Android Lint
         run: ./gradlew $GRADLE_ANDROID_LINT_TASK
-#      - name: Run Unit Test
-#        run: ./gradlew $GRADLE_UNIT_TEST_TASK
+      - name: Run Unit Test
+        run: ./gradlew $GRADLE_UNIT_TEST_TASK
 #      - name: Set up and run Danger
 #        if: cancelled() != true #中断されない限り、エラーでも実行
 #        env:
