@@ -58,8 +58,8 @@ jobs:
         with:
           path: ${{ env.dir }}
           key: ${{ runner.os }}-gem-${{ env.key }}
-#      - name: Run Android Lint
-#        run: ./gradlew $GRADLE_ANDROID_LINT_TASK
+      - name: Run Android Lint
+        run: ./gradlew $GRADLE_ANDROID_LINT_TASK
 #      - name: Run Unit Test
 #        run: ./gradlew $GRADLE_UNIT_TEST_TASK
 #      - name: Set up and run Danger
