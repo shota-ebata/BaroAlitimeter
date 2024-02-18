@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 
-class SpySensorRepository: SensorRepository {
+class SpySensorRepository : SensorRepository {
     private val _pressureSensorState = MutableStateFlow<Pressure>(Pressure.Loading)
     override val pressureSensorState: StateFlow<Pressure> = _pressureSensorState.asStateFlow()
     suspend fun emitPressureSensorState(pressure: Pressure) = _pressureSensorState.emit(pressure)
