@@ -17,4 +17,4 @@ jobs:
     steps:
       - uses: hmarr/auto-approve-action@v4
         with:
-          review-message: "[Auto approved automated PR]"
+          review-message: "Auto approved automated PR\n[.github/workflows/pr-auto-approve.yml](https://github.com/shota-ebata/BaroAlitimeter/blob/main/.github/workflows/.github/workflows/pr-auto-approve.yml)"
