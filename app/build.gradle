@@ -41,14 +41,13 @@ android {
                 storeFile file(storeFilePathValue)
             } else {
                 def releaseKeystoreFileName = "release-keystore.keystore"
-                System.getenv("SHOTA_EBATA_KEY_STORE_BASE64").let { base64 ->
-                    def decoder = Base64.getMimeDecoder()
-                    File(releaseKeystoreFileName).also { file ->
-                        file.createNewFile()
-                        file.writeBytes(decoder.decode(base64))
-                    }
-                }
-                storeFile = rootProject.file(releaseKeystoreFileName)
+                def keyStoreBase64 = System.getenv("SHOTA_EBATA_KEY_STORE_BASE64")
+                def decoder = Base64.getMimeDecoder()
+                def file = new File(releaseKeystoreFileName)
+                file.createNewFile()
+                def decode = decoder.decode(keyStoreBase64)
+                def text = new String(decode)
+                file.write(text)
             }
             storePassword System.getenv("SHOTA_EBATA_KEY_STORE_PASSWORD")
             keyAlias System.getenv("KEY_ALIAS_VALUE")
