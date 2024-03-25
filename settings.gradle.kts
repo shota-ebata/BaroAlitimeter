@@ -13,4 +13,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "BaroAlitimeter"
-include ':app'
+include(":app")
