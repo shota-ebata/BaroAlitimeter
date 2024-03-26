@@ -45,7 +45,7 @@ android {
                 storeFile = file(storeFilePathValue!!)
             } else {
                 val releaseKeystoreFileName = "release-keystore.keystore"
-                System.getenv("SHOTA_EBATA_KEY_STORE_BASE64").let { base64 ->
+                System.getenv("SHOTA_EBATA_KEY_STORE_BASE64")?.let { base64 ->
                     val decoder = Base64.getMimeDecoder()
                     File(releaseKeystoreFileName).also { file ->
                         file.createNewFile()
