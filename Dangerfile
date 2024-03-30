@@ -40,15 +40,12 @@ fail("fit left in tests") if `grep -r fit specs/ `.length > 1
 # strings.xmlのパス
 STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
 
-# Pull Request内の変更ファイルの一覧を取得
+# Pull Request内のファイル変更を取得
 changed_files = git.modified_files + git.added_files
 
-# 変更ファイルの一覧をコメントとして出力
-if changed_files.any?
-  comment("Changed files in this PR:")
-  changed_files.each do |file|
-    comment("- #{file}")
-  end
+# strings.xmlが変更されたかチェックし、コメントを追加
+if changed_files.include?(STRINGS_XML_PATH)
+  message("Hey, I noticed changes in #{STRINGS_XML_PATH}!")
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
