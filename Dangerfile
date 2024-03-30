@@ -41,11 +41,20 @@ fail("fit left in tests") if `grep -r fit specs/ `.length > 1
 STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
 
 # Pull Request内のファイル変更を取得
+diff = git.diff_for_file(STRINGS_XML_PATH)
+
+# Pull Request内のファイル変更を取得
 changed_files = git.modified_files + git.added_files
 
-# strings.xmlが変更されたかチェックし、コメントを追加
-if changed_files.include?(STRINGS_XML_PATH)
-  message("Hey, I noticed changes in #{STRINGS_XML_PATH}!")
+# strings.xmlが変更された場合
+if diff
+  # 変更行の一覧を出力
+  puts "Changes in #{STRINGS_XML_PATH}:"
+  puts "---------------------------------------------"
+  diff.patch.split("\n").each do |line|
+    puts line if line.start_with?('+') || line.start_with?('-')
+  end
+  puts "---------------------------------------------"
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
