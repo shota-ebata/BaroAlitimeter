@@ -54,6 +54,7 @@ if changed_files.include?(STRINGS_XML_PATH)
     diff.patch.split("\n").each do |line|
       text = text + line + "\n"
     end
+    message("#{text}")
   end
 end
 
