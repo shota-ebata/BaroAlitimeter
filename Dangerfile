@@ -37,19 +37,19 @@ fail("fit left in tests") if `grep -r fit specs/ `.length > 1
 # 追加で独自のチェックをする場合はこのあたりで実施する
 # ...
 
+# Pull Request内のファイル変更を取得
+changed_files = git.modified_files + git.added_files
+
 # strings.xmlのパス
 STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
 
 # Pull Request内のファイル変更を取得
 diff = git.diff_for_file(STRINGS_XML_PATH)
 
-# Pull Request内のファイル変更を取得
-changed_files = git.modified_files + git.added_files
-
 # strings.xmlが変更された場合
 if diff
   # 変更行の一覧をコメントとして出力
-    comment("Changes in #{STRINGS_XML_PATH}:\n```diff\n#{diff.patch}\n```")
+  comment("Changes in #{STRINGS_XML_PATH}:\n```diff\n#{diff.patch}\n```")
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
