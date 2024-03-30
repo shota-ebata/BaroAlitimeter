@@ -7,7 +7,6 @@
     <uses-feature
         android:name="android.hardware.sensor.barometer"
         android:required="true" />
-
     <uses-feature
         android:name="android.hardware.sensor.ambient_temperature"
         android:required="false" />
@@ -23,11 +22,14 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BaroAlitimeter"
         tools:targetApi="31">
-
+        <activity
+            android:name=".ResTestActivity"
+            android:exported="false"
+            android:label="@string/title_activity_res_test"
+            android:theme="@style/Theme.BaroAlitimeter" />
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
-
             android:theme="@style/Theme.BaroAlitimeter">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
