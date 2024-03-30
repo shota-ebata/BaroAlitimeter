@@ -40,17 +40,14 @@ fail("fit left in tests") if `grep -r fit specs/ `.length > 1
 # strings.xmlのパス
 STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
 
-# Pull Request内のファイル変更を取得
+# Pull Request内の変更ファイルの一覧を取得
 changed_files = git.modified_files + git.added_files
 
-# strings.xmlが変更された場合
-if changed_files.include?(STRINGS_XML_PATH)
-  # 変更行の一覧を取得
-  diff = git.diff_for_file(STRINGS_XML_PATH)
-  # 変更行がある場合にのみコメントを出力
-  if diff
-    # 変更行の一部のみを抽出してコメントとして出力
-    comment("Changes in #{STRINGS_XML_PATH}:")
+# 変更ファイルの一覧をコメントとして出力
+if changed_files.any?
+  comment("Changed files in this PR:")
+  changed_files.each do |file|
+    comment("- #{file}")
   end
 end
 
