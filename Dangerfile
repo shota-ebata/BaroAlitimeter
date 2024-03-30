@@ -45,11 +45,11 @@ changed_files = git.modified_files + git.added_files
 
 # strings.xmlが変更されたかチェックし、コメントを追加
 if changed_files.include?(STRINGS_XML_PATH)
-  message("Hey, I noticed changes in #{STRINGS_XML_PATH}!")
-  comment("Changed files in this PR:")
+  text = ""
   changed_files.each do |file|
-    comment("- #{file}")
+    text = text + "#{file} \n"
   end
+  message("Hey, I noticed changes in #{text}!")
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
