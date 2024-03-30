@@ -49,7 +49,7 @@ diff = git.diff_for_file(STRINGS_XML_PATH)
 # strings.xmlが変更された場合
 if diff
   # 変更行の一覧をコメントとして出力
-  comment("Changes in #{STRINGS_XML_PATH}:\n```diff\n#{diff.patch}\n```")
+  comment("Changes in #{diff.patch}")
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
