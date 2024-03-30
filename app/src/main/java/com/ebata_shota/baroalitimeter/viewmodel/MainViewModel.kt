@@ -254,11 +254,11 @@ constructor(
     private fun updateTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
         _mainUiState.update { currentMainUiState ->
             // 表示できるUiStateじゃないなら無視
-            if (currentMainUiState !is MainUiState.UiState) return@update currentMainUiState
+            if (currentMainUiState !is MainUiState.UiState) return
 
             // Editモードじゃないなら無視
             val temperatureUiState = currentMainUiState.temperatureUiState
-            if (temperatureUiState !is MainUiState.TemperatureUiState.EditMode) return@update currentMainUiState
+            if (temperatureUiState !is MainUiState.TemperatureUiState.EditMode) return
 
             // textFieldValueを更新
             currentMainUiState.copy(
@@ -276,11 +276,11 @@ constructor(
     private fun updateAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
         _mainUiState.update { currentMainUiState ->
             // 表示できるUiStateじゃないなら無視
-            if (currentMainUiState !is MainUiState.UiState) return@update currentMainUiState
+            if (currentMainUiState !is MainUiState.UiState) return
 
             // Editモードじゃないなら無視
             val altitudeUiState = currentMainUiState.altitudeUiState
-            if (altitudeUiState !is MainUiState.AltitudeUiState.EditMode) return@update currentMainUiState
+            if (altitudeUiState !is MainUiState.AltitudeUiState.EditMode) return
 
             // textFieldValueを更新
             currentMainUiState.copy(
