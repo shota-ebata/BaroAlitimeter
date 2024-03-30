@@ -51,11 +51,6 @@ if changed_files.include?(STRINGS_XML_PATH)
   if diff
     # 変更行の一部のみを抽出してコメントとして出力
     comment("Changes in #{STRINGS_XML_PATH}:")
-    diff.patch.split("\n").each do |line|
-      # 最初の100行までを出力（必要に応じて変更）
-      break if line.nil? || line == "" || line.start_with?("@@")
-      comment(line)
-    end
   end
 end
 
