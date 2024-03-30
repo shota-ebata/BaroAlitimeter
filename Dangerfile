@@ -48,13 +48,8 @@ changed_files = git.modified_files + git.added_files
 
 # strings.xmlが変更された場合
 if diff
-  # 変更行の一覧を出力
-  puts "Changes in #{STRINGS_XML_PATH}:"
-  puts "---------------------------------------------"
-  diff.patch.split("\n").each do |line|
-    puts line if line.start_with?('+') || line.start_with?('-')
-  end
-  puts "---------------------------------------------"
+  # 変更行の一覧をコメントとして出力
+    comment("Changes in #{STRINGS_XML_PATH}:\n```diff\n#{diff.patch}\n```")
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
