@@ -47,9 +47,9 @@ changed_files = git.modified_files + git.added_files
 if changed_files.include?(STRINGS_XML_PATH)
   message("Hey, I noticed changes in #{STRINGS_XML_PATH}!")
   comment("Changed files in this PR:")
-    changed_files.each do |file|
-      comment("- #{file}")
-    end
+  changed_files.each do |file|
+    comment("- #{file}")
+  end
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
