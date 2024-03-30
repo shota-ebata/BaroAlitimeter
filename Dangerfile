@@ -52,7 +52,7 @@ if changed_files.include?(STRINGS_XML_PATH)
     text = ""
     # 変更行の一部のみを抽出してコメントとして出力
     diff.patch.split("\n").each do |line|
-      text = text + line "\n"
+      text = text + line + "\n"
     end
   end
 end
