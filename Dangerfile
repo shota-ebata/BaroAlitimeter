@@ -37,6 +37,17 @@ fail("fit left in tests") if `grep -r fit specs/ `.length > 1
 # 追加で独自のチェックをする場合はこのあたりで実施する
 # ...
 
+# strings.xmlのパス
+STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
+
+# Pull Request内のファイル変更を取得
+changed_files = git.modified_files + git.added_files
+
+# strings.xmlが変更されたかチェックし、コメントを追加
+if changed_files.include?(STRINGS_XML_PATH)
+  message("Hey, I noticed changes in #{STRINGS_XML_PATH}!")
+end
+
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
 return unless status_report[:errors].empty?
 
