@@ -46,10 +46,14 @@ changed_files = git.modified_files + git.added_files
 # strings.xmlが変更されたかチェックし、コメントを追加
 if changed_files.include?(STRINGS_XML_PATH)
   text = ""
-  changed_files.each do |file|
-    text = text + "#{file} \n"
+  diff = git.diff_for_file(STRINGS_XML_PATH)
+  if diff
+    # 変更行の一部のみを抽出してコメントとして出力
+    diff.patch.split("\n").each do |line|
+    # 最初の100行までを出力（必要に応じて変更）
+    text = line + ""
   end
-  message("Hey, I noticed changes in #{text}!")
+  message("#{text}")
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
