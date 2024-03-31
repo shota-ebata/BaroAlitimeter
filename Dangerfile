@@ -54,6 +54,29 @@ def get_line_number(file, search_text)
     return -1
 end
 
+
+def find_file_names_include(search_text)
+   # 検索するディレクトリを指定
+   search_directory = "app"
+
+   # 特定のテキストを含むファイルの名前を格納する配列を初期化
+   files_with_text = []
+
+   # 指定したディレクトリ内のファイルを走査して特定のテキストを含むファイルを検索
+   Dir.glob("#{search_directory}/**/*").each do |file|
+     next unless File.file?(file)
+
+     # ファイルを開いてテキストを検索
+     if File.read(file).include?(search_text)
+       files_with_text << file
+     end
+   end
+   return search_directory
+end
+
+
+
+
 file_name = STRINGS_XML_PATH
 
 # strings.xmlが変更されたかチェックし、コメントを追加
@@ -67,9 +90,15 @@ if changed_files.include?(file_name)
                 message("#{line.sub("+", "")}")
                 line_text = line.sub("+ ", "")
                 string_res_name = line_text.match(/<string name=".+"/)[0].sub(/<string name="/, "").sub(/"/, "")
+
                 File.open(file_name, "r") do |file|
                     line_number = get_line_number(file, line_text)
-                    message("ここ・・・テキストを変えたな？？ #{string_res_name} の影響範囲調べろよ", file: file_name, line: line_number)
+                    find_file_names_include("R.string.#{string_res_name}").each do |hit_file_name|
+                        message("hit_file_name", file: file_name, line: line_number)
+                    end
+                    find_file_names_include("@string/#{string_res_name}").each do |hit_file_name|
+                        message("hit_file_name", file: file_name, line: line_number)
+                    end
                 end
             end
         end
