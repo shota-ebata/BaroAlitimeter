@@ -67,7 +67,6 @@ if changed_files.include?(STRINGS_XML_PATH)
                 string_res_name = line_text.match(/<string name=".+"/)[0].sub(/<string name="/, "").sub(/"/, "")
                 File.open(STRINGS_XML_PATH, "r") do |file|
                     line_number = get_line_number(file, line_text)
-                    set_message(file: STRINGS_XML_PATH, line_number: line_number, message: )
                     message("ここ・・・テキストを変えたな？？ #{string_res_name} の影響範囲調べろよ", file: file_name, line: line_number)
                 end
             end
