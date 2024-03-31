@@ -43,19 +43,41 @@ STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
 # Pull Request内のファイル変更を取得
 changed_files = git.modified_files + git.added_files
 
+def get_line_number(file, search_text)
+    line_number = 1
+    file.each_line do |line|
+        if line.include?(search_text)
+            return line_number
+        end
+        line_number += 1
+    end
+    return -1
+end
+
 # strings.xmlが変更されたかチェックし、コメントを追加
 if changed_files.include?(STRINGS_XML_PATH)
-  # 変更行の一覧を取得
-  diff = git.diff_for_file(STRINGS_XML_PATH)
-  # 変更行がある場合にのみコメントを出力
-  if diff
-    text = ""
-    # 変更行の一部のみを抽出してコメントとして出力
-    diff.patch.split("\n").each do |line|
-      text = text + line + "\n"
+    # 変更行の一覧を取得
+    diff = git.diff_for_file(STRINGS_XML_PATH)
+    # 変更行がある場合にのみコメントを出力
+    if diff
+        diff.patch.lines.each do |line|
+            if line.match(/^\+{1}[ ].+/)
+                line_text = line.sub("+ ", "")
+                string_res_name = line_text.match(/<string name=".+"/)[0].sub(/<string name="/, "").sub(/"/, "")
+                file_name = STRINGS_XML_PATH
+                File.open(file_name, "r") do |file|
+                    line_number = get_line_number(file, line_text)
+                    message("#{line.sub("+", "")}")
+                    message("file_name = #{file_name}, line_number = #{line_number}")
+                    message(message: "影響範囲調べろよ1", file: file_name, line: line_number)
+                    message(message: "影響範囲調べろよ2", file: file, line: line_number)
+                    message(message: "影響範囲調べろよ3", file: "strings.xml", line: line_number)
+                    warn(message: "影響範囲調べろよ4", file: "strings.xml", line: line_number)
+                end
+            end
+        end
     end
-    message("#{text}")
-  end
+    message("#{diff.patch.lines}")
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
