@@ -57,7 +57,7 @@ end
 
 def find_file_names_include(search_text)
    # 検索するディレクトリを指定
-   search_directory = "app"
+   search_directory = "app/src"
 
    # 特定のテキストを含むファイルの名前を格納する配列を初期化
    files_with_text = []
@@ -101,10 +101,7 @@ if changed_files.include?(file_name)
 
                 File.open(file_name, "r") do |file|
                     line_number = get_line_number(file, line_text)
-                    message_text = "リソース使用箇所\n"
-                    message_text = message_text + create_message_text("R.string.#{string_res_name}")
-                    message_text = message_text + create_message_text("@string/#{string_res_name}")
-
+                    message_text = "リソース使用箇所\n" + create_message_text("R.string.#{string_res_name}") + create_message_text("@string/#{string_res_name}")
                     message(message_text, file: file_name, line: line_number)
                 end
             end
