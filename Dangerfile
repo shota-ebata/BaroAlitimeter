@@ -76,11 +76,8 @@ end
 
 
 def create_message_text(search_text)
-    message_text = ""
-    find_file_names_include(search_text).each do |hit_file_name|
-        message_text = message_text + "- " + hit_file_name  + "\n"
-    end
-    return message_text
+    file_name_list = find_file_names_include(search_text)
+    return file_name_list.map {|hit_file_name| "- " + hit_file_name  + "\n" }.join
 end
 
 
