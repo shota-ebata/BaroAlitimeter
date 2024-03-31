@@ -54,10 +54,12 @@ def get_line_number(file, search_text)
     return -1
 end
 
+file_name = STRINGS_XML_PATH
+
 # strings.xmlが変更されたかチェックし、コメントを追加
-if changed_files.include?(STRINGS_XML_PATH)
+if changed_files.include?(file_name)
     # 変更行の一覧を取得
-    diff = git.diff_for_file(STRINGS_XML_PATH)
+    diff = git.diff_for_file(file_name)
     # 変更行がある場合にのみコメントを出力
     if diff
         diff.patch.lines.each do |line|
@@ -65,7 +67,7 @@ if changed_files.include?(STRINGS_XML_PATH)
                 message("#{line.sub("+", "")}")
                 line_text = line.sub("+ ", "")
                 string_res_name = line_text.match(/<string name=".+"/)[0].sub(/<string name="/, "").sub(/"/, "")
-                File.open(STRINGS_XML_PATH, "r") do |file|
+                File.open(file_name, "r") do |file|
                     line_number = get_line_number(file, line_text)
                     message("ここ・・・テキストを変えたな？？ #{string_res_name} の影響範囲調べろよ", file: file_name, line: line_number)
                 end
