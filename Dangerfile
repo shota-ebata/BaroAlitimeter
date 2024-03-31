@@ -101,7 +101,7 @@ if changed_files.include?(file_name)
 
                 File.open(file_name, "r") do |file|
                     line_number = get_line_number(file, line_text)
-
+                    message_text = "リソース使用箇所\n"
                     message_text = create_message_text("R.string.#{string_res_name}")
                     message_text = message_text + create_message_text("@string/#{string_res_name}")
 
