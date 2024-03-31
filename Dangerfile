@@ -68,8 +68,7 @@ if changed_files.include?(STRINGS_XML_PATH)
                 File.open(file_name, "r") do |file|
                     line_number = get_line_number(file, line_text)
                     message("#{line.sub("+", "")}")
-                    message("file_name = #{file_name}, line_number = #{line_number}")
-                    warn(message: "影響範囲調べろよ1", file: file_name, line: line_number)
+                    message("#{file_name} 影響範囲調べろよ", file: file_name, line: line_number)
                 end
             end
         end
