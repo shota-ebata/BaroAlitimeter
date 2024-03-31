@@ -88,10 +88,11 @@ if changed_files.include?(file_name)
                 line_text = line.sub("+ ", "")
                 # Stringリソース名取得
                 string_res_name = line_text.match(/<string name=".+"/)[0].sub(/<string name="/, "").sub(/"/, "")
+                res_use_file_name_list = find_file_names_include("R.string.#{string_res_name}")
+                res_use_file_name_list << find_file_names_include("@string/#{string_res_name}")
                 message_text_list = []
                 message_text_list << "リソース使用箇所\n"
-                message_text_list << find_file_names_include("R.string.#{string_res_name}").unshift("- ").push("\n")
-                message_text_list << find_file_names_include("@string/#{string_res_name}").unshift("- ").push("\n")
+                message_text_list << res_use_file_name_list.unshift("- ").push("\n")
                 line_number = -1
                 # リソース名を利用している場所を検索する
                 File.open(file_name, "r") do |file|
