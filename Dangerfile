@@ -69,10 +69,7 @@ if changed_files.include?(STRINGS_XML_PATH)
                     line_number = get_line_number(file, line_text)
                     message("#{line.sub("+", "")}")
                     message("file_name = #{file_name}, line_number = #{line_number}")
-                    message(message: "影響範囲調べろよ1", file: file_name, line: line_number)
-                    message(message: "影響範囲調べろよ2", file: file, line: line_number)
-                    message(message: "影響範囲調べろよ3", file: "strings.xml", line: line_number)
-                    warn(message: "影響範囲調べろよ4", file: "strings.xml", line: line_number)
+                    warn(message: "影響範囲調べろよ1", file: file_name, line: line_number)
                 end
             end
         end
