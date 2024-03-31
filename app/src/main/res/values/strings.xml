@@ -21,9 +21,9 @@
     <string name="title_activity_res_test">ResTestActivity</string>
 
     <!-- Strings used for fragments for navigation -->
-    <string name="first_fragment_label">First Fragment</string>
+    <string name="first_fragment_label">First Fragment_</string>
     <string name="second_fragment_label">Second Fragment</string>
-    <string name="next">Next2</string>
+    <string name="next">Next3</string>
     <string name="previous">Previous</string>
 
     <string name="lorem_ipsum">
