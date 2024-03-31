@@ -63,12 +63,12 @@ def find_file_names_include(search_text)
    files_with_text = []
 
    # 指定したディレクトリ内のファイルを走査して特定のテキストを含むファイルを検索
-   Dir.glob("#{search_directory}/**/*").each do |file|
-     next unless File.file?(file)
+   Dir.glob("#{search_directory}/**/*").each do |file_name|
+     next unless File.file?(file_name)
 
      # ファイルを開いてテキストを検索
-     if File.read(file).include?(search_text)
-       files_with_text << file
+     if File.read(file_name).include?(search_text)
+       files_with_text << file_name
      end
    end
    return files_with_text
@@ -80,8 +80,6 @@ def create_message_text(search_text)
     return file_name_list.map {|hit_file_name| "- " + hit_file_name  + "\n" }.join
 end
 
-
-
 file_name = STRINGS_XML_PATH
 
 # strings.xmlが変更されたかチェックし、コメントを追加
@@ -91,20 +89,24 @@ if changed_files.include?(file_name)
     # 変更行がある場合にのみコメントを出力
     if diff
         diff.patch.lines.each do |line|
+            # 差分から追加行を検索
             if line.match(/^\+{1}[ ].+/)
-                message("#{line.sub("+", "")}")
                 line_text = line.sub("+ ", "")
+                # Stringリソース名取得
                 string_res_name = line_text.match(/<string name=".+"/)[0].sub(/<string name="/, "").sub(/"/, "")
-
+                message_text_list = []
+                message_text_list << "リソース使用箇所\n"
+                message_text_list << create_message_text("R.string.#{string_res_name}")
+                message_text_list << create_message_text("@string/#{string_res_name}")
+                line_number = -1
+                # リソース名を利用している場所を検索する
                 File.open(file_name, "r") do |file|
                     line_number = get_line_number(file, line_text)
-                    message_text = "リソース使用箇所\n" + create_message_text("R.string.#{string_res_name}") + create_message_text("@string/#{string_res_name}")
-                    message(message_text, file: file_name, line: line_number)
                 end
+                message(message_text_list.join, file: file_name, line: line_number)
             end
         end
     end
-    message("#{diff.patch.lines}")
 end
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
