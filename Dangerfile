@@ -62,13 +62,13 @@ if changed_files.include?(STRINGS_XML_PATH)
     if diff
         diff.patch.lines.each do |line|
             if line.match(/^\+{1}[ ].+/)
+                message("#{line.sub("+", "")}")
                 line_text = line.sub("+ ", "")
                 string_res_name = line_text.match(/<string name=".+"/)[0].sub(/<string name="/, "").sub(/"/, "")
-                file_name = STRINGS_XML_PATH
-                File.open(file_name, "r") do |file|
+                File.open(STRINGS_XML_PATH, "r") do |file|
                     line_number = get_line_number(file, line_text)
-                    message("#{line.sub("+", "")}")
-                    message("#{file_name} 影響範囲調べろよ", file: file_name, line: line_number)
+                    set_message(file: STRINGS_XML_PATH, line_number: line_number, message: )
+                    message("ここ・・・テキストを変えたな？？ #{string_res_name} の影響範囲調べろよ", file: file_name, line: line_number)
                 end
             end
         end
