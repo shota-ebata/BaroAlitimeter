@@ -94,10 +94,10 @@ if changed_files.include?(file_name)
                 File.open(file_name, "r") do |file|
                     line_number = get_line_number(file, line_text)
                     find_file_names_include("R.string.#{string_res_name}").each do |hit_file_name|
-                        message("hit_file_name", file: file_name, line: line_number)
+                        message("#{hit_file_name}", file: file_name, line: line_number)
                     end
                     find_file_names_include("@string/#{string_res_name}").each do |hit_file_name|
-                        message("hit_file_name", file: file_name, line: line_number)
+                        message("#{hit_file_name}", file: file_name, line: line_number)
                     end
                 end
             end
