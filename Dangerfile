@@ -66,7 +66,7 @@ if changed_files.include?(file_name)
 
                 message_text_list = []
                 message_text_list << "リソース使用箇所\n"
-                message_text_list << "- `" + res_text + "`/n"
+                message_text_list << "- `" + res_text + "`\n"
                 message_text_list << res_use_file_name_list1.unshift("  - ").push("\n") if !res_use_file_name_list1.empty?
                 message_text_list << res_use_file_name_list2.unshift("  - ").push("\n") if !res_use_file_name_list2.empty?
                 line_number = -1
