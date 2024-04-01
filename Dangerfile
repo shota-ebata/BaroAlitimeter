@@ -54,27 +54,23 @@ if changed_files.include?(file_name)
     diff = git.diff_for_file(file_name)
     # 変更行がある場合にのみコメントを出力
     if diff
+#         diff.patch.lines.map do |line|
+#             next unless line.match(/^\+{1}[ ].+/)
+#         end
         diff.patch.lines.each do |line|
             # 差分から追加行を検索
             if line.match(/^\+{1}[ ].+/)
                 line_text = line.sub("+ ", "")
                 # Stringリソース名取得
                 res_text = line_text.match(/<.+ name=".+">.+<\/.+>/)[0]
-                string_res_name = res_text.sub(/<.+ name="/, "").sub(/">.+<\/.+>/, "")
-                res_use_file_name_list1 = find_file_names_include("R.string.#{string_res_name}")
-                res_use_file_name_list2 = find_file_names_include("@string/#{string_res_name}")
-
-                message_text_list = []
-                message_text_list << "リソース使用箇所\n"
-                message_text_list << "- `" + res_text + "`\n"
-                message_text_list << res_use_file_name_list1.unshift("  - ").push("\n") if !res_use_file_name_list1.empty?
-                message_text_list << res_use_file_name_list2.unshift("  - ").push("\n") if !res_use_file_name_list2.empty?
+                message_text_list = get_string_res_usage_file_list(res_text)
                 line_number = -1
                 # リソース名を利用している場所を検索する
-                File.open(file_name, "r") do |file|
-                    line_number = get_line_number(file, line_text)
-                end
-                message(message_text_list.join, file: file_name, line: line_number)
+#                 File.open(file_name, "r") do |file|
+#                     line_number = get_line_number(file, line_text)
+#                 end
+#                 message(message_text_list.join, file: file_name, line: line_number)
+                message(message_text_list.join)
             end
         end
     end
