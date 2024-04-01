@@ -54,21 +54,7 @@ if changed_files.include?(file_name)
     diff = git.diff_for_file(file_name)
     # 変更行がある場合にのみコメントを出力
     if diff
-#         diff.patch.lines.map do |line|
-#             next unless line.match(/^\+{1}[ ].+/)
-#         end
-        message_text = "Stringリソース使用箇所\n"
-        additional_row_list = get_additional_row_list(diff)
-        additional_row_list.each do |additional_row_text|
-            # リソース名取得
-            string_res_name = get_resource_name(additional_row_text)
-            # リソース名を出力に加える
-            message_text += "- `" + string_res_name + "`\n"
-            # Stringリソース使用ファイル一覧を取得
-            file_name_list = find_string_res_usage_file_name_list(string_res_name)
-            # ファイル一覧も出力に加える
-            message_text += file_name_list.map { |file_name| "  - " + file_name + "\n" }.join
-        end
+        message_text =create_string_res_usage_list_message(diff)
         message(message_text)
     end
 end
