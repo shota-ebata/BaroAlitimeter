@@ -70,3 +70,20 @@ def get_resource_name(text)
     # リソース名取得
     return res_text.sub(/<.+ name="/, "").sub(/">.+<\/.+>/, "")
 end
+
+# Stringリソース使用箇所一覧メッセージを作成
+def create_string_res_usage_list_message(diff)
+    message_text = "Stringリソース使用箇所\n"
+    additional_row_list = get_additional_row_list(diff)
+    additional_row_list.each do |additional_row_text|
+        # リソース名取得
+        string_res_name = get_resource_name(additional_row_text)
+        # リソース名を出力に加える
+        message_text += "- `" + string_res_name + "`\n"
+        # Stringリソース使用ファイル一覧を取得
+        file_name_list = find_string_res_usage_file_name_list(string_res_name)
+        # ファイル一覧も出力に加える
+        message_text += file_name_list.map { |file_name| "  - " + file_name + "\n" }.join
+    end
+    return message_text
+end
