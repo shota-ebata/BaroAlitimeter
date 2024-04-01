@@ -63,14 +63,14 @@ if changed_files.include?(file_name)
                 line_text = line.sub("+ ", "")
                 # Stringリソース名取得
                 res_text = line_text.match(/<.+ name=".+">.+<\/.+>/)[0]
-                message_text_list = get_string_res_usage_file_list(res_text)
+                message_text = get_string_res_usage_file_list(res_text)
                 line_number = -1
                 # リソース名を利用している場所を検索する
 #                 File.open(file_name, "r") do |file|
 #                     line_number = get_line_number(file, line_text)
 #                 end
 #                 message(message_text_list.join, file: file_name, line: line_number)
-                message(message_text_list)
+                message(message_text)
             end
         end
     end
