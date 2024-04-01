@@ -61,8 +61,8 @@ if changed_files.include?(file_name)
                 # Stringリソース名取得
                 res_text = line_text.match(/<.+ name=".+">.+<\/.+>/)[0]
                 string_res_name = res_text.sub(/<.+ name="/, "").sub(/">.+<\/.+>/, "")
-                res_use_file_name_list = find_file_names_include("R.string.#{string_res_name}") + find_file_names_include("@string/#{string_res_name}")
-                res_use_file_name_list.flatten
+                res_use_file_name_list = find_file_names_include("R.string.#{string_res_name}")
+                res_use_file_name_list = res_use_file_name_list + find_file_names_include("@string/#{string_res_name}")
                 message_text_list = []
                 message_text_list << "リソース使用箇所\n"
                 message_text_list << res_use_file_name_list.unshift("- ").push("\n")
