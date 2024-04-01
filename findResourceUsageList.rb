@@ -65,7 +65,7 @@ end
 def get_resource_name(text)
     # <xxx name="リソース名">リソース</>形式のテキストだけを抽出する
     match = text.match(/<.+ name=".+">.+<\/.+>/)
-    return nil if match.empty?
+    return nil if match.blank?
     res_text = match[0]
     # リソース名取得
     return res_text.sub(/<.+ name="/, "").sub(/">.+<\/.+>/, "")
