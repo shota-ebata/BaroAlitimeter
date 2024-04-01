@@ -38,11 +38,8 @@ def get_string_res_usage_file_list(res_text)
 
     message_text_list = []
     message_text_list.append("- `" + res_text)
-    if !res_use_file_name_list1.empty do
-        message_text_list.append(res_use_file_name_list1.unshift("  - "))
-    end
-    if !res_use_file_name_list2.empty do
-        message_text_list.append(res_use_file_name_list2.unshift("  - "))
-    end
+    message_text_list.append(res_use_file_name_list1.unshift("  - ")) if !res_use_file_name_list1.empty?
+    message_text_list.append(res_use_file_name_list2.unshift("  - ")) if !res_use_file_name_list2.empty?
+
     return message_text_list.push("\n").join
 end
