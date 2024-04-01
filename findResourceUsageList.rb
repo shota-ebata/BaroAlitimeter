@@ -37,9 +37,9 @@ def get_string_res_usage_file_list(res_text)
     res_use_file_name_list2 = find_file_names_include("@string/#{string_res_name}")
 
     message_text_list = []
-    message_text_list << "- `" + res_text + "`\n"
-    message_text_list << res_use_file_name_list1.unshift("  - ").push("\n") if !res_use_file_name_list1.empty?
-    message_text_list << res_use_file_name_list2.unshift("  - ").push("\n") if !res_use_file_name_list2.empty?
+    message_text_list << "- `" + res_text
+    message_text_list << res_use_file_name_list1.unshift("  - ") if !res_use_file_name_list1.empty?
+    message_text_list << res_use_file_name_list2.unshift("  - ") if !res_use_file_name_list2.empty?
 
-    return message_text_list
+    return message_text_list.push("\n").join
 end
