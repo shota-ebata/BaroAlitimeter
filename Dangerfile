@@ -70,7 +70,7 @@ if changed_files.include?(file_name)
 #                     line_number = get_line_number(file, line_text)
 #                 end
 #                 message(message_text_list.join, file: file_name, line: line_number)
-                message(message_text_list.join)
+                message(message_text_list)
             end
         end
     end
