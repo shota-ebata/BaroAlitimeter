@@ -61,7 +61,7 @@ def get_additional_row_list(diff)
     return additional_row_list
 end
 
-# <xxx name="リソース名">リソース</>形式のテキストからリソース名を抽出
+# <xxx name="リソース名">リソース</xxx>形式のテキストからリソース名を抽出
 def get_resource_name(text)
     # <xxx name="リソース名">リソース</>形式のテキストだけを抽出する
     match = text.match(/<.+ name=".+">.+<\/.+>/)

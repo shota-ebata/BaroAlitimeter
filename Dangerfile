@@ -58,7 +58,7 @@ if changed_files.include?(file_name)
 #             next unless line.match(/^\+{1}[ ].+/)
 #         end
         message_text = "Stringリソース使用箇所\n"
-        additional_row_list = get_additional_row_list()
+        additional_row_list = get_additional_row_list(diff)
         additional_row_list.each do |additional_row_text|
             # リソース名取得
             string_res_name = get_resource_name(additional_row_text)
