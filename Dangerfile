@@ -58,25 +58,16 @@ if changed_files.include?(file_name)
 #             next unless line.match(/^\+{1}[ ].+/)
 #         end
         message_text = "Stringリソース使用箇所\n"
-        diff.patch.lines.each do |line|
-            # 差分から追加行を検索
-            if line.match(/^\+{1}[ ].+/)
-                line_text = line.sub("+ ", "")
-                # Stringリソース名取得
-                res_text = line_text.match(/<.+ name=".+">.+<\/.+>/)[0]
-#                 file_list_text = get_string_res_usage_file_list(res_text)
-                string_res_name = res_text.sub(/<.+ name="/, "").sub(/">.+<\/.+>/, "")
-                message_text += "- `" + string_res_name + "`\n"
-                file_name_list = find_string_res_usage_file_name_list(string_res_name)
-
-#                 line_number = -1
-                # リソース名を利用している場所を検索する
-#                 File.open(file_name, "r") do |file|
-#                     line_number = get_line_number(file, line_text)
-#                 end
-#                 message(message_text_list.join, file: file_name, line: line_number)
-                message_text += file_name_list.map { |file_name| "  - " + file_name + "\n" }.join
-            end
+        additional_row_list = get_additional_row_list()
+        additional_row_list.each do |additional_row_text|
+            # リソース名取得
+            string_res_name = get_resource_name(additional_row_text)
+            # リソース名を出力に加える
+            message_text += "- `" + string_res_name + "`\n"
+            # Stringリソース使用ファイル一覧を取得
+            file_name_list = find_string_res_usage_file_name_list(string_res_name)
+            # ファイル一覧も出力に加える
+            message_text += file_name_list.map { |file_name| "  - " + file_name + "\n" }.join
         end
         message(message_text)
     end

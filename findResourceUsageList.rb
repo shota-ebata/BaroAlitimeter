@@ -48,3 +48,27 @@ def find_string_res_usage_file_name_list(string_res_name)
     res_use_file_name_list2 = find_file_names_include("@string/#{string_res_name}")
     return res_use_file_name_list1 + res_use_file_name_list2
 end
+
+# 差分から追加行だけを抽出
+def get_additional_row_list(diff)
+    additional_row_list = []
+    diff.patch.lines.each do |line|
+        # 差分から追加行だけを抽出
+        if line.match(/^\+{1}[ ].+/)
+            additional_row_list.append(line.sub("+ ", ""))
+        end
+    end
+    return additional_row_list
+end
+
+# <xxx name="リソース名">リソース</>形式のテキストからリソース名を抽出
+def get_resource_name(text)
+    # <xxx name="リソース名">リソース</>形式のテキストだけを抽出する
+    match = text.match(/<.+ name=".+">.+<\/.+>/)
+    if match.empty
+        return nil
+    end
+    res_text = match[0]
+    # リソース名取得
+    return res_text.sub(/<.+ name="/, "").sub(/">.+<\/.+>/, "")
+end
