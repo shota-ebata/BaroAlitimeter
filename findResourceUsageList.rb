@@ -13,7 +13,7 @@ end
 
 def find_file_names_include(search_text)
    # 検索するディレクトリを指定
-   search_directory = "app/src"
+   search_directory = "./"
 
    # 特定のテキストを含むファイルの名前を格納する配列を初期化
    files_with_text = []
