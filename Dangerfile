@@ -57,7 +57,7 @@ if changed_files.include?(file_name)
 #         diff.patch.lines.map do |line|
 #             next unless line.match(/^\+{1}[ ].+/)
 #         end
-        message_text = ""
+        message_text = "Stringリソース使用箇所\n"
         diff.patch.lines.each do |line|
             # 差分から追加行を検索
             if line.match(/^\+{1}[ ].+/)
