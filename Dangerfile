@@ -57,22 +57,24 @@ if changed_files.include?(file_name)
 #         diff.patch.lines.map do |line|
 #             next unless line.match(/^\+{1}[ ].+/)
 #         end
+        message_text = ""
         diff.patch.lines.each do |line|
             # 差分から追加行を検索
             if line.match(/^\+{1}[ ].+/)
                 line_text = line.sub("+ ", "")
                 # Stringリソース名取得
                 res_text = line_text.match(/<.+ name=".+">.+<\/.+>/)[0]
-                message_text = get_string_res_usage_file_list(res_text)
+                file_list_text = get_string_res_usage_file_list(res_text)
                 line_number = -1
                 # リソース名を利用している場所を検索する
 #                 File.open(file_name, "r") do |file|
 #                     line_number = get_line_number(file, line_text)
 #                 end
 #                 message(message_text_list.join, file: file_name, line: line_number)
-                message(message_text)
+                message_text += file_list_text
             end
         end
+        message(message_text)
     end
 end
 
