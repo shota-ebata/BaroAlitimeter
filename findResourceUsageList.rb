@@ -29,3 +29,17 @@ def find_file_names_include(search_text)
    end
    return files_with_text
 end
+
+
+def get_string_res_usage_file_list(res_text)
+    string_res_name = res_text.sub(/<.+ name="/, "").sub(/">.+<\/.+>/, "")
+    res_use_file_name_list1 = find_file_names_include("R.string.#{string_res_name}")
+    res_use_file_name_list2 = find_file_names_include("@string/#{string_res_name}")
+
+    message_text_list = []
+    message_text_list << "- `" + res_text + "`\n"
+    message_text_list << res_use_file_name_list1.unshift("  - ").push("\n") if !res_use_file_name_list1.empty?
+    message_text_list << res_use_file_name_list2.unshift("  - ").push("\n") if !res_use_file_name_list2.empty?
+
+    return message_text_list
+end
