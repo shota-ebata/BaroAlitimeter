@@ -54,7 +54,7 @@ if changed_files.include?(file_name)
     diff = git.diff_for_file(file_name)
     # 変更行がある場合にのみコメントを出力
     if diff
-        message_text =create_string_res_usage_list_message(diff.patch.lines)
+        message_text =create_string_res_usage_list_message(diff)
         message(message_text)
     end
 end
