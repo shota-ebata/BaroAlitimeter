@@ -72,7 +72,7 @@ def get_resource_name(text)
 end
 
 # Stringリソース使用箇所一覧メッセージを作成
-def create_string_res_usage_list_message(diff)
+def create_string_res_usage_list_message(diff:)
     message_text = "Stringリソース使用箇所\n"
     additional_row_list = get_additional_row_list(diff)
     additional_row_list.each do |additional_row_text|
