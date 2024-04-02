@@ -50,9 +50,9 @@ def find_string_res_usage_file_name_list(string_res_name)
 end
 
 # 差分から追加行だけを抽出
-def get_additional_row_list(diff)
+def get_additional_row_list(lines)
     additional_row_list = []
-    diff.patch.lines.each do |line|
+    lines.each do |line|
         # 差分から追加行だけを抽出
         if line.match(/^\+{1}[ ].+/)
             additional_row_list.append(line.sub("+ ", ""))
@@ -72,9 +72,9 @@ def get_resource_name(text)
 end
 
 # Stringリソース使用箇所一覧メッセージを作成
-def create_string_res_usage_list_message(diff)
+def create_string_res_usage_list_message(lines)
     message_text = "Stringリソース使用箇所\n"
-    additional_row_list = get_additional_row_list(diff)
+    additional_row_list = get_additional_row_list(lines)
     additional_row_list.each do |additional_row_text|
         # リソース名取得
         string_res_name = get_resource_name(additional_row_text)
