@@ -17,7 +17,7 @@ def find_file_names_include(search_text)
 
    # 指定したディレクトリ内のファイルを走査して特定のテキストを含むファイルを検索
    Dir.glob("**/*").each do |file_name|
-     next file_name.include?("/build/")
+     next if file_name.include?("/build/")
      next unless File.file?(file_name)
 
      # ファイルを開いてテキストを検索
