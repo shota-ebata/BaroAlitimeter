@@ -37,7 +37,7 @@ fail("fit left in tests") if `grep -r fit specs/ `.length > 1
 # 追加で独自のチェックをする場合はこのあたりで実施する
 # ...
 
-require_relative "findResourceUsageList"
+require_relative "script/findResourceUsageList"
 
 
 # strings.xmlのパス
