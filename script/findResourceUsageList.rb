@@ -10,24 +10,22 @@ def get_line_number(file, search_text)
     return -1
 end
 
-
 def find_file_names_include(search_text)
-   # 特定のテキストを含むファイルの名前を格納する配列を初期化
-   files_with_text = []
+    # 特定のテキストを含むファイルの名前を格納する配列を初期化
+    files_with_text = []
 
-   # 指定したディレクトリ内のファイルを走査して特定のテキストを含むファイルを検索
-   Dir.glob("**/*").each do |file_name|
-     next if file_name.include?("/build/")
-     next unless File.file?(file_name)
+    # 指定したディレクトリ内のファイルを走査して特定のテキストを含むファイルを検索
+    Dir.glob("**/*").each do |file_name|
+        next if file_name.include?("build/")
+        next unless File.file?(file_name)
 
-     # ファイルを開いてテキストを検索
-     if File.read(file_name).include?(search_text)
-       files_with_text << file_name
-     end
-   end
-   return files_with_text
+        # ファイルを開いてテキストを検索
+        if File.read(file_name).include?(search_text)
+            files_with_text << file_name
+        end
+    end
+    return files_with_text
 end
-
 
 def find_string_res_usage_file_list_text(res_text)
     string_res_name = res_text.sub(/<.+ name="/, "").sub(/">.+<\/.+>/, "")
@@ -48,9 +46,9 @@ def find_string_res_usage_file_name_list(string_res_name)
 end
 
 # 差分から追加行だけを抽出
-def get_additional_row_list(diff)
+def get_additional_row_list(diff_lines)
     additional_row_list = []
-    diff.patch.lines.each do |line|
+    diff_lines.each do |line|
         # 差分から追加行だけを抽出
         if line.match(/^\+{1}[ ].+/)
             additional_row_list.append(line.sub("+ ", ""))
@@ -70,9 +68,9 @@ def get_resource_name(text)
 end
 
 # Stringリソース使用箇所一覧メッセージを作成
-def create_string_res_usage_list_message(diff:)
+def create_string_res_usage_list_message(diff_lines:)
     message_text = "Stringリソース使用箇所\n"
-    additional_row_list = get_additional_row_list(diff)
+    additional_row_list = get_additional_row_list(diff_lines)
     additional_row_list.each do |additional_row_text|
         # リソース名取得
         string_res_name = get_resource_name(additional_row_text)
