@@ -83,3 +83,23 @@ def create_string_res_usage_list_message(xml_file_name:, diff_lines:)
     end
     return message_text
 end
+
+# リソース使用箇所の一覧を表示する
+def show_res_usage_message(git)
+    # Pull Request内のファイル変更を取得
+    changed_files = git.modified_files + git.added_files
+
+
+    changed_files.each do |file_name|
+        # Stringリソースの変更をチェック
+        if file_name.include?("res/values/strings.xml")
+            # 変更行の一覧を取得
+            diff = git.diff_for_file(file_name)
+            # 変更行がある場合にのみコメントを出力
+            if diff
+                message_text = create_string_res_usage_list_message(xml_file_name: file_name, diff_lines: diff.patch.lines)
+                message(message_text)
+            end
+        end
+    end
+end
