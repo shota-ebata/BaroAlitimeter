@@ -119,7 +119,7 @@ def show_res_usage_message(git)
         if full_file_name.include?("res/drawable")
             # リソース名抽出
             res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
-            message_text = "<b>Stringリソース(#{full_file_name})使用箇所</b>\n"
+            message_text = "<b>Drawableリソース(#{full_file_name})使用箇所</b>\n"
             # リソース使用しているファイル一覧を取得する
             file_list = find_file_name_list(drawable_res_name: res_name)
             file_list.each do |file_name|
