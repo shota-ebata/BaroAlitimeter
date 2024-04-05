@@ -68,8 +68,7 @@ def get_resource_name(text)
 end
 
 # Stringリソース使用箇所一覧メッセージを作成
-def create_string_res_usage_list_message(xml_file_name:, diff_lines:)
-    message_text = "<b>Stringリソース(#{xml_file_name})使用箇所</b>\n"
+def create_string_res_usage_list_message(diff_lines:)
     additional_row_list = get_additional_row_list(diff_lines)
     additional_row_list.each do |additional_row_text|
         # リソース名取得
@@ -111,7 +110,8 @@ def show_res_usage_message(git)
             diff = git.diff_for_file(file_name)
             # 変更行がある場合にのみコメントを出力
             if diff
-                message_text = create_string_res_usage_list_message(xml_file_name: file_name, diff_lines: diff.patch.lines)
+                message_text = "<b>Stringリソース(#{file_name})使用箇所</b>\n"
+                message_text += create_string_res_usage_list_message(diff_lines: diff.patch.lines)
                 message(message_text)
             end
         end
