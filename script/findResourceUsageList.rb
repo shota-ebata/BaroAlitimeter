@@ -98,7 +98,7 @@ end
 # end
 
 # リソース使用箇所の一覧を表示する
-def show_res_usage_message(git:)
+def show_res_usage_message(git)
     # Pull Request内のファイル変更を取得
     changed_files = git.modified_files + git.added_files
     changed_files.each do |full_file_name|
