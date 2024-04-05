@@ -92,8 +92,8 @@ def get_res_name_by_full_file_name(full_file_name:)
 end
 
 def find_file_name_list(drawable_res_name:)
-    res_use_file_name_list1 = find_file_names_include("R.drawable.#{res_name}")
-    res_use_file_name_list2 = find_file_names_include("@drawable/#{res_name}")
+    res_use_file_name_list1 = find_file_names_include("R.drawable.#{drawable_res_name}")
+    res_use_file_name_list2 = find_file_names_include("@drawable/#{drawable_res_name}")
     return res_use_file_name_list1 + res_use_file_name_list2
 end
 
