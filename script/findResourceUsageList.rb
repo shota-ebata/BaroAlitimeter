@@ -83,20 +83,20 @@ def create_string_res_usage_list_message(diff_lines:)
     end
     return message_text
 end
-#
-# # ファイル名からリソース名部分を抽出
-# def get_res_name_by_full_file_name(full_file_name:)
-#     # xxx.xml, xxx.pngなど
-#     match = full_file_name.match(/\/.+\..+$/)
-#     # リソース名抽出
-#     return match[0].sub("/", "").sub(/\..+$/, "")
-# end
-#
-# def find_file_name_list(drawable_res_name:)
-#     res_use_file_name_list1 = find_file_names_include("R.drawable.#{drawable_res_name}")
-#     res_use_file_name_list2 = find_file_names_include("@drawable/#{drawable_res_name}")
-#     return res_use_file_name_list1 + res_use_file_name_list2
-# end
+
+# ファイル名からリソース名部分を抽出
+def get_res_name_by_full_file_name(full_file_name:)
+    # xxx.xml, xxx.pngなど
+    match = full_file_name.match(/\/.+\..+$/)
+    # リソース名抽出
+    return match[0].sub("/", "").sub(/\..+$/, "")
+end
+
+def find_file_name_list(drawable_res_name:)
+    res_use_file_name_list1 = find_file_names_include("R.drawable.#{drawable_res_name}")
+    res_use_file_name_list2 = find_file_names_include("@drawable/#{drawable_res_name}")
+    return res_use_file_name_list1 + res_use_file_name_list2
+end
 
 # リソース使用箇所の一覧を表示する
 def show_res_usage_message(git)
@@ -104,28 +104,28 @@ def show_res_usage_message(git)
     changed_files = git.modified_files + git.added_files
 
 
-    changed_files.each do |file_name|
+    changed_files.each do |full_file_name|
         # Stringリソースの変更をチェック
-        if file_name.include?("res/values/strings.xml")
+        if full_file_name.include?("res/values/strings.xml")
             # 変更行の一覧を取得
-            diff = git.diff_for_file(file_name)
+            diff = git.diff_for_file(full_file_name)
             # 変更行がある場合にのみコメントを出力
             if diff
-                message_text = "<b>Stringリソース(#{file_name})使用箇所</b>\n"
+                message_text = "<b>Stringリソース(#{full_file_name})使用箇所</b>\n"
                 message_text += create_string_res_usage_list_message(diff_lines: diff.patch.lines)
                 message(message_text)
             end
         end
         # Drawableリソースの変更をチェック
-#         if full_file_name.include?("res/drawable")
-#             # リソース名抽出
-#             res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
-#             message_text = "<b>Stringリソース(#{full_file_name})使用箇所</b>\n"
-#             # リソース使用しているファイル一覧を取得する
-#             file_list = find_file_name_list(drawable_res_name: res_name)
-#             file_list.each do |file_name|
-#                 message_text += file_name
-#             end
-#         end
+        if full_file_name.include?("res/drawable")
+            # リソース名抽出
+            res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
+            message_text = "<b>Stringリソース(#{full_file_name})使用箇所</b>\n"
+            # リソース使用しているファイル一覧を取得する
+            file_list = find_file_name_list(drawable_res_name: res_name)
+            file_list.each do |file_name|
+                message_text += file_name
+            end
+        end
     end
 end
