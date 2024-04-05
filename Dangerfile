@@ -42,6 +42,7 @@ require_relative "script/findResourceUsageList"
 
 # strings.xmlのパス
 STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
+"res/drawable/ic_launcher_foreground.xml"
 
 # Pull Request内のファイル変更を取得
 changed_files = git.modified_files + git.added_files
@@ -54,7 +55,7 @@ if changed_files.include?(file_name)
     diff = git.diff_for_file(file_name)
     # 変更行がある場合にのみコメントを出力
     if diff
-        message_text = create_string_res_usage_list_message(diff: diff)
+        message_text = create_string_res_usage_list_message(diff_lines: diff.patch.lines)
         message(message_text)
     end
 end
