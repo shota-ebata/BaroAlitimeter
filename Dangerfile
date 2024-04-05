@@ -47,16 +47,16 @@ STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
 # Pull Request内のファイル変更を取得
 changed_files = git.modified_files + git.added_files
 
-file_name = STRINGS_XML_PATH
-
-# strings.xmlが変更されたかチェックし、コメントを追加
-if changed_files.include?(file_name)
-    # 変更行の一覧を取得
-    diff = git.diff_for_file(file_name)
-    # 変更行がある場合にのみコメントを出力
-    if diff
-        message_text = create_string_res_usage_list_message(diff_lines: diff.patch.lines)
-        message(message_text)
+changed_files.each do |file_name|
+    # Stringリソースの変更をチェック
+    if file_name.include?("res/values/strings.xml")
+        # 変更行の一覧を取得
+        diff = git.diff_for_file(file_name)
+        # 変更行がある場合にのみコメントを出力
+        if diff
+            message_text = create_string_res_usage_list_message(xml_file_name: file_name, diff_lines: diff.patch.lines)
+            message(message_text)
+        end
     end
 end
 
