@@ -44,7 +44,7 @@ STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
 "res/drawable/ic_launcher_foreground.xml"
 
 # リソース使用箇所の一覧を表示する
-show_res_usage_message(git)
+show_res_usage_message(git:)
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
 return unless status_report[:errors].empty?
