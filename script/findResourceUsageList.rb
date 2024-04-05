@@ -68,8 +68,8 @@ def get_resource_name(text)
 end
 
 # Stringリソース使用箇所一覧メッセージを作成
-def create_string_res_usage_list_message(diff_lines:)
-    message_text = "Stringリソース使用箇所\n"
+def create_string_res_usage_list_message(xml_file_name:, diff_lines:)
+    message_text = "<b>Stringリソース(#{xml_file_name})使用箇所</b>\n"
     additional_row_list = get_additional_row_list(diff_lines)
     additional_row_list.each do |additional_row_text|
         # リソース名取得
