@@ -84,7 +84,7 @@ def create_string_res_usage_list_message(diff_lines:)
 end
 
 # ファイル名からリソース名部分を抽出
-def get_res_name_by_fill_file_name(full_file_name:)
+def get_res_name_by_full_file_name(full_file_name:)
     # xxx.xml, xxx.pngなど
     match = full_file_name.match(/\/.+\..+$/)
     # リソース名抽出
@@ -116,7 +116,7 @@ def show_res_usage_message(git)
         # Drawableリソースの変更をチェック
         if full_file_name.include?("res/drawable")
             # リソース名抽出
-            res_name = get_res_name_by_file_path(full_file_name: full_file_name)
+            res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
             message_text = "<b>Stringリソース(#{full_file_name})使用箇所</b>\n"
             # リソース使用しているファイル一覧を取得する
             file_list = find_file_name_list(drawable_res_name: res_name)
