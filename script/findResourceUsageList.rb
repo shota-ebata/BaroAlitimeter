@@ -122,7 +122,7 @@ def show_res_usage_message(git)
     drawable_file_name_list.each do |full_file_name|
         # リソース名抽出
         res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
-        drawable_message_text += "- #{full_file_name}\n"
+        drawable_message_text += "- `#{full_file_name}`\n"
         # リソース使用しているファイル一覧を取得する
         file_list = find_file_name_list(drawable_res_name: res_name)
         file_list.each do |file_name|
