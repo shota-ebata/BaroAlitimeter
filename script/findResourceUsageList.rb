@@ -102,8 +102,6 @@ end
 def show_res_usage_message(git)
     # Pull Request内のファイル変更を取得
     changed_files = git.modified_files + git.added_files
-
-
     changed_files.each do |full_file_name|
         # Stringリソースの変更をチェック
         if full_file_name.include?("res/values/strings.xml")
@@ -113,6 +111,7 @@ def show_res_usage_message(git)
             if diff
                 message_text = "<b>Stringリソース(#{full_file_name})使用箇所</b>\n"
                 message_text += create_string_res_usage_list_message(diff_lines: diff.patch.lines)
+                # danger出力
                 message(message_text)
             end
         end
@@ -126,6 +125,8 @@ def show_res_usage_message(git)
             file_list.each do |file_name|
                 message_text += file_name
             end
+            # danger出力
+            message(message_text)
         end
     end
 end
