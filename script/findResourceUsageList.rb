@@ -82,20 +82,20 @@ def create_string_res_usage_list_message(diff_lines:)
     end
     return message_text
 end
-
-# ファイル名からリソース名部分を抽出
-def get_res_name_by_full_file_name(full_file_name:)
-    # xxx.xml, xxx.pngなど
-    match = full_file_name.match(/\/.+\..+$/)
-    # リソース名抽出
-    return match[0].sub("/", "").sub(/\..+$/, "")
-end
-
-def find_file_name_list(drawable_res_name:)
-    res_use_file_name_list1 = find_file_names_include("R.drawable.#{drawable_res_name}")
-    res_use_file_name_list2 = find_file_names_include("@drawable/#{drawable_res_name}")
-    return res_use_file_name_list1 + res_use_file_name_list2
-end
+#
+# # ファイル名からリソース名部分を抽出
+# def get_res_name_by_full_file_name(full_file_name:)
+#     # xxx.xml, xxx.pngなど
+#     match = full_file_name.match(/\/.+\..+$/)
+#     # リソース名抽出
+#     return match[0].sub("/", "").sub(/\..+$/, "")
+# end
+#
+# def find_file_name_list(drawable_res_name:)
+#     res_use_file_name_list1 = find_file_names_include("R.drawable.#{drawable_res_name}")
+#     res_use_file_name_list2 = find_file_names_include("@drawable/#{drawable_res_name}")
+#     return res_use_file_name_list1 + res_use_file_name_list2
+# end
 
 # リソース使用箇所の一覧を表示する
 def show_res_usage_message(git:)
