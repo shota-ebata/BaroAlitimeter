@@ -110,14 +110,14 @@ def show_res_usage_message(git)
         diff = git.diff_for_file(full_file_name)
         # 変更行がある場合にのみコメントを出力
         if diff
-            message_text = "<b>Stringリソース(#{full_file_name})使用箇所</b>\n"
+            message_text = "<b>Stringリソース(#{full_file_name})の影響範囲</b>\n"
             message_text += create_string_res_usage_list_message(diff_lines: diff.patch.lines)
             # danger出力
             message(message_text)
         end
     end
     # Drawableリソースの変更をチェック
-    drawable_message_text = "<b>Drawableリソース使用箇所</b>\n"
+    drawable_message_text = "<b>Drawableリソースの影響範囲</b>\n"
     drawable_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/drawable") }
     drawable_file_name_list.each do |full_file_name|
         # リソース名抽出
