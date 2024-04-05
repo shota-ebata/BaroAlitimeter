@@ -87,7 +87,7 @@ end
 # ファイル名からリソース名部分を抽出
 def get_res_name_by_full_file_name(full_file_name:)
     # xxx.xml, xxx.pngなど
-    match = full_file_name.match(/\/.+\..+$/)
+    match = full_file_name.match(/\w+\..+$/)
     # リソース名抽出
     return match[0].sub("/", "").sub(/\..+$/, "")
 end
