@@ -102,31 +102,33 @@ end
 def show_res_usage_message(git)
     # Pull Request内のファイル変更を取得
     changed_files = git.modified_files + git.added_files
-    changed_files.each do |full_file_name|
-        # Stringリソースの変更をチェック
-        if full_file_name.include?("res/values/strings.xml")
-            # 変更行の一覧を取得
-            diff = git.diff_for_file(full_file_name)
-            # 変更行がある場合にのみコメントを出力
-            if diff
-                message_text = "<b>Stringリソース(#{full_file_name})使用箇所</b>\n"
-                message_text += create_string_res_usage_list_message(diff_lines: diff.patch.lines)
-                # danger出力
-                message(message_text)
-            end
-        end
-        # Drawableリソースの変更をチェック
-        if full_file_name.include?("res/drawable")
-            # リソース名抽出
-            res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
-            message_text = "<b>Drawableリソース(#{full_file_name})使用箇所</b>\n"
-            # リソース使用しているファイル一覧を取得する
-            file_list = find_file_name_list(drawable_res_name: res_name)
-            file_list.each do |file_name|
-                message_text += file_name
-            end
+
+    # Stringリソースの変更をチェック
+    strings_xml_file_name_list = changed_files.filter_map { |full_file_name| full_file_name.include?("res/values/strings.xml") }
+    strings_xml_file_name_list.each do |full_file_name|
+        # 変更行の一覧を取得
+        diff = git.diff_for_file(full_file_name)
+        # 変更行がある場合にのみコメントを出力
+        if diff
+            message_text = "<b>Stringリソース(#{full_file_name})使用箇所</b>\n"
+            message_text += create_string_res_usage_list_message(diff_lines: diff.patch.lines)
             # danger出力
             message(message_text)
         end
     end
+    # Drawableリソースの変更をチェック
+    drawable_message_text = "<b>Drawableリソース使用箇所</b>\n"
+    drawable_file_name_list = changed_files.filter_map { |full_file_name| full_file_name.include?("res/drawable") }
+    drawable_file_name_list.each do |full_file_name|
+        # リソース名抽出
+        res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
+        drawable_message_text += "- #{full_file_name}"
+        # リソース使用しているファイル一覧を取得する
+        file_list = find_file_name_list(drawable_res_name: res_name)
+        file_list.each do |file_name|
+            drawable_message_text += "  - #{file_name}"
+        end
+    end
+    # danger出力
+    message(drawable_message_text)
 end
