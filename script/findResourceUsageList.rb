@@ -104,7 +104,7 @@ def show_res_usage_message(git)
     changed_files = git.modified_files + git.added_files
 
     # Stringリソースの変更をチェック
-    strings_xml_file_name_list = changed_files.filter_map { |full_file_name| full_file_name.include?("res/values/strings.xml") }
+    strings_xml_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/values/strings.xml") }
     strings_xml_file_name_list.each do |full_file_name|
         # 変更行の一覧を取得
         diff = git.diff_for_file(full_file_name)
@@ -117,18 +117,18 @@ def show_res_usage_message(git)
         end
     end
     # Drawableリソースの変更をチェック
-    drawable_message_text = "<b>Drawableリソース使用箇所</b>\n"
-    drawable_file_name_list = changed_files.filter_map { |full_file_name| full_file_name.include?("res/drawable") }
-    drawable_file_name_list.each do |full_file_name|
-        # リソース名抽出
-        res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
-        drawable_message_text += "- #{full_file_name}"
-        # リソース使用しているファイル一覧を取得する
-        file_list = find_file_name_list(drawable_res_name: res_name)
-        file_list.each do |file_name|
-            drawable_message_text += "  - #{file_name}"
-        end
-    end
-    # danger出力
-    message(drawable_message_text)
+#     drawable_message_text = "<b>Drawableリソース使用箇所</b>\n"
+#     drawable_file_name_list = changed_files.filter_map { |full_file_name| full_file_name.include?("res/drawable") }
+#     drawable_file_name_list.each do |full_file_name|
+#         # リソース名抽出
+#         res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
+#         drawable_message_text += "- #{full_file_name}"
+#         # リソース使用しているファイル一覧を取得する
+#         file_list = find_file_name_list(drawable_res_name: res_name)
+#         file_list.each do |file_name|
+#             drawable_message_text += "  - #{file_name}"
+#         end
+#     end
+#     # danger出力
+#     message(drawable_message_text)
 end
