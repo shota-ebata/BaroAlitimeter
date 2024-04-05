@@ -88,7 +88,7 @@ def get_res_name_by_full_file_name(full_file_name:)
     # xxx.xml, xxx.pngなど
     match = full_file_name.match(/\/.+\..+$/)
     # リソース名抽出
-    return match[0].sub("/", "").sub(/\..+$/)
+    return match[0].sub("/", "").sub(/\..+$/, "")
 end
 
 def find_file_name_list(drawable_res_name:)
@@ -98,7 +98,7 @@ def find_file_name_list(drawable_res_name:)
 end
 
 # リソース使用箇所の一覧を表示する
-def show_res_usage_message(git)
+def show_res_usage_message(git:)
     # Pull Request内のファイル変更を取得
     changed_files = git.modified_files + git.added_files
     changed_files.each do |full_file_name|
