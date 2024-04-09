@@ -108,6 +108,23 @@ def create_string_res_usage_list_message(diff_lines:)
     return message_text
 end
 
+# Colorリソース使用箇所一覧メッセージを作成
+def create_color_res_usage_list_message(diff_lines:)
+    additional_row_list = get_additional_row_list(diff_lines)
+    message_text = ""
+    additional_row_list.each do |additional_row_text|
+        # リソース名だけを取得
+        color_res_name = get_tag_name(additional_row_text)
+        # リソース名を出力に加える
+        message_text += "- `" + color_res_name + "`\n"
+        # Colorリソース使用ファイル一覧を取得
+        hit_file_name_list = find_color_res_usage_file_name_list(color_res_name)
+        # ファイル一覧も出力に加える
+        message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name}：#{hit_file_name.line_number_list.join(", ")}\n" }.join
+    end
+    return message_text
+end
+
 # Stringリソース影響範囲のメッセージを表示する
 def show_string_res_usage_message(changed_files:)
     # Stringリソースの変更だけを抽出
@@ -127,9 +144,11 @@ end
 
 # Drawableリソース影響範囲のメッセージを表示する
 def show_drawable_res_usage_message(changed_files:)
+    drawable_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/drawable") }
+    # Drawableリソース差分が無いなら何もしない
+    return if drawable_file_name_list.empty?
     # Drawableリソースの変更をチェック
     drawable_message_text = "<b>Drawableリソースの影響範囲</b>\n"
-    drawable_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/drawable") }
     drawable_file_name_list.each do |res_full_file_name|
         # リソース名だけを抽出
         res_name = get_name_by_full_file_name(full_file_name: res_full_file_name)
@@ -144,26 +163,8 @@ def show_drawable_res_usage_message(changed_files:)
     message(drawable_message_text)
 end
 
-# Colorリソース使用箇所一覧メッセージを作成
-def create_color_res_usage_list_message(diff_lines:)
-    additional_row_list = get_additional_row_list(diff_lines)
-    message_text = ""
-    additional_row_list.each do |additional_row_text|
-        # リソース名だけを取得
-        color_res_name = get_tag_name(additional_row_text)
-        # リソース名を出力に加える
-        message_text += "- `" + color_res_name + "`\n"
-        # Colorリソース使用ファイル一覧を取得
-        hit_file_name_list = find_color_res_usage_file_name_list(color_res_name)
-        # ファイル一覧も出力に加える
-        message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name}：#{hit_file_name.line_number_list.join(", ")}\n" }.join
-    end
-    return message_text
-end
-
 # Colorリソース影響範囲のメッセージを表示する
 def show_color_res_usage_message(changed_files:)
-    color_message_text = "<b>Colorリソースの影響範囲</b>\n"
     # Colorリソースの変更をチェック
     colors_xml_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/values/colors.xml") }
     colors_xml_file_name_list.each do |res_full_file_name|
