@@ -1,8 +1,8 @@
 
 def get_line_number_by_file_name_and_search_text(full_file_name, search_text)
+    hit_lines = []
     File.open(full_file_name, "r") do |file|
         line_number = 1
-        hit_lines = []
         file.each_line do |line|
             if line.include?(search_text)
                 hit_lines.append(line_number)
@@ -140,7 +140,7 @@ def show_res_usage_message(git)
         # リソース使用しているファイル一覧を取得する
         file_list = find_file_name_list(drawable_res_name: res_name)
         file_list.each do |file_name|
-            drawable_message_text += "  - #{file_name}\n"
+            drawable_message_text += "  - #{file_name}  :#{get_line_number_by_file_name_and_search_text(file_name, file_name)}\n"
         end
     end
     # danger出力
