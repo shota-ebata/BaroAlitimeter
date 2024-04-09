@@ -204,9 +204,9 @@ def show_color_res_usage_message(changed_files:)
     end
 end
 
-# Dimens
+# Dimensリソース影響範囲のメッセージを表示する
 def show_dimen_res_usage_message(changed_files:)
-    dimens_xml_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/values/dimens.xml") }
+    dimens_xml_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("dimens.xml") }
     dimens_xml_file_name_list.each do |res_full_file_name|
         # 変更行の一覧を取得
         diff = git.diff_for_file(res_full_file_name)
@@ -233,4 +233,7 @@ def show_res_usage_message(git)
 
     # Colorリソース影響範囲のメッセージを表示する
     show_color_res_usage_message(changed_files: changed_files)
+
+    # Dimensリソース影響範囲のメッセージを表示する
+    show_dimen_res_usage_message(changed_files: changed_files)
 end
