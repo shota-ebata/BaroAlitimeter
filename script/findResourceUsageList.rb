@@ -1,6 +1,17 @@
 
-def get_line_number_by_file_name_and_search_text(full_file_name, search_text)
+class FileNameWithLines
+  attr_accessor :full_file_name, :lines
+
+  def initialize(full_file_name, lines)
+    @full_file_name = full_file_name
+    @lines = lines
+  end
+end
+
+def get_line_number(full_file_name, search_text)
     hit_lines = []
+    return [] unless File.file?(full_file_name)
+
     File.open(full_file_name, "r") do |file|
         line_number = 1
         file.each_line do |line|
@@ -13,44 +24,22 @@ def get_line_number_by_file_name_and_search_text(full_file_name, search_text)
     return hit_lines
 end
 
-def get_line_number(file, search_text)
-    line_number = 1
-    file.each_line do |line|
-        if line.include?(search_text)
-            return line_number
-        end
-        line_number += 1
-    end
-    return -1
-end
-
 def find_file_names_include(search_text)
     # 特定のテキストを含むファイルの名前を格納する配列を初期化
-    files_with_text = []
+    hit_file_name_list = []
 
     # 指定したディレクトリ内のファイルを走査して特定のテキストを含むファイルを検索
-    Dir.glob("**/*").each do |file_name|
-        next if file_name.include?("build/")
-        next unless File.file?(file_name)
+    Dir.glob("**/*").each do |full_file_name|
+        next if full_file_name.include?("build/")
+        next unless File.file?(full_file_name)
 
         # ファイルを開いてテキストを検索
-        if File.read(file_name).include?(search_text)
-            files_with_text << file_name
+        if File.read(full_file_name).include?(search_text)
+            hit_lines = get_line_number(full_file_name, search_text)
+            hit_file_name_list.append(FileNameWithLines.new(full_file_name, hit_lines))
         end
     end
-    return files_with_text
-end
-
-def find_string_res_usage_file_list_text(res_text)
-    string_res_name = res_text.sub(/<.+ name="/, "").sub(/">.+<\/.+>/, "")
-    res_use_file_name_list1 = find_file_names_include("R.string.#{string_res_name}")
-    res_use_file_name_list2 = find_file_names_include("@string/#{string_res_name}")
-
-    message_text_list = []
-    message_text_list << "- `" + res_text + "`\n"
-    message_text_list << res_use_file_name_list1.unshift("  - ").push("\n") if !res_use_file_name_list1.empty?
-    message_text_list << res_use_file_name_list2.unshift("  - ").push("\n") if !res_use_file_name_list2.empty?
-    return message_text_list.join
+    return hit_file_name_list
 end
 
 def find_string_res_usage_file_name_list(string_res_name)
@@ -91,9 +80,9 @@ def create_string_res_usage_list_message(diff_lines:)
         # リソース名を出力に加える
         message_text += "- `" + string_res_name + "`\n"
         # Stringリソース使用ファイル一覧を取得
-        full_file_name_list = find_string_res_usage_file_name_list(string_res_name)
+        hit_file_name_list = find_string_res_usage_file_name_list(string_res_name)
         # ファイル一覧も出力に加える
-        message_text += full_file_name_list.map { |full_file_name| "  - " + full_file_name + " :#{get_line_number_by_file_name_and_search_text(full_file_name, string_res_name)}\n" }.join
+        message_text += hit_file_name_list.map { |hit_file_name| "  - " + hit_file_name.full_file_name + " :#{hit_file_name.lines)}\n" }.join
     end
     return message_text
 end
@@ -104,7 +93,7 @@ def get_name_by_full_file_name(full_file_name:)
     return match[0].sub("/", "").sub(/\..+$/, "")
 end
 
-def find_file_name_list(drawable_res_name:)
+def find_drawable_res_usage_file_name_list(drawable_res_name:)
     res_use_file_name_list1 = find_file_names_include("R.drawable.#{drawable_res_name}")
     res_use_file_name_list2 = find_file_names_include("@drawable/#{drawable_res_name}")
     return res_use_file_name_list1 + res_use_file_name_list2
@@ -136,9 +125,9 @@ def show_res_usage_message(git)
         res_name = get_name_by_full_file_name(full_file_name: res_full_file_name)
         drawable_message_text += "- `#{full_file_name}`\n"
         # リソース使用しているファイル一覧を取得する
-        file_list = find_file_name_list(drawable_res_name: res_name)
-        file_list.each do |file_name|
-            drawable_message_text += "  - #{file_name}  :#{get_line_number_by_file_name_and_search_text(file_name, res_name)}\n"
+        hit_file_name_list = find_drawable_res_usage_file_name_list(drawable_res_name: res_name)
+        hit_file_name_list.each do |hit_file_name|
+            drawable_message_text += "  - #{hit_file_name.full_file_name}  :#{hit_file_name.lines}\n"
         end
     end
     # danger出力
