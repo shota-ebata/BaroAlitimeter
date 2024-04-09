@@ -43,7 +43,7 @@ def find_file_names_include(search_text)
 end
 
 # Stringリソースの使用箇所を取得(FileNameWithLinesの配列を返す)
-def find_string_res_usage_file_name_list(string_res_name)
+def find_string_res_usage_file_name_list(string_res_name:)
     res_use_file_name_list1 = find_file_names_include("R.string.#{string_res_name}")
     res_use_file_name_list2 = find_file_names_include("@string/#{string_res_name}")
     return res_use_file_name_list1 + res_use_file_name_list2
@@ -99,9 +99,9 @@ def create_string_res_usage_list_message(diff_lines:)
         # リソース名だけを取得
         string_res_name = get_tag_name(additional_row_text)
         # リソース名を出力に加える
-        message_text += "- `" + string_res_name + "`\n"
+        message_text += "- `#{string_res_name}`\n"
         # Stringリソース使用ファイル一覧を取得
-        hit_file_name_list = find_string_res_usage_file_name_list(string_res_name)
+        hit_file_name_list = find_string_res_usage_file_name_list(string_res_name: string_res_name)
         # ファイル一覧も出力に加える
         message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name}：#{hit_file_name.line_number_list.join(", ")}\n" }.join
     end
@@ -116,9 +116,9 @@ def create_color_res_usage_list_message(diff_lines:)
         # リソース名だけを取得
         color_res_name = get_tag_name(additional_row_text)
         # リソース名を出力に加える
-        message_text += "- `" + color_res_name + "`\n"
+        message_text += "- `#{color_res_name}`\n"
         # Colorリソース使用ファイル一覧を取得
-        hit_file_name_list = find_color_res_usage_file_name_list(color_res_name)
+        hit_file_name_list = find_color_res_usage_file_name_list(color_res_name: color_res_name)
         # ファイル一覧も出力に加える
         message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name}：#{hit_file_name.line_number_list.join(", ")}\n" }.join
     end
