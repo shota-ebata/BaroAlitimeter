@@ -42,21 +42,21 @@ def find_file_names_include(search_text)
     return hit_file_name_list
 end
 
-# Stringリソースの使用箇所を取得
+# Stringリソースの使用箇所を取得(FileNameWithLinesの配列を返す)
 def find_string_res_usage_file_name_list(string_res_name)
     res_use_file_name_list1 = find_file_names_include("R.string.#{string_res_name}")
     res_use_file_name_list2 = find_file_names_include("@string/#{string_res_name}")
     return res_use_file_name_list1 + res_use_file_name_list2
 end
 
-# Drawableリソースの使用箇所を取得
+# Drawableリソースの使用箇所を取得(FileNameWithLinesの配列を返す)
 def find_drawable_res_usage_file_name_list(drawable_res_name:)
     res_use_file_name_list1 = find_file_names_include("R.drawable.#{drawable_res_name}")
     res_use_file_name_list2 = find_file_names_include("@drawable/#{drawable_res_name}")
     return res_use_file_name_list1 + res_use_file_name_list2
 end
 
-# Colorリソースの使用箇所を取得
+# Colorリソースの使用箇所を取得(FileNameWithLinesの配列を返す)
 def find_color_res_usage_file_name_list(color_res_name:)
     res_use_file_name_list1 = find_file_names_include("R.color.#{color_res_name}")
     res_use_file_name_list2 = find_file_names_include("@color/#{color_res_name}")
@@ -144,6 +144,41 @@ def show_drawable_res_usage_message(changed_files:)
     message(drawable_message_text)
 end
 
+# Colorリソース使用箇所一覧メッセージを作成
+def create_color_res_usage_list_message(diff_lines:)
+    additional_row_list = get_additional_row_list(diff_lines)
+    message_text = ""
+    additional_row_list.each do |additional_row_text|
+        # リソース名だけを取得
+        color_res_name = get_tag_name(additional_row_text)
+        # リソース名を出力に加える
+        message_text += "- `" + color_res_name + "`\n"
+        # Colorリソース使用ファイル一覧を取得
+        hit_file_name_list = find_color_res_usage_file_name_list(color_res_name)
+        # ファイル一覧も出力に加える
+        message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name}：#{hit_file_name.line_number_list.join(", ")}\n" }.join
+    end
+    return message_text
+end
+
+# Colorリソース影響範囲のメッセージを表示する
+def show_color_res_usage_message(changed_files:)
+    color_message_text = "<b>Colorリソースの影響範囲</b>\n"
+    # Colorリソースの変更をチェック
+    colors_xml_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/values/colors.xml") }
+    colors_xml_file_name_list.each do |res_full_file_name|
+        # 変更行の一覧を取得
+        diff = git.diff_for_file(res_full_file_name)
+        # 変更行がある場合にのみコメントを出力
+        if diff
+            message_text = "<b>Colorリソース(#{res_full_file_name})の影響範囲</b>\n"
+            message_text += create_color_res_usage_list_message(diff_lines: diff.patch.lines)
+            # danger出力
+            message(message_text)
+        end
+    end
+end
+
 # リソース使用箇所の一覧を表示する
 def show_res_usage_message(git)
     # Pull Request内のファイル変更を取得
@@ -154,4 +189,7 @@ def show_res_usage_message(git)
 
     # Drawableリソース影響範囲のメッセージを表示する
     show_drawable_res_usage_message(changed_files: changed_files)
+
+    # Colorリソース影響範囲のメッセージを表示する
+    show_color_res_usage_message(changed_files: changed_files)
 end
