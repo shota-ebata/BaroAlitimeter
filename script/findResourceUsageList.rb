@@ -63,6 +63,13 @@ def find_color_res_usage_file_name_list(color_res_name:)
     return res_use_file_name_list1 + res_use_file_name_list2
 end
 
+# Dimenリソースの使用箇所を取得(FileNameWithLinesの配列を返す)
+def find_dimen_res_usage_file_name_list(dimen_res_name:)
+    res_use_file_name_list1 = find_file_names_include("R.dimen.#{dimen_res_name}")
+    res_use_file_name_list2 = find_file_names_include("@dimen/#{dimen_res_name}")
+    return res_use_file_name_list1 + res_use_file_name_list2
+end
+
 # ファイル名(aaa/bbb/xxx.xml, aaa/bbb/xxx.png)から名前部分(xxx)だけを抽出
 def get_name_by_full_file_name(full_file_name:)
     match = full_file_name.match(/\w+\..+$/)
@@ -125,6 +132,23 @@ def create_color_res_usage_list_message(diff_lines:)
     return message_text
 end
 
+# Dimenリソース使用箇所一覧メッセージを作成
+def create_dimen_res_usage_list_message(changed_files:)
+    additional_row_list = get_additional_row_list(diff_lines)
+    message_text = ""
+    additional_row_list.each do |additional_row_text|
+        # リソース名だけを取得
+        dimen_res_name = get_tag_name(additional_row_text)
+        # リソース名を出力に加える
+        message_text += "- `#{dimen_res_name}`\n"
+        # Colorリソース使用ファイル一覧を取得
+        hit_file_name_list = find_dimen_res_usage_file_name_list(dimen_res_name: dimen_res_name)
+        # ファイル一覧も出力に加える
+        message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name}：#{hit_file_name.line_number_list.join(", ")}\n" }.join
+    end
+    return message_text
+end
+
 # Stringリソース影響範囲のメッセージを表示する
 def show_string_res_usage_message(changed_files:)
     # Stringリソースの変更だけを抽出
@@ -174,6 +198,22 @@ def show_color_res_usage_message(changed_files:)
         if diff
             message_text = "<b>Colorリソース(#{res_full_file_name})の影響範囲</b>\n"
             message_text += create_color_res_usage_list_message(diff_lines: diff.patch.lines)
+            # danger出力
+            message(message_text)
+        end
+    end
+end
+
+# Dimens
+def show_dimen_res_usage_message(changed_files:)
+    dimens_xml_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/values/dimens.xml") }
+    dimens_xml_file_name_list.each do |res_full_file_name|
+        # 変更行の一覧を取得
+        diff = git.diff_for_file(res_full_file_name)
+        # 変更行がある場合にのみコメントを出力
+        if diff
+            message_text = "<b>Dimenリソース(#{res_full_file_name})の影響範囲</b>\n"
+            message_text += create_dimen_res_usage_list_message(diff_lines: diff.patch.lines)
             # danger出力
             message(message_text)
         end
