@@ -39,6 +39,7 @@ class MainActivity : ComponentActivity() {
         onBackPressedDispatcher.addCallback(owner = this, onBackPressedCallback)
 
         R.string.next
+        R.string.next
         R.drawable.icon_palette_24
 
         R.drawable.ic_launcher_foreground
