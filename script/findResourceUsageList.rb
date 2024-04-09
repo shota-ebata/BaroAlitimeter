@@ -1,4 +1,5 @@
 
+
 def get_line_number_by_file_name_and_search_text(full_file_name, search_text)
     File.open(full_file_name, "r") do |file|
         line_number = 1
@@ -92,7 +93,7 @@ def create_string_res_usage_list_message(diff_lines:)
         # Stringリソース使用ファイル一覧を取得
         full_file_name_list = find_string_res_usage_file_name_list(string_res_name)
         # ファイル一覧も出力に加える
-        message_text += full_file_name_list.map { |full_file_name| "  - " + full_file_name + "[#{get_line_number_by_file_name_and_search_text(full_file_name, string_res_name)}]\n" }.join
+        message_text += full_file_name_list.map { |full_file_name| "  - " + full_file_name + " :#{get_line_number_by_file_name_and_search_text(full_file_name, string_res_name)}\n" }.join
     end
     return message_text
 end
