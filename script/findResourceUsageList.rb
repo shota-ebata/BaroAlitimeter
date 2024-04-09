@@ -133,7 +133,7 @@ def create_color_res_usage_list_message(diff_lines:)
 end
 
 # Dimenリソース使用箇所一覧メッセージを作成
-def create_dimen_res_usage_list_message(changed_files:)
+def create_dimen_res_usage_list_message(diff_lines:)
     additional_row_list = get_additional_row_list(diff_lines)
     message_text = ""
     additional_row_list.each do |additional_row_text|
