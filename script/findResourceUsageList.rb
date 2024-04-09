@@ -98,11 +98,9 @@ def create_string_res_usage_list_message(diff_lines:)
     return message_text
 end
 
-# ファイル名からリソース名部分を抽出
-def get_res_name_by_full_file_name(full_file_name:)
-    # xxx.xml, xxx.pngなど
+# ファイル名(aaa/bbb/xxx.xml, aaa/bbb/xxx.png)から名前部分(xxx)だけを抽出
+def get_name_by_full_file_name(full_file_name:)
     match = full_file_name.match(/\w+\..+$/)
-    # リソース名抽出
     return match[0].sub("/", "").sub(/\..+$/, "")
 end
 
@@ -133,14 +131,14 @@ def show_res_usage_message(git)
     # Drawableリソースの変更をチェック
     drawable_message_text = "<b>Drawableリソースの影響範囲</b>\n"
     drawable_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/drawable") }
-    drawable_file_name_list.each do |full_file_name|
-        # リソース名抽出
-        res_name = get_res_name_by_full_file_name(full_file_name: full_file_name)
+    drawable_file_name_list.each do |res_full_file_name|
+        # リソース名だけを抽出
+        res_name = get_name_by_full_file_name(full_file_name: res_full_file_name)
         drawable_message_text += "- `#{full_file_name}`\n"
         # リソース使用しているファイル一覧を取得する
         file_list = find_file_name_list(drawable_res_name: res_name)
         file_list.each do |file_name|
-            drawable_message_text += "  - #{file_name}  :#{get_line_number_by_file_name_and_search_text(file_name, file_name)}\n"
+            drawable_message_text += "  - #{file_name}  :#{get_line_number_by_file_name_and_search_text(file_name, res_name)}\n"
         end
     end
     # danger出力
