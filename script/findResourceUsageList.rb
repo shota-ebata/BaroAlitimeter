@@ -1,27 +1,27 @@
 
 class FileNameWithLines
-  attr_accessor :full_file_name, :lines
+  attr_accessor :full_file_name, :line_number_list
 
-  def initialize(full_file_name, lines)
+  def initialize(full_file_name, line_number_list)
     @full_file_name = full_file_name
-    @lines = lines
+    @line_number_list = line_number_list
   end
 end
 
 def get_line_number_list(full_file_name, search_text)
-    hit_lines = []
+    hit_line_number_list = []
     return [] unless File.file?(full_file_name)
 
     File.open(full_file_name, "r") do |file|
         line_number = 1
         file.each_line do |line|
             if line.include?(search_text)
-                hit_lines.append(line_number)
+                hit_line_number_list.append(line_number)
             end
             line_number += 1
         end
     end
-    return hit_lines
+    return hit_line_number_list
 end
 
 def find_file_names_include(search_text)
@@ -35,8 +35,8 @@ def find_file_names_include(search_text)
 
         # ファイルを開いてテキストを検索
         if File.read(full_file_name).include?(search_text)
-            hit_lines = get_line_number_list(full_file_name, search_text)
-            hit_file_name_list.append(FileNameWithLines.new(full_file_name, hit_lines))
+            hit_line_number_list = get_line_number_list(full_file_name, search_text)
+            hit_file_name_list.append(FileNameWithLines.new(full_file_name, hit_line_number_list))
         end
     end
     return hit_file_name_list
@@ -82,7 +82,7 @@ def create_string_res_usage_list_message(diff_lines:)
         # Stringリソース使用ファイル一覧を取得
         hit_file_name_list = find_string_res_usage_file_name_list(string_res_name)
         # ファイル一覧も出力に加える
-        message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name}：#{hit_file_name.lines.join(", ")}\n" }.join
+        message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name}：#{hit_file_name.line_number_list.join(", ")}\n" }.join
     end
     return message_text
 end
@@ -117,6 +117,7 @@ def show_res_usage_message(git)
             message(message_text)
         end
     end
+
     # Drawableリソースの変更をチェック
     drawable_message_text = "<b>Drawableリソースの影響範囲</b>\n"
     drawable_file_name_list = changed_files.filter_map { |full_file_name| full_file_name if full_file_name.include?("res/drawable") }
@@ -127,9 +128,10 @@ def show_res_usage_message(git)
         # リソース使用しているファイル一覧を取得する
         hit_file_name_list = find_drawable_res_usage_file_name_list(drawable_res_name: res_name)
         hit_file_name_list.each do |hit_file_name|
-            drawable_message_text += "  - #{hit_file_name.full_file_name}：#{hit_file_name.lines.join(", ")}\n"
+            drawable_message_text += "  - #{hit_file_name.full_file_name}：#{hit_file_name.line_number_list.join(", ")}\n"
         end
     end
+
     # danger出力
     message(drawable_message_text)
 end
