@@ -1,16 +1,16 @@
 
-
 def get_line_number_by_file_name_and_search_text(full_file_name, search_text)
     File.open(full_file_name, "r") do |file|
         line_number = 1
+        hit_lines = []
         file.each_line do |line|
             if line.include?(search_text)
-                return line_number
+                hit_lines.append(line_number)
             end
             line_number += 1
         end
     end
-    return -1
+    return hit_lines
 end
 
 def get_line_number(file, search_text)
