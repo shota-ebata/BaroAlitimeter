@@ -140,6 +140,8 @@ def show_drawable_res_usage_message(changed_files:)
             drawable_message_text += "  - #{hit_file_name.full_file_name}：#{hit_file_name.line_number_list.join(", ")}\n"
         end
     end
+    # danger出力
+    message(drawable_message_text)
 end
 
 # リソース使用箇所の一覧を表示する
@@ -152,7 +154,4 @@ def show_res_usage_message(git)
 
     # Drawableリソース影響範囲のメッセージを表示する
     show_drawable_res_usage_message(changed_files: changed_files)
-
-    # danger出力
-    message(drawable_message_text)
 end
