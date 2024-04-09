@@ -8,7 +8,7 @@ class FileNameWithLines
   end
 end
 
-def get_line_number(full_file_name, search_text)
+def get_line_number_list(full_file_name, search_text)
     hit_lines = []
     return [] unless File.file?(full_file_name)
 
@@ -35,7 +35,7 @@ def find_file_names_include(search_text)
 
         # ファイルを開いてテキストを検索
         if File.read(full_file_name).include?(search_text)
-            hit_lines = get_line_number(full_file_name, search_text)
+            hit_lines = get_line_number_list(full_file_name, search_text)
             hit_file_name_list.append(FileNameWithLines.new(full_file_name, hit_lines))
         end
     end
@@ -124,7 +124,7 @@ def show_res_usage_message(git)
     drawable_file_name_list.each do |res_full_file_name|
         # リソース名だけを抽出
         res_name = get_name_by_full_file_name(full_file_name: res_full_file_name)
-        drawable_message_text += "- `#{full_file_name}`\n"
+        drawable_message_text += "- `#{res_full_file_name}`\n"
         # リソース使用しているファイル一覧を取得する
         hit_file_name_list = find_drawable_res_usage_file_name_list(drawable_res_name: res_name)
         hit_file_name_list.each do |hit_file_name|
