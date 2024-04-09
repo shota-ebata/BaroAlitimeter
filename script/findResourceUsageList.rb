@@ -82,7 +82,7 @@ def create_string_res_usage_list_message(diff_lines:)
         # Stringリソース使用ファイル一覧を取得
         hit_file_name_list = find_string_res_usage_file_name_list(string_res_name)
         # ファイル一覧も出力に加える
-        message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name} :#{hit_file_name.lines.join(", ")}\n" }.join
+        message_text += hit_file_name_list.map { |hit_file_name| "  - #{hit_file_name.full_file_name}： #{hit_file_name.lines.join(", ")}\n" }.join
     end
     return message_text
 end
@@ -127,7 +127,7 @@ def show_res_usage_message(git)
         # リソース使用しているファイル一覧を取得する
         hit_file_name_list = find_drawable_res_usage_file_name_list(drawable_res_name: res_name)
         hit_file_name_list.each do |hit_file_name|
-            drawable_message_text += "  - #{hit_file_name.full_file_name} :#{hit_file_name.lines.join(", ")}\n"
+            drawable_message_text += "  - #{hit_file_name.full_file_name}： #{hit_file_name.lines.join(", ")}\n"
         end
     end
     # danger出力
