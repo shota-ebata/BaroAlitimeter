@@ -42,6 +42,8 @@ class MainActivity : ComponentActivity() {
         R.string.next
         R.drawable.icon_palette_24
 
+        R.color.teal_701
+
         R.drawable.ic_launcher_foreground
 
         viewModel.modeState.collect(lifecycleScope) { mode ->
