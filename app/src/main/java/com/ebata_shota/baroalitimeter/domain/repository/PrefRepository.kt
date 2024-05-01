@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.Flow
 interface PrefRepository {
     val preferencesFlow: Flow<PreferencesModel>
     suspend fun setThemeMode(value: ThemeMode)
+    suspend fun getSeaLevelPressure(): Result<Float>
     suspend fun setSeaLevelPressure(value: Float)
     suspend fun getTemperature(): Result<Float>
     suspend fun setTemperature(value: Float)
