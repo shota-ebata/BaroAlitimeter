@@ -3,7 +3,6 @@
     android:height="108dp"
     android:viewportWidth="512"
     android:viewportHeight="512">
-<!--  変更差分 -->
   <group
       android:scaleX="0.57"
       android:scaleY="0.57"

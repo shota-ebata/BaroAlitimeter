@@ -37,13 +37,8 @@ fail("fit left in tests") if `grep -r fit specs/ `.length > 1
 # 追加で独自のチェックをする場合はこのあたりで実施する
 # ...
 
-require_relative "script/findResourceUsageList"
-
-# strings.xmlのパス
-STRINGS_XML_PATH = "app/src/main/res/values/strings.xml"
-"res/drawable/ic_launcher_foreground.xml"
-
 # リソース使用箇所の一覧を表示する
+require_relative "script/findResourceUsageList"
 show_res_usage_message(git)
 
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
