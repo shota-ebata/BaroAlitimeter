@@ -10,6 +10,7 @@ import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 class SensorRepositoryImpl
@@ -23,6 +24,12 @@ constructor(
 
     private val _temperatureState: MutableStateFlow<Temperature> = MutableStateFlow(Temperature.Loading)
     override val temperatureSensorState: StateFlow<Temperature> = _temperatureState.asStateFlow()
+
+    override suspend fun getPressureSensorValue(): Result<Pressure.Success> {
+        return Result.runCatching {
+            pressureSensorState.first() as Pressure.Success
+        }
+    }
 
     init {
         val pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)

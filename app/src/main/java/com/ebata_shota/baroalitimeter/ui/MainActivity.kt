@@ -6,15 +6,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
-import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
 import com.ebata_shota.baroalitimeter.domain.extensions.collect
-import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
 import com.ebata_shota.baroalitimeter.ui.screen.MainScreen
-import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -43,20 +38,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            val themeMode: ThemeMode? by viewModel.themeState.collectAsStateWithLifecycle()
-            themeMode?.let { // FIXME: nullableなのなーんかイケてない
-                BaroAlitimeterTheme(
-                    darkTheme = when (it) {
-                        ThemeMode.LIGHT -> false
-                        ThemeMode.DARK -> true
-                        ThemeMode.SYSTEM -> isSystemInDarkTheme()
-                    }
-                ) {
-                    MainScreen(
-                        selectedThemeMode = it
-                    )
-                }
-            }
+            MainScreen()
         }
     }
 }
