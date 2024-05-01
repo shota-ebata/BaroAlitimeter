@@ -37,6 +37,10 @@ fail("fit left in tests") if `grep -r fit specs/ `.length > 1
 # 追加で独自のチェックをする場合はこのあたりで実施する
 # ...
 
+# リソース使用箇所の一覧を表示する
+require_relative "script/findResourceUsageList"
+show_res_usage_message(git)
+
 # Danger でエラーがある場合は既に何かしらコメントされているのでここで終了
 return unless status_report[:errors].empty?
 
