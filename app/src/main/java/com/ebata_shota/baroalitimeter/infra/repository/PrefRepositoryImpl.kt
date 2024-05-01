@@ -48,6 +48,12 @@ constructor(
         setPrefValue(AppPreferencesKeys.THEME_MODE, value.name)
     }
 
+    override suspend fun getSeaLevelPressure(): Result<Float> {
+        return Result.runCatching {
+            seaLevelPressureFlow.first()
+        }
+    }
+
     override suspend fun setSeaLevelPressure(value: Float) {
         getSeaLevelPressure().getOrNull()?.let {
             setPrefValue(AppPreferencesKeys.OLD_SEA_LEVEL_PRESSURE, it)
@@ -107,12 +113,6 @@ constructor(
     private suspend fun getOldSeaLevelPressure(): Result<Float?> {
         return Result.runCatching {
             oldSeaLevelPressureFlow.first()
-        }
-    }
-
-    private suspend fun getSeaLevelPressure(): Result<Float> {
-        return Result.runCatching {
-            seaLevelPressureFlow.first()
         }
     }
 
