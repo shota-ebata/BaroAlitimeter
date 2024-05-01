@@ -11,7 +11,6 @@ import androidx.compose.runtime.getValue
 import androidx.core.view.WindowCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.lifecycleScope
-import com.ebata_shota.baroalitimeter.R
 import com.ebata_shota.baroalitimeter.domain.extensions.collect
 import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
 import com.ebata_shota.baroalitimeter.ui.screen.MainScreen
@@ -37,14 +36,6 @@ class MainActivity : ComponentActivity() {
             }
         }
         onBackPressedDispatcher.addCallback(owner = this, onBackPressedCallback)
-
-        R.string.next
-        R.string.next
-        R.drawable.icon_palette_24
-
-        R.color.teal_701
-
-        R.drawable.ic_launcher_foreground
 
         viewModel.modeState.collect(lifecycleScope) { mode ->
             onBackPressedCallback.isEnabled =
