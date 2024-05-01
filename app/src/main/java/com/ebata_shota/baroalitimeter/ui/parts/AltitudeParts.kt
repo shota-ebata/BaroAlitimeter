@@ -12,12 +12,12 @@ import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 
 @Composable
 fun AltitudeParts(
-    uiState: MainViewModel.MainUiState.AltitudeUiState,
+    uiState: MainViewModel.ContentUiState.AltitudeUiState,
     events: AltitudePartsEvents,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
-        is MainViewModel.MainUiState.AltitudeUiState.ViewerMode -> {
+        is MainViewModel.ContentUiState.AltitudeUiState.ViewerMode -> {
             Row(
                 modifier = modifier.padding(8.dp)
             ) {
@@ -28,7 +28,7 @@ fun AltitudeParts(
             }
         }
 
-        is MainViewModel.MainUiState.AltitudeUiState.EditMode -> {
+        is MainViewModel.ContentUiState.AltitudeUiState.EditMode -> {
             EditTextFieldRow(
                 textFieldValue = uiState.altitudeTextFieldValue,
                 onChangeTextFieldValue = events::onChangeAltitudeTextFieldValue,

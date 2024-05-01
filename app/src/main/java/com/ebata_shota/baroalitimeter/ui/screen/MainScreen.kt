@@ -47,7 +47,7 @@ fun MainScreen(
     selectedThemeMode: ThemeMode,
     viewModel: MainViewModel = hiltViewModel(),
 ) {
-    val uiState: MainViewModel.MainUiState by viewModel.mainUiState.collectAsStateWithLifecycle()
+    val uiState: MainViewModel.ContentUiState by viewModel.contentUiState.collectAsStateWithLifecycle()
     val coroutineScope: CoroutineScope = rememberCoroutineScope()
 
     var shouldShowTopAppBarDropdownMenu: Boolean by remember {
@@ -128,8 +128,8 @@ fun MainScreen(
                 color = MaterialTheme.colorScheme.background
             ) {
                 when (val currentUiState = uiState) {
-                    MainViewModel.MainUiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
-                    is MainViewModel.MainUiState.UiState -> {
+                    MainViewModel.ContentUiState.Loading -> Unit // FIXME: ローディング中表示があれば実装したい
+                    is MainViewModel.ContentUiState.VisibleUiState -> {
                         MainContent(
                             uiState = currentUiState,
                             /**
