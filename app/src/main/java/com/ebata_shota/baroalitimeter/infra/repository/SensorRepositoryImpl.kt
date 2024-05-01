@@ -25,7 +25,7 @@ constructor(
     private val _temperatureState: MutableStateFlow<Temperature> = MutableStateFlow(Temperature.Loading)
     override val temperatureSensorState: StateFlow<Temperature> = _temperatureState.asStateFlow()
 
-    override suspend fun getPressureSensorValue(): Result<Pressure.Success> {
+    override suspend fun getPressureSensor(): Result<Pressure.Success> {
         return Result.runCatching {
             pressureSensorState.first() as Pressure.Success
         }
