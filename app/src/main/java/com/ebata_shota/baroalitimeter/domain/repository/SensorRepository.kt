@@ -6,5 +6,6 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface SensorRepository {
     val pressureSensorState: StateFlow<Pressure>
+    suspend fun getPressureSensorValue(): Result<Pressure.Success>
     val temperatureSensorState: StateFlow<Temperature>
 }
