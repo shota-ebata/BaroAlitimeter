@@ -1,4 +1,4 @@
-package com.ebata_shota.baroalitimeter.infra.repository
+package com.ebata_shota.baroalitimeter.usecase
 
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -10,13 +10,13 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 
 @OptIn(ExperimentalCoroutinesApi::class)
-class CalcRepositoryImplTest {
+class CalcUseCaseImplTest {
 
-    private lateinit var repository: CalcRepositoryImpl
+    private lateinit var useCase: CalcUseCaseImpl
 
     @Before
     fun setup() {
-        repository = CalcRepositoryImpl(
+        useCase = CalcUseCaseImpl(
             dispatcher = UnconfinedTestDispatcher()
         )
     }
@@ -24,7 +24,7 @@ class CalcRepositoryImplTest {
     @Test
     fun calcAltitude() {
         runTest {
-            val result: Float = repository.calcAltitude(
+            val result: Float = useCase.calcAltitude(
                 pressure = 900.0f,
                 seaLevelPressure = 1013.25f,
                 temperature = 15.0f
