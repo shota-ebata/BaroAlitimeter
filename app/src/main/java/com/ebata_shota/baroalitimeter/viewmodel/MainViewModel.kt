@@ -6,6 +6,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ebata_shota.baroalitimeter.R
+import com.ebata_shota.baroalitimeter.domain.extensions.combineTransform6
 import com.ebata_shota.baroalitimeter.domain.extensions.logUserActionEvent
 import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
@@ -15,7 +16,6 @@ import com.ebata_shota.baroalitimeter.domain.model.content.UserActionEvent
 import com.ebata_shota.baroalitimeter.domain.repository.CalcRepository
 import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
 import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
-import com.ebata_shota.baroalitimeter.ui.model.SensorAndPrefModel
 import com.ebata_shota.baroalitimeter.ui.parts.AltitudePartsEvents
 import com.ebata_shota.baroalitimeter.ui.parts.TemperaturePartsEvents
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -27,9 +27,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -49,36 +46,40 @@ constructor(
 
     sealed interface MainUiState {
 
-    sealed interface ContentUiState {
+        object Uninitialized : MainUiState
 
-        object Loading : ContentUiState
+        data class Initialized(
+            val themeMode: ThemeMode,
+            val contentUiState: ContentUiState,
+        ) : MainUiState
+    }
 
-        data class VisibleUiState(
-            val pressureText: String,
-            val seaLevelPressureText: String,
-            val temperatureUiState: TemperatureUiState,
-            val altitudeUiState: AltitudeUiState,
-        ) : ContentUiState
+    data class ContentUiState(
+        val pressureText: String,
+        val seaLevelPressureText: String,
+        val temperatureUiState: TemperatureUiState,
+        val altitudeUiState: AltitudeUiState,
+    ) {
 
         sealed interface TemperatureUiState {
 
             data class ViewerMode(
-                val temperatureText: String
+                val temperatureText: String,
             ) : TemperatureUiState
 
             data class EditMode(
-                val temperatureTextFieldValue: TextFieldValue
+                val temperatureTextFieldValue: TextFieldValue,
             ) : TemperatureUiState
         }
 
         sealed interface AltitudeUiState {
 
             data class ViewerMode(
-                val altitudeText: String
+                val altitudeText: String,
             ) : AltitudeUiState
 
             data class EditMode(
-                val altitudeTextFieldValue: TextFieldValue
+                val altitudeTextFieldValue: TextFieldValue,
             ) : AltitudeUiState
         }
     }
@@ -99,14 +100,73 @@ constructor(
     private val _modeState: MutableStateFlow<Mode> = MutableStateFlow(Mode.Viewer)
     val modeState: StateFlow<Mode> = _modeState.asStateFlow()
 
-    val themeState: StateFlow<ThemeMode?> = prefRepository
-        .preferencesFlow
-        .map { it.themeMode }
-        .stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(),
-            initialValue = null
+    private val _temperatureTextFieldValue = MutableStateFlow(TextFieldValue())
+    private val temperatureTextFieldValue = _temperatureTextFieldValue.asStateFlow()
+
+    private val _altitudeTextFieldValue = MutableStateFlow(TextFieldValue())
+    private val altitudeTextFieldValue = _altitudeTextFieldValue.asStateFlow()
+
+    val mainUiState: StateFlow<MainUiState> = combineTransform6(
+        modeState,
+        temperatureTextFieldValue,
+        altitudeTextFieldValue,
+        sensorRepository.pressureSensorState,
+        sensorRepository.temperatureSensorState,
+        prefRepository.preferencesFlow
+    ) {
+            mode: Mode,
+            temperatureTextFieldValue: TextFieldValue,
+            altitudeTextFieldValue: TextFieldValue,
+            pressureSensorState: Pressure,
+            temperatureSensorState: Temperature, // TODO: temperatureSensorStateをうまく使う
+            preferencesModel: PreferencesModel,
+        ->
+
+        // TODO: UseCaseに切り出し
+        if (pressureSensorState !is Pressure.Success) {
+            emit(MainUiState.Uninitialized)
+            return@combineTransform6
+        }
+
+        val pressure = pressureSensorState.value
+        val temperature = preferencesModel.temperature
+        val seaLevelPressure = preferencesModel.seaLevelPressure
+        val pressureText = pressure.formattedString(1)
+        val seaLevelPressureText = seaLevelPressure.formattedString(2)
+        val temperatureText = temperature.formattedString(0)
+        val altitudeText = calcRepository.calcAltitude(
+            pressure = pressure,
+            temperature = temperature,
+            seaLevelPressure = seaLevelPressure
+        ).formattedString(0)
+
+        val initialized = MainUiState.Initialized(
+            themeMode = preferencesModel.themeMode,
+            contentUiState = ContentUiState(
+                pressureText = pressureText,
+                seaLevelPressureText = seaLevelPressureText,
+                temperatureUiState = if (mode == Mode.EditTemperature) {
+                    ContentUiState.TemperatureUiState.EditMode(
+                        temperatureTextFieldValue = temperatureTextFieldValue
+                    )
+                } else {
+                    ContentUiState.TemperatureUiState.ViewerMode(temperatureText)
+                },
+                altitudeUiState = if (mode == Mode.EditAltitude) {
+                    ContentUiState.AltitudeUiState.EditMode(
+                        altitudeTextFieldValue = altitudeTextFieldValue
+                    )
+                } else {
+                    ContentUiState.AltitudeUiState.ViewerMode(altitudeText)
+                }
+            )
         )
+        emit(initialized)
+    }.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.Lazily,
+        initialValue = MainUiState.Uninitialized
+    )
 
     fun onSelectedThemeMode(themeMode: ThemeMode) {
         viewModelScope.launch {
@@ -114,138 +174,31 @@ constructor(
         }
     }
 
-    private val _contentUiState = MutableStateFlow<ContentUiState>(ContentUiState.Loading)
-    val contentUiState: StateFlow<ContentUiState> = _contentUiState.asStateFlow()
-
     private val _showUndoSnackBarEvent = MutableSharedFlow<ShowUndoSnackBarEvent>()
     val showUndoSnackBarEvent: SharedFlow<ShowUndoSnackBarEvent> = _showUndoSnackBarEvent.asSharedFlow()
-
-    init {
-        @Suppress("UnexpectedIndentation")
-        viewModelScope.launch {
-            combine(
-                modeState,
-                sensorRepository.pressureSensorState,
-                sensorRepository.temperatureSensorState,
-                prefRepository.preferencesFlow,
-            ) {
-                    mode: Mode,
-                    pressureSensorState: Pressure,
-                    temperatureSensorState: Temperature, // TODO: temperatureSensorStateをうまく使う
-                    preferencesModel: PreferencesModel,
-                ->
-                SensorAndPrefModel(
-                    mode = mode,
-                    pressureSensorState = pressureSensorState,
-                    temperatureSensorState = temperatureSensorState,
-                    preferencesModel = preferencesModel
-                )
-            }.distinctUntilChanged { old, new ->
-                // 重複を無視する
-                old == new
-            }.collect {
-                _contentUiState.update { currentUiState ->
-                    currentUiState.nextUiState(it)
-                }
-            }
-        }
-    }
-
-    private suspend fun ContentUiState.nextUiState(
-        sensorAndPrefModel: SensorAndPrefModel
-    ): ContentUiState {
-        val pressureSensorState: Pressure = sensorAndPrefModel.pressureSensorState
-        val mode: Mode = sensorAndPrefModel.mode
-        val preferencesModel: PreferencesModel = sensorAndPrefModel.preferencesModel
-        return when (val currentMainUiState: ContentUiState = this) {
-
-            ContentUiState.Loading -> when (pressureSensorState) {
-                is Pressure.Loading -> ContentUiState.Loading
-                is Pressure.Success -> {
-                    val pressure = pressureSensorState.value
-                    val temperature = preferencesModel.temperature
-                    val seaLevelPressure = preferencesModel.seaLevelPressure
-                    val pressureText = pressure.formattedString(1)
-                    val seaLevelPressureText = seaLevelPressure.formattedString(2)
-                    val temperatureText = temperature.formattedString(0)
-                    val altitudeText = calcRepository.calcAltitude(
-                        pressure = pressure,
-                        temperature = temperature,
-                        seaLevelPressure = seaLevelPressure
-                    ).formattedString(0)
-
-                    ContentUiState.VisibleUiState(
-                        pressureText = pressureText,
-                        seaLevelPressureText = seaLevelPressureText,
-                        temperatureUiState = ContentUiState.TemperatureUiState.ViewerMode(temperatureText),
-                        altitudeUiState = ContentUiState.AltitudeUiState.ViewerMode(altitudeText)
-                    )
-                }
-            }
-
-            is ContentUiState.VisibleUiState -> when (pressureSensorState) {
-                Pressure.Loading -> ContentUiState.Loading
-                is Pressure.Success -> {
-                    val pressure = pressureSensorState.value
-                    val temperature = preferencesModel.temperature
-                    val seaLevelPressure = preferencesModel.seaLevelPressure
-                    val pressureText = pressure.formattedString(1)
-                    val seaLevelPressureText = seaLevelPressure.formattedString(2)
-                    val temperatureText = temperature.formattedString(0)
-                    val altitudeText = calcRepository.calcAltitude(
-                        pressure = pressure,
-                        temperature = temperature,
-                        seaLevelPressure = seaLevelPressure
-                    ).formattedString(0)
-
-                    currentMainUiState.copy(
-                        pressureText = pressureText,
-                        seaLevelPressureText = seaLevelPressureText,
-                        temperatureUiState = when (mode) {
-                            Mode.Viewer, Mode.EditAltitude -> ContentUiState.TemperatureUiState.ViewerMode(temperatureText)
-                            Mode.EditTemperature -> when (currentMainUiState.temperatureUiState) {
-                                // 元々Editモードならそのまま
-                                is ContentUiState.TemperatureUiState.EditMode -> currentMainUiState.temperatureUiState
-                                // ViewerモードならEditモードに変更
-                                is ContentUiState.TemperatureUiState.ViewerMode -> ContentUiState.TemperatureUiState.EditMode(
-                                    temperatureTextFieldValue = TextFieldValue(
-                                        text = temperatureText,
-                                        selection = TextRange(temperatureText.length)
-                                    )
-                                )
-                            }
-                        },
-                        altitudeUiState = when (mode) {
-                            Mode.Viewer, Mode.EditTemperature -> ContentUiState.AltitudeUiState.ViewerMode(altitudeText)
-                            Mode.EditAltitude -> when (currentMainUiState.altitudeUiState) {
-                                // 元々Editモードならそのまま
-                                is ContentUiState.AltitudeUiState.EditMode -> currentMainUiState.altitudeUiState
-                                // ViewerモードならEditモードに変更
-                                is ContentUiState.AltitudeUiState.ViewerMode -> ContentUiState.AltitudeUiState.EditMode(
-                                    altitudeTextFieldValue = TextFieldValue(
-                                        text = altitudeText,
-                                        selection = TextRange(altitudeText.length)
-                                    )
-                                )
-                            }
-                        }
-                    )
-                }
-            }
-        }
-    }
 
     override fun onClickTemperature() {
         changeModeToEditTemperature()
     }
 
     private fun changeModeToEditTemperature() {
-        _modeState.update { mode ->
-            val state = contentUiState.value
-            if (state is ContentUiState.VisibleUiState && state.temperatureUiState is ContentUiState.TemperatureUiState.ViewerMode) {
+        viewModelScope.launch {
+            val temperatureText = prefRepository.getTemperature().getOrNull()?.formattedString(0) ?: run {
+                return@launch
+            }
+            updateTemperatureTextFieldValue(
+                TextFieldValue(
+                    text = temperatureText,
+                    selection = TextRange(temperatureText.length)
+                )
+            )
+            _modeState.update { mode ->
+                if (mode != Mode.Viewer) {
+                    return@launch
+                }
                 logUserActionEvent(UserActionEvent.EditTemperature)
                 Mode.EditTemperature
-            } else mode
+            }
         }
     }
 
@@ -254,12 +207,34 @@ constructor(
     }
 
     private fun changeModeToEditAltitude() {
-        _modeState.update { mode ->
-            val state = contentUiState.value
-            if (state is ContentUiState.VisibleUiState && state.altitudeUiState is ContentUiState.AltitudeUiState.ViewerMode) {
+        viewModelScope.launch {
+            val pressureSensorState = sensorRepository.getPressureSensorValue().getOrNull() ?: run {
+                return@launch
+            }
+            val temperature = prefRepository.getTemperature().getOrNull() ?: run {
+                return@launch
+            }
+            val seaLevelPressure = prefRepository.getSeaLevelPressure().getOrNull() ?: run {
+                return@launch
+            }
+            val altitudeText = calcRepository.calcAltitude(
+                pressure = pressureSensorState.value,
+                temperature = temperature,
+                seaLevelPressure = seaLevelPressure
+            ).formattedString(0)
+            updateAltitudeTextFieldValue(
+                TextFieldValue(
+                    text = altitudeText,
+                    selection = TextRange(altitudeText.length)
+                )
+            )
+            _modeState.update { mode ->
+                if (mode != Mode.Viewer) {
+                    return@launch
+                }
                 logUserActionEvent(UserActionEvent.EditAltitude)
                 Mode.EditAltitude
-            } else mode
+            }
         }
     }
 
@@ -268,20 +243,8 @@ constructor(
     }
 
     private fun updateTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
-        _contentUiState.update { currentMainUiState ->
-            // 表示できるUiStateじゃないなら無視
-            if (currentMainUiState !is ContentUiState.VisibleUiState) return@update currentMainUiState
-
-            // Editモードじゃないなら無視
-            val temperatureUiState = currentMainUiState.temperatureUiState
-            if (temperatureUiState !is ContentUiState.TemperatureUiState.EditMode) return@update currentMainUiState
-
-            // textFieldValueを更新
-            currentMainUiState.copy(
-                temperatureUiState = temperatureUiState.copy(
-                    temperatureTextFieldValue = textFieldValue
-                )
-            )
+        _temperatureTextFieldValue.update {
+            textFieldValue
         }
     }
 
@@ -290,20 +253,8 @@ constructor(
     }
 
     private fun updateAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
-        _contentUiState.update { currentMainUiState ->
-            // 表示できるUiStateじゃないなら無視
-            if (currentMainUiState !is ContentUiState.VisibleUiState) return@update currentMainUiState
-
-            // Editモードじゃないなら無視
-            val altitudeUiState = currentMainUiState.altitudeUiState
-            if (altitudeUiState !is ContentUiState.AltitudeUiState.EditMode) return@update currentMainUiState
-
-            // textFieldValueを更新
-            currentMainUiState.copy(
-                altitudeUiState = altitudeUiState.copy(
-                    altitudeTextFieldValue = textFieldValue
-                )
-            )
+        _altitudeTextFieldValue.update {
+            textFieldValue
         }
     }
 
@@ -348,18 +299,24 @@ constructor(
     private fun onCompletedEditTemperature() {
         viewModelScope.launch {
             logUserActionEvent(UserActionEvent.DoneEditTemperature)
-            val currentMainUiState = contentUiState.value
 
             // 表示できるUiStateじゃないなら無視
-            if (currentMainUiState !is ContentUiState.VisibleUiState) return@launch
+            val currentMainUiState = mainUiState.value
+            if (currentMainUiState !is MainUiState.Initialized) {
+                return@launch
+            }
 
             // Editモードじゃないなら無視
-            val temperatureUiState = currentMainUiState.temperatureUiState
-            if (temperatureUiState !is ContentUiState.TemperatureUiState.EditMode) return@launch
+            val temperatureUiState = currentMainUiState.contentUiState.temperatureUiState
+            if (temperatureUiState !is ContentUiState.TemperatureUiState.EditMode) {
+                return@launch
+            }
 
             // 圧力センサーの値を取得できる状態じゃないなら無視
             val pressureState = sensorRepository.pressureSensorState.value
-            if (pressureState !is Pressure.Success) return@launch
+            if (pressureState !is Pressure.Success) {
+                return@launch
+            }
 
             try {
                 val temperature = temperatureUiState.temperatureTextFieldValue.text.toFloat() // FIXME: 入力制限をしていないので、Floatの範囲外に入ると問題になる
@@ -387,14 +344,18 @@ constructor(
     private fun onCompletedEditAltitude() {
         viewModelScope.launch {
             logUserActionEvent(UserActionEvent.DoneEditAltitude)
-            val currentMainUiState = contentUiState.value
 
             // 表示できるUiStateじゃないなら無視
-            if (currentMainUiState !is ContentUiState.VisibleUiState) return@launch
+            val currentMainUiState = mainUiState.value
+            if (currentMainUiState !is MainUiState.Initialized) {
+                return@launch
+            }
 
             // Editモードじゃないなら無視
-            val altitudeUiState = currentMainUiState.altitudeUiState
-            if (altitudeUiState !is ContentUiState.AltitudeUiState.EditMode) return@launch
+            val altitudeUiState = currentMainUiState.contentUiState.altitudeUiState
+            if (altitudeUiState !is ContentUiState.AltitudeUiState.EditMode) {
+                return@launch
+            }
 
             // 圧力センサーの値を取得できる状態じゃないなら無視
             val pressureState = sensorRepository.pressureSensorState.value
