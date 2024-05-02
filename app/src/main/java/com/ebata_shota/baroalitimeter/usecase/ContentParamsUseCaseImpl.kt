@@ -48,7 +48,7 @@ constructor(
     }
 
     override suspend fun setTemperature(value: Float) {
-
+        prefRepository.setTemperature(value)
     }
 
     override suspend fun getAltitude(): Result<Float> = runCatching {
