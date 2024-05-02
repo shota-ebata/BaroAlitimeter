@@ -19,6 +19,7 @@ constructor(
     sensorManager: SensorManager,
 ) : SensorRepository {
 
+    // FIXME: SharedFlowもしくはflowに変更
     private val _pressureState: MutableStateFlow<Pressure> = MutableStateFlow(Pressure.Loading)
     override val pressureSensorState: StateFlow<Pressure> = _pressureState.asStateFlow()
 
