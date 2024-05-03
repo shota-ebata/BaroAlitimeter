@@ -2,12 +2,12 @@ package com.ebata_shota.baroalitimeter.ui.viewmodel
 
 import com.ebata_shota.baroalitimeter.domain.model.ContentParams
 import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
-import com.ebata_shota.baroalitimeter.domain.usecase.ContentParamsUseCase
-import com.ebata_shota.baroalitimeter.domain.usecase.ThemeUseCase
 import com.ebata_shota.baroalitimeter.usecase.spy.SpyContentParamsUseCase
 import com.ebata_shota.baroalitimeter.usecase.spy.SpyThemeUseCase
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
+import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.StandardTestDispatcher
@@ -16,20 +16,15 @@ import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.spy
 
 class MainViewModelTest {
 
     private lateinit var viewModel: MainViewModel
 
     private lateinit var spyContentParamsUseCase: SpyContentParamsUseCase
-    private lateinit var mockContentParamsUseCase: ContentParamsUseCase
+    private lateinit var spyThemeUseCase: SpyThemeUseCase
 
-    private val spyThemeUseCase: SpyThemeUseCase = spy(SpyThemeUseCase())
-    private lateinit var mockThemeUseCase: ThemeUseCase
-
-    private val firebaseAnalytics: FirebaseAnalytics = mock()
+    private val firebaseAnalytics: FirebaseAnalytics = mockk()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -38,10 +33,8 @@ class MainViewModelTest {
         val dispatcher = StandardTestDispatcher()
         Dispatchers.setMain(dispatcher)
 
-        spyContentParamsUseCase = spy(SpyContentParamsUseCase())
-        mockContentParamsUseCase = mock()
-
-        mockThemeUseCase = mock()
+        spyContentParamsUseCase = spyk(SpyContentParamsUseCase())
+        spyThemeUseCase = spyk(SpyThemeUseCase())
 
 
         runTest {

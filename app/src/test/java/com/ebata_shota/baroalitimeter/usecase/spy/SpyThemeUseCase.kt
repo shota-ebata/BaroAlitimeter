@@ -14,7 +14,5 @@ class SpyThemeUseCase : ThemeUseCase {
         _themeMode.emit(value)
     }
 
-    override suspend fun setThemeMode(value: ThemeMode) {
-        _themeMode.emit(value)
-    }
+    override suspend fun setThemeMode(value: ThemeMode) = Unit
 }
