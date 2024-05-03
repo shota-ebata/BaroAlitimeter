@@ -13,11 +13,11 @@ class SpyContentParamsUseCase : ContentParamsUseCase {
         _contentParamsFlow.emit(contentParams)
     }
 
-    override suspend fun getTemperature(): Result<Float> = runCatching { 0.0f }
+    override suspend fun getTemperature(): Float = 0.0f
 
     override suspend fun setTemperature(value: Float) = Unit
 
-    override suspend fun getAltitude(): Result<Float> = runCatching { 0.0f }
+    override suspend fun getAltitude(): Float = 0.0f
 
     override suspend fun setAltitude(altitude: Float) = Unit
 
