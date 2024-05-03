@@ -162,9 +162,7 @@ constructor(
                 if (mode != Mode.Viewer) {
                     return@launch
                 }
-                val temperature = contentParamsUseCase.getTemperature().getOrNull() ?: run {
-                    return@launch
-                }
+                val temperature = contentParamsUseCase.getTemperature()
                 val temperatureText = temperature.formattedString(0)
                 updateTemperatureTextFieldValue(
                     TextFieldValue(
@@ -188,9 +186,7 @@ constructor(
                 if (mode != Mode.Viewer) {
                     return@launch
                 }
-                val altitude = contentParamsUseCase.getAltitude().getOrNull() ?: run {
-                    return@launch
-                }
+                val altitude = contentParamsUseCase.getAltitude()
                 val altitudeText = altitude.formattedString(0)
                 updateAltitudeTextFieldValue(
                     TextFieldValue(

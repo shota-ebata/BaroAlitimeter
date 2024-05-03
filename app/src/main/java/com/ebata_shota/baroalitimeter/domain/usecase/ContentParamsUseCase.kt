@@ -5,9 +5,9 @@ import kotlinx.coroutines.flow.Flow
 
 interface ContentParamsUseCase {
     val contentParamsFlow: Flow<ContentParams>
-    suspend fun getTemperature(): Result<Float>
+    suspend fun getTemperature(): Float
     suspend fun setTemperature(value: Float)
-    suspend fun getAltitude(): Result<Float>
+    suspend fun getAltitude(): Float
     suspend fun setAltitude(altitude: Float)
     suspend fun undoSeaLevelPressure()
     suspend fun undoTemperature()
