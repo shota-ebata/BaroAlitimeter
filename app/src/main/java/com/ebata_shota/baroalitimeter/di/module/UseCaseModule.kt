@@ -9,21 +9,18 @@ import com.ebata_shota.baroalitimeter.usecase.ThemeUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
-import dagger.hilt.components.SingletonComponent
-import javax.inject.Singleton
+import dagger.hilt.android.components.ViewModelComponent
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 interface UseCaseModule {
+
     @Binds
-    @Singleton
     fun bindCalcUseCase(useCase: CalcUseCaseImpl): CalcUseCase
 
     @Binds
-    @Singleton
     fun bindContentParamsUseCase(useCase: ContentParamsUseCaseImpl): ContentParamsUseCase
 
     @Binds
-    @Singleton
     fun bindThemeUseCase(useCase: ThemeUseCaseImpl): ThemeUseCase
 }
