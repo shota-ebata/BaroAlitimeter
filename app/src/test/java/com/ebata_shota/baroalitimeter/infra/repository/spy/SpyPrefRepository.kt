@@ -6,7 +6,6 @@ import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
-import kotlinx.coroutines.flow.first
 
 class SpyPrefRepository: PrefRepository {
     private val _preferencesFlow = MutableSharedFlow<PreferencesModel>()
@@ -15,43 +14,19 @@ class SpyPrefRepository: PrefRepository {
         _preferencesFlow.emit(value)
     }
 
-    override suspend fun setThemeMode(value: ThemeMode) {
-        _preferencesFlow.emit(
-            preferencesFlow.first().copy(themeMode = value)
-        )
-    }
+    override suspend fun setThemeMode(value: ThemeMode) = Unit
 
-    override suspend fun getSeaLevelPressure(): Result<Float> = runCatching {
-        preferencesFlow.first().seaLevelPressure
-    }
+    override suspend fun getSeaLevelPressure(): Float = 0.0f
 
-    override suspend fun setSeaLevelPressure(value: Float) {
-        _preferencesFlow.emit(
-            preferencesFlow.first().copy(seaLevelPressure = value)
-        )
-    }
+    override suspend fun setSeaLevelPressure(value: Float) = Unit
 
-    override suspend fun getTemperature(): Result<Float> = runCatching {
-        preferencesFlow.first().temperature
-    }
+    override suspend fun getTemperature(): Float = 0.0f
 
-    override suspend fun setTemperature(value: Float) {
-        _preferencesFlow.emit(
-            preferencesFlow.first().copy(temperature = value)
-        )
-    }
+    override suspend fun setTemperature(value: Float) = Unit
 
-    override suspend fun setUseTemperatureSensor(value: Boolean) {
-        _preferencesFlow.emit(
-            preferencesFlow.first().copy(useTemperatureSensor = value)
-        )
-    }
+    override suspend fun setUseTemperatureSensor(value: Boolean) = Unit
 
-    override suspend fun undoSeaLevelPressure() {
-        TODO("Not yet implemented")
-    }
+    override suspend fun undoSeaLevelPressure() = Unit
 
-    override suspend fun undoTemperature() {
-        TODO("Not yet implemented")
-    }
+    override suspend fun undoTemperature() = Unit
 }
