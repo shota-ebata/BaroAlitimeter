@@ -377,6 +377,7 @@ constructor(
         firebaseAnalytics.logUserActionEvent(userActionEvent)
     }
 
+    // FIXME: UseCaseなどに切り出す
     private fun Float?.formattedString(
         fractionDigits: Int,
         usesGroupingSeparator: Boolean = false,
