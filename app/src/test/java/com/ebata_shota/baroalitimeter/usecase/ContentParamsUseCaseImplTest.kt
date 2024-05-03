@@ -2,23 +2,18 @@ package com.ebata_shota.baroalitimeter.usecase
 
 import com.ebata_shota.baroalitimeter.domain.model.ContentParams
 import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
-import com.ebata_shota.baroalitimeter.domain.model.Pressure
 import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
-import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
-import com.ebata_shota.baroalitimeter.domain.repository.SensorRepository
-import com.ebata_shota.baroalitimeter.domain.usecase.CalcUseCase
 import com.ebata_shota.baroalitimeter.extensions.collectToList
 import com.ebata_shota.baroalitimeter.infra.repository.spy.SpyPrefRepository
 import com.ebata_shota.baroalitimeter.infra.repository.spy.SpySensorRepository
+import io.mockk.coEvery
+import io.mockk.coVerify
+import io.mockk.spyk
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 
 @Suppress("SameParameterValue")
 class ContentParamsUseCaseImplTest {
@@ -26,13 +21,8 @@ class ContentParamsUseCaseImplTest {
     private lateinit var useCase: ContentParamsUseCaseImpl
 
     private lateinit var spySensorRepository: SpySensorRepository
-    private lateinit var mockSensorRepository: SensorRepository
-
     private lateinit var spyPrefRepository: SpyPrefRepository
-    private lateinit var mockPrefRepository: PrefRepository
-
     private lateinit var spyCalcUseCase: SpyCalcUseCase
-    private lateinit var mockCalcUseCase: CalcUseCase
 
     private val basePreferencesModel = PreferencesModel(
         themeMode = ThemeMode.LIGHT,
@@ -43,23 +33,20 @@ class ContentParamsUseCaseImplTest {
 
     @Before
     fun setup() {
-        spySensorRepository = SpySensorRepository()
-        mockSensorRepository = mock()
-        spyPrefRepository = SpyPrefRepository()
-        mockPrefRepository = mock()
-        spyCalcUseCase = SpyCalcUseCase()
-        mockCalcUseCase = mock()
+        spySensorRepository = spyk(SpySensorRepository())
+        spyPrefRepository = spyk(SpyPrefRepository())
+        spyCalcUseCase = spyk(SpyCalcUseCase())
+        useCase = ContentParamsUseCaseImpl(
+            sensorRepository = spySensorRepository,
+            prefRepository = spyPrefRepository,
+            calcUseCase = spyCalcUseCase
+        )
     }
 
     @Test
     fun test_contentParamsFlow() {
         runTest {
             // preparation
-            useCase = ContentParamsUseCaseImpl(
-                sensorRepository = spySensorRepository,
-                prefRepository = spyPrefRepository,
-                calcUseCase = spyCalcUseCase
-            )
             val pressure = 1001.0f
             val seaLevelPressure = basePreferencesModel.seaLevelPressure
             val temperature = basePreferencesModel.temperature
@@ -72,7 +59,7 @@ class ContentParamsUseCaseImplTest {
             assertTrue(result.isEmpty())
 
             // 圧力センサーの結果が取得済みになってもFlowが発火しないこと
-            spySensorRepository.emitPressureSensorState(Pressure.Success(pressure))
+            spySensorRepository.emitPressureSensorState(pressure)
             // assert
             assertTrue(result.isEmpty())
 
@@ -101,17 +88,12 @@ class ContentParamsUseCaseImplTest {
     fun test_getTemperature() {
         runTest {
             // preparation
-            whenever(mockPrefRepository.getTemperature()).thenReturn(Result.success(1.0f))
-            useCase = ContentParamsUseCaseImpl(
-                sensorRepository = spySensorRepository,
-                prefRepository = mockPrefRepository,
-                calcUseCase = spyCalcUseCase
-            )
+            coEvery { spyPrefRepository.getTemperature() } returns 1.0f
 
             // execute
             useCase.getTemperature()
             // assert: prefRepository.getTemperature()が一回実行されること
-            verify(mockPrefRepository, times(1)).getTemperature()
+            coVerify { spyPrefRepository.getTemperature() }
         }
     }
 
@@ -119,18 +101,13 @@ class ContentParamsUseCaseImplTest {
     fun test_setTemperature() {
         runTest {
             // preparation
-            val temperature = 1.0f
-            whenever(mockPrefRepository.setTemperature(temperature)).thenReturn(Unit)
-            useCase = ContentParamsUseCaseImpl(
-                sensorRepository = spySensorRepository,
-                prefRepository = mockPrefRepository,
-                calcUseCase = spyCalcUseCase
-            )
+            val temperature = basePreferencesModel.temperature
+            coEvery { spyPrefRepository.setTemperature(temperature) } returns Unit
 
             // execute
             useCase.setTemperature(temperature)
             // assert: prefRepository.setTemperature()が一回実行されること
-            verify(mockPrefRepository, times(1)).setTemperature(temperature)
+            coVerify { spyPrefRepository.setTemperature(temperature) }
         }
     }
 
@@ -138,43 +115,32 @@ class ContentParamsUseCaseImplTest {
     fun test_getAltitude() {
         runTest {
             // preparation
+            val temperature = basePreferencesModel.temperature
             val pressure = 1000.0f
             val seaLevelPressure = basePreferencesModel.seaLevelPressure
-            val temperature = basePreferencesModel.temperature
             val altitude = 200.0f
-            whenever(mockSensorRepository.getPressureSensor()).thenReturn(
-                Result.success(
-                    Pressure.Success(pressure)
-                )
-            )
-            whenever(mockPrefRepository.getSeaLevelPressure()).thenReturn(
-                Result.success(seaLevelPressure)
-            )
-            whenever(mockPrefRepository.getTemperature()).thenReturn(
-                Result.success(temperature)
-            )
-            whenever(
-                mockCalcUseCase.calcAltitude(
+            coEvery { spyPrefRepository.getTemperature() } returns temperature
+            coEvery { spySensorRepository.getPressure() } returns pressure
+            coEvery { spyPrefRepository.getSeaLevelPressure() } returns seaLevelPressure
+            coEvery {
+                spyCalcUseCase.calcAltitude(
                     pressure = pressure,
                     temperature = temperature,
                     seaLevelPressure = seaLevelPressure
                 )
-            ).thenReturn(altitude)
-            useCase = ContentParamsUseCaseImpl(
-                sensorRepository = mockSensorRepository,
-                prefRepository = mockPrefRepository,
-                calcUseCase = mockCalcUseCase
-            )
+            } returns altitude
 
             // execute
-            val result = useCase.getAltitude().getOrThrow()
+            val result = useCase.getAltitude()
             // assert: prefRepository.getAltitude()が一回実行されること
             assertEquals(altitude, result)
-            verify(mockCalcUseCase, times(1)).calcAltitude(
-                pressure = pressure,
-                seaLevelPressure = seaLevelPressure,
-                temperature = temperature
-            )
+            coVerify {
+                spyCalcUseCase.calcAltitude(
+                    pressure = pressure,
+                    seaLevelPressure = seaLevelPressure,
+                    temperature = temperature
+                )
+            }
         }
     }
 
@@ -182,44 +148,36 @@ class ContentParamsUseCaseImplTest {
     fun test_setAltitude() {
         runTest {
             // preparation
-            val pressure = 1000.0f
             val temperature = basePreferencesModel.temperature
+            val pressure = 1000.0f
             val altitude = 200.0f
-            val newSeaLevelPressure = 999.0f
-            whenever(mockSensorRepository.getPressureSensor()).thenReturn(
-                Result.success(
-                    Pressure.Success(pressure)
-                )
-            )
-            whenever(mockPrefRepository.getTemperature()).thenReturn(
-                Result.success(temperature)
-            )
-            whenever(
-                mockCalcUseCase.calcSeaLevelPressure(
+            val newSeaLevelPressure = basePreferencesModel.seaLevelPressure
+            coEvery { spyPrefRepository.getTemperature() } returns temperature
+            coEvery { spySensorRepository.getPressure() } returns pressure
+            coEvery {
+                spyCalcUseCase.calcSeaLevelPressure(
                     pressure = pressure,
                     temperature = temperature,
                     altitude = altitude
                 )
-            ).thenReturn(
-                newSeaLevelPressure
-            )
-            useCase = ContentParamsUseCaseImpl(
-                sensorRepository = mockSensorRepository,
-                prefRepository = mockPrefRepository,
-                calcUseCase = mockCalcUseCase
-            )
+            } returns newSeaLevelPressure
+            coEvery {
+                spyPrefRepository.setSeaLevelPressure(newSeaLevelPressure)
+            } returns Unit
 
             // execute
             useCase.setAltitude(altitude)
             // assert: prefRepository.setAltitude()が一回実行されること
-            verify(mockCalcUseCase, times(1)).calcSeaLevelPressure(
-                pressure = pressure,
-                temperature = temperature,
-                altitude = altitude
-            )
-            verify(mockPrefRepository, times(1)).setSeaLevelPressure(
-                value = newSeaLevelPressure
-            )
+            coVerify {
+                spyCalcUseCase.calcSeaLevelPressure(
+                    pressure = pressure,
+                    temperature = temperature,
+                    altitude = altitude
+                )
+            }
+            coVerify {
+                spyPrefRepository.setSeaLevelPressure(newSeaLevelPressure)
+            }
         }
     }
 
@@ -227,17 +185,12 @@ class ContentParamsUseCaseImplTest {
     fun test_undoTemperature() {
         runTest {
             // preparation
-            whenever(mockPrefRepository.undoTemperature()).thenReturn(Unit)
-            useCase = ContentParamsUseCaseImpl(
-                sensorRepository = mockSensorRepository,
-                prefRepository = mockPrefRepository,
-                calcUseCase = mockCalcUseCase
-            )
+            coEvery { spyPrefRepository.undoTemperature() } returns Unit
 
             // execute
             useCase.undoTemperature()
             // assert: prefRepository.undoTemperature()が一回実行されること
-            verify(mockPrefRepository, times(1)).undoTemperature()
+            coVerify { spyPrefRepository.undoTemperature() }
         }
     }
 
@@ -245,17 +198,12 @@ class ContentParamsUseCaseImplTest {
     fun test_undoSeaLevelPressure() {
         runTest {
             // preparation
-            whenever(mockPrefRepository.undoSeaLevelPressure()).thenReturn(Unit)
-            useCase = ContentParamsUseCaseImpl(
-                sensorRepository = mockSensorRepository,
-                prefRepository = mockPrefRepository,
-                calcUseCase = mockCalcUseCase
-            )
+            coEvery { spyPrefRepository.undoSeaLevelPressure() } returns Unit
 
             // execute
             useCase.undoSeaLevelPressure()
             // assert: prefRepository.undoSeaLevelPressure()が一回実行されること
-            verify(mockPrefRepository, times(1)).undoSeaLevelPressure()
+            coVerify { spyPrefRepository.undoSeaLevelPressure() }
         }
     }
 }
