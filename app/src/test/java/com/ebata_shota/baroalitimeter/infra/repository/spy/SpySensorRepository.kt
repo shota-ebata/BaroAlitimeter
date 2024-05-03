@@ -1,4 +1,4 @@
-package com.ebata_shota.baroalitimeter.infra.repository
+package com.ebata_shota.baroalitimeter.infra.repository.spy
 
 import com.ebata_shota.baroalitimeter.domain.model.Pressure
 import com.ebata_shota.baroalitimeter.domain.model.Temperature
@@ -10,9 +10,17 @@ import kotlinx.coroutines.flow.asStateFlow
 class SpySensorRepository : SensorRepository {
     private val _pressureSensorState = MutableStateFlow<Pressure>(Pressure.Loading)
     override val pressureSensorState: StateFlow<Pressure> = _pressureSensorState.asStateFlow()
-    suspend fun emitPressureSensorState(pressure: Pressure) = _pressureSensorState.emit(pressure)
+    suspend fun emitPressureSensorState(pressure: Pressure) {
+        _pressureSensorState.emit(pressure)
+    }
+
+    override suspend fun getPressureSensor(): Result<Pressure.Success> = runCatching {
+        pressureSensorState.value as Pressure.Success
+    }
 
     private val _temperatureSensorState = MutableStateFlow<Temperature>(Temperature.Loading)
     override val temperatureSensorState: StateFlow<Temperature> = _temperatureSensorState.asStateFlow()
-    suspend fun emitTemperatureSensorState(temperature: Temperature) = _temperatureSensorState.emit(temperature)
+    suspend fun emitTemperatureSensorState(temperature: Temperature) {
+        _temperatureSensorState.emit(temperature)
+    }
 }
