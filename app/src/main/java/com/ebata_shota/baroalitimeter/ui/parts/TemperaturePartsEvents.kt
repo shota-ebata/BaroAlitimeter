@@ -9,12 +9,12 @@ import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 
 @Composable
 fun TemperatureParts(
-    uiState: MainViewModel.MainUiState.TemperatureUiState,
+    uiState: MainViewModel.ContentUiState.TemperatureUiState,
     events: TemperaturePartsEvents,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
-        is MainViewModel.MainUiState.TemperatureUiState.ViewerMode -> {
+        is MainViewModel.ContentUiState.TemperatureUiState.ViewerMode -> {
             ClickableCard(
                 text = stringResource(id = R.string.temperature, uiState.temperatureText),
                 onClick = events::onClickTemperature,
@@ -22,7 +22,7 @@ fun TemperatureParts(
             )
         }
 
-        is MainViewModel.MainUiState.TemperatureUiState.EditMode -> {
+        is MainViewModel.ContentUiState.TemperatureUiState.EditMode -> {
             EditTextFieldRow(
                 textFieldValue = uiState.temperatureTextFieldValue,
                 onChangeTextFieldValue = events::onChangeTemperatureTextFieldValue,

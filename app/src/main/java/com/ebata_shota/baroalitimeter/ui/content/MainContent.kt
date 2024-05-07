@@ -26,7 +26,7 @@ import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 
 @Composable
 fun MainContent(
-    uiState: MainViewModel.MainUiState.UiState,
+    uiState: MainViewModel.ContentUiState,
     temperaturePartsEvents: TemperaturePartsEvents,
     altitudePartsEvents: AltitudePartsEvents,
     modifier: Modifier = Modifier
@@ -96,11 +96,11 @@ fun MainContentPreview() {
             color = MaterialTheme.colorScheme.background
         ) {
             MainContent(
-                uiState = MainViewModel.MainUiState.UiState(
+                uiState = MainViewModel.ContentUiState(
                     pressureText = "1024.1",
                     seaLevelPressureText = "1023.3",
-                    temperatureUiState = MainViewModel.MainUiState.TemperatureUiState.ViewerMode("12"),
-                    altitudeUiState = MainViewModel.MainUiState.AltitudeUiState.ViewerMode("24"),
+                    temperatureUiState = MainViewModel.ContentUiState.TemperatureUiState.ViewerMode("12"),
+                    altitudeUiState = MainViewModel.ContentUiState.AltitudeUiState.ViewerMode("24"),
                 ),
                 temperaturePartsEvents = object : TemperaturePartsEvents {
                     override fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue) {}
