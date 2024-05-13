@@ -1,36 +1,30 @@
 package com.ebata_shota.baroalitimeter.ui.viewmodel
 
-import android.hardware.SensorManager
-import com.ebata_shota.baroalitimeter.domain.model.PreferencesModel
-import com.ebata_shota.baroalitimeter.domain.model.Pressure
-import com.ebata_shota.baroalitimeter.domain.model.Temperature
+import com.ebata_shota.baroalitimeter.domain.model.ContentParams
 import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
-import com.ebata_shota.baroalitimeter.domain.repository.CalcRepository
-import com.ebata_shota.baroalitimeter.domain.repository.PrefRepository
-import com.ebata_shota.baroalitimeter.infra.repository.CalcRepositoryImpl
-import com.ebata_shota.baroalitimeter.infra.repository.SpySensorRepository
+import com.ebata_shota.baroalitimeter.usecase.spy.SpyContentParamsUseCase
+import com.ebata_shota.baroalitimeter.usecase.spy.SpyThemeUseCase
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 import com.google.firebase.analytics.FirebaseAnalytics
+import io.mockk.mockk
+import io.mockk.spyk
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.spy
-import org.mockito.kotlin.whenever
 
 class MainViewModelTest {
 
-    private val sensorRepository: SpySensorRepository = spy(SpySensorRepository())
-    private val prefRepository: PrefRepository = mock()
-    private lateinit var calcRepository: CalcRepository
-    private val firebaseAnalytics: FirebaseAnalytics = mock()
     private lateinit var viewModel: MainViewModel
+
+    private lateinit var spyContentParamsUseCase: SpyContentParamsUseCase
+    private lateinit var spyThemeUseCase: SpyThemeUseCase
+
+    private val firebaseAnalytics: FirebaseAnalytics = mockk()
 
     @OptIn(ExperimentalCoroutinesApi::class)
     @Before
@@ -39,43 +33,42 @@ class MainViewModelTest {
         val dispatcher = StandardTestDispatcher()
         Dispatchers.setMain(dispatcher)
 
-        calcRepository = CalcRepositoryImpl(dispatcher = dispatcher)
+        spyContentParamsUseCase = spyk(SpyContentParamsUseCase())
+        spyThemeUseCase = spyk(SpyThemeUseCase())
+
 
         runTest {
-            sensorRepository.emitPressureSensorState(
-                Pressure.Success(
-                    value = SensorManager.PRESSURE_STANDARD_ATMOSPHERE
+            spyContentParamsUseCase.emitContentParamsFlow(
+                ContentParams(
+                    pressure = 1000.0f,
+                    temperature = 25.0f,
+                    seaLevelPressure = 1000.0f,
+                    altitude = 0.0f
                 )
-            )
-            sensorRepository.emitTemperatureSensorState(
-                Temperature.HasNotSensor
             )
         }
-
-        whenever(prefRepository.preferencesFlow).thenReturn(
-            MutableStateFlow(
-                PreferencesModel(
-                    themeMode = ThemeMode.LIGHT,
-                    seaLevelPressure = SensorManager.PRESSURE_STANDARD_ATMOSPHERE,
-                    temperature = 15.0F,
-                    useTemperatureSensor = false
-                )
-            )
-        )
-
-        viewModel = MainViewModel(
-            sensorRepository = sensorRepository,
-            prefRepository = prefRepository,
-            calcRepository = calcRepository,
-            firebaseAnalytics = firebaseAnalytics
-        )
     }
 
     /**
      * 初期のモードはViewer
      */
     @Test
-    fun defaultMode() {
-        assertEquals(MainViewModel.Mode.Viewer, viewModel.modeState.value)
+    fun test_defaultMode() {
+        runTest {
+            // preparation
+            viewModel = MainViewModel(
+                contentParamsUseCase = spyContentParamsUseCase,
+                themeUseCase = spyThemeUseCase,
+                firebaseAnalytics = firebaseAnalytics
+            )
+            spyThemeUseCase.emitThemeMode(ThemeMode.LIGHT)
+            // execute
+
+
+            // assert
+            assertEquals(MainViewModel.Mode.Viewer, viewModel.modeState.value)
+        }
     }
+
+    // TODO: テスト追加
 }

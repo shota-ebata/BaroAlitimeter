@@ -1,11 +1,10 @@
 package com.ebata_shota.baroalitimeter.domain.repository
 
-import com.ebata_shota.baroalitimeter.domain.model.Pressure
 import com.ebata_shota.baroalitimeter.domain.model.Temperature
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.Flow
 
 interface SensorRepository {
-    val pressureSensorState: StateFlow<Pressure>
-    suspend fun getPressureSensorValue(): Result<Pressure.Success>
-    val temperatureSensorState: StateFlow<Temperature>
+    val pressureFlow: Flow<Float>
+    suspend fun getPressure(): Float
+    val temperatureSensorState: Flow<Temperature>
 }
