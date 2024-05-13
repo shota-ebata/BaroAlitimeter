@@ -36,9 +36,7 @@ constructor(
     private val contentParamsUseCase: ContentParamsUseCase,
     private val themeUseCase: ThemeUseCase,
     private val firebaseAnalytics: FirebaseAnalytics,
-) : ViewModel(),
-    TemperaturePartsEvents,
-    AltitudePartsEvents {
+) : ViewModel() {
 
     sealed interface MainUiState {
 
@@ -152,7 +150,7 @@ constructor(
     private val _showUndoSnackBarEvent = MutableSharedFlow<ShowUndoSnackBarEvent>()
     val showUndoSnackBarEvent: SharedFlow<ShowUndoSnackBarEvent> = _showUndoSnackBarEvent.asSharedFlow()
 
-    override fun onClickTemperature() {
+    fun onClickTemperature() {
         changeModeToEditTemperature()
     }
 
@@ -176,7 +174,7 @@ constructor(
         }
     }
 
-    override fun onClickAltitude() {
+    fun onClickAltitude() {
         changeModeToEditAltitude()
     }
 
@@ -200,7 +198,7 @@ constructor(
         }
     }
 
-    override fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
+    fun onChangeTemperatureTextFieldValue(textFieldValue: TextFieldValue) {
         updateTemperatureTextFieldValue(textFieldValue)
     }
 
@@ -210,7 +208,7 @@ constructor(
         }
     }
 
-    override fun onChangeAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
+    fun onChangeAltitudeTextFieldValue(textFieldValue: TextFieldValue) {
         updateAltitudeTextFieldValue(textFieldValue)
     }
 
@@ -220,7 +218,7 @@ constructor(
         }
     }
 
-    override fun onClickCancelEditTemperature() {
+    fun onClickCancelEditTemperature() {
         cancelEditTemperature()
     }
 
@@ -229,7 +227,7 @@ constructor(
         changeModeToViewer()
     }
 
-    override fun onClickCancelAltitude() {
+    fun onClickCancelAltitude() {
         cancelEditAltitude()
     }
 
@@ -253,7 +251,7 @@ constructor(
         }
     }
 
-    override fun onClickDoneEditTemperature() {
+    fun onClickDoneEditTemperature() {
         onCompletedEditTemperature()
         showTemperatureUndoSnackBar()
     }
@@ -293,7 +291,7 @@ constructor(
         }
     }
 
-    override fun onClickDoneEditAltitude() {
+    fun onClickDoneEditAltitude() {
         onCompletedEditAltitude()
         showAltitudeUndoSnackbar()
     }
