@@ -45,6 +45,10 @@ jobs:
             ~/.gradle/caches
             ~/.gradle/wrapper
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle', '**/*.gradle.kts') }}
+      - name: Create google-services.json # 「google-services.json」生成
+        env:
+          GOOGLE_SERVICES_JSON_BASE64: ${{ secrets.GOOGLE_SERVICES_JSON_BASE64 }}
+        run: echo $GOOGLE_SERVICES_JSON_BASE64 | base64 -di > ./app/google-services.json
       - name: Set up Ruby 3.0.0 # gem を利用するので Ruby をセットアップ
         uses: ruby/setup-ruby@v1
         with:
