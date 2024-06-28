@@ -33,4 +33,9 @@ class CalcUseCaseImplTest {
             assertEquals(1010.83f, BigDecimal(result.toDouble()).setScale(2, RoundingMode.HALF_EVEN).toFloat())
         }
     }
+
+    @Test
+    fun test_failed() {
+        assertEquals(1, 2)
+    }
 }
