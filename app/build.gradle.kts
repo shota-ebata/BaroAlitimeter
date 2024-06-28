@@ -42,10 +42,16 @@ android {
                 val signingProps = Properties()
                 signingProps.load(FileInputStream(signFileBase))
                 val storeFilePathValue = signingProps["storeFilePathValue"]
+                val keyStorePassword = signingProps["keyStorePassword"] as String
+                val keyAliasValue = signingProps["keyAliasValue"] as String
+                val keyPasswordValue = signingProps["keyPasswordValue"] as String
                 storeFile = file(storeFilePathValue!!)
+                storePassword = keyStorePassword
+                keyAlias = keyAliasValue
+                keyPassword = keyPasswordValue
             } else {
                 val releaseKeystoreFileName = "release-keystore.keystore"
-                System.getenv("SHOTA_EBATA_KEY_STORE_BASE64")?.let { base64 ->
+                System.getenv("RELEASE_KEY_STORE_BASE64")?.let { base64 ->
                     val decoder = Base64.getMimeDecoder()
                     File(releaseKeystoreFileName).also { file ->
                         file.createNewFile()
@@ -53,10 +59,10 @@ android {
                     }
                 }
                 storeFile = rootProject.file(releaseKeystoreFileName)
+                storePassword = System.getenv("RELEASE_KEY_STORE_PASSWORD")
+                keyAlias = System.getenv("RELEASE_KEY_ALIAS_VALUE")
+                keyPassword = System.getenv("RELEASE_KEY_PASSWORD_VALUE")
             }
-            storePassword = System.getenv("SHOTA_EBATA_KEY_STORE_PASSWORD")
-            keyAlias = System.getenv("KEY_ALIAS_VALUE")
-            keyPassword = System.getenv("KEY_PASSWORD_VALUE")
         }
     }
 
