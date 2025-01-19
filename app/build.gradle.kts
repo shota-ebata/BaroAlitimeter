@@ -14,14 +14,14 @@ plugins {
 
 android {
     namespace = "com.ebata_shota.baroalitimeter"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.ebata_shota.baroalitimeter"
         minSdk = 24
-        targetSdk = 34
-        versionCode = 3
-        versionName = "1.0.1"
+        targetSdk = 35
+        versionCode = 4
+        versionName = "1.0.2"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
