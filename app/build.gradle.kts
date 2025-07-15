@@ -14,12 +14,12 @@ plugins {
 
 android {
     namespace = "com.ebata_shota.baroalitimeter"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.ebata_shota.baroalitimeter"
         minSdk = 24
-        targetSdk = 35
+        targetSdk = 36
         versionCode = 4
         versionName = "1.0.2"
 
