@@ -39,7 +39,7 @@ fun MainTopAppBar(
         title = {
             Text(stringResource(id = R.string.title))
         },
-        colors = TopAppBarDefaults.smallTopAppBarColors(),
+        colors = TopAppBarDefaults.topAppBarColors(),
         windowInsets = TopAppBarDefaults.windowInsets,
         actions = {
             IconButton(

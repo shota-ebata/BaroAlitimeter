@@ -4,10 +4,6 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -34,8 +30,7 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.ebata_shota.baroalitimeter.R
 import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
 import com.ebata_shota.baroalitimeter.ui.content.MainContent
-import com.ebata_shota.baroalitimeter.ui.content.RadioListContent
-import com.ebata_shota.baroalitimeter.ui.model.ThemeModeRadioOption
+import com.ebata_shota.baroalitimeter.ui.dialog.ThemeModeDialog
 import com.ebata_shota.baroalitimeter.ui.parts.AltitudePartsEvents
 import com.ebata_shota.baroalitimeter.ui.parts.MainTopAppBar
 import com.ebata_shota.baroalitimeter.ui.parts.TemperaturePartsEvents
@@ -43,7 +38,6 @@ import com.ebata_shota.baroalitimeter.ui.theme.BaroAlitimeterTheme
 import com.ebata_shota.baroalitimeter.viewmodel.MainViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
@@ -61,11 +55,8 @@ fun MainScreen(
     val snackbarHostState: SnackbarHostState = remember {
         SnackbarHostState()
     }
-    // stateだけど・・・ViewModelに置くのは少し難しいように見える
-    val themeModalBottomSheetState: ModalBottomSheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true
-    )
+
+    val shouldShowThemeModeDialog by viewModel.themeModeDialogState.collectAsStateWithLifecycle()
 
     /**
      *  interfaceとはいえ他のComposable関数にViewModelを渡すのは微妙か？
@@ -157,9 +148,7 @@ fun MainScreen(
                             showTopAppBarDropdownMenu = { shouldShowTopAppBarDropdownMenu = true },
                             hideTopAppBarDropdownMenu = { shouldShowTopAppBarDropdownMenu = false },
                             onClickTheme = {
-                                coroutineScope.launch {
-                                    themeModalBottomSheetState.show()
-                                }
+                                viewModel.onClickThemeMenu()
                             }
                         )
                     },
@@ -169,35 +158,25 @@ fun MainScreen(
                         )
                     }
                 ) { innerPadding ->
-                    ModalBottomSheetLayout(
+                    Surface(
                         modifier = Modifier
-                            .padding(innerPadding)
-                            .fillMaxSize(),
-                        sheetState = themeModalBottomSheetState,
-                        sheetContent = {
-                            RadioListContent(
-                                radioOptions = ThemeModeRadioOption.values(),
-                                selectedOption = ThemeModeRadioOption.of(currentUiState.themeMode),
-                                onOptionSelected = { themeModeRadioOption ->
-                                    coroutineScope.launch {
-                                        themeModalBottomSheetState.hide()
-                                        viewModel.onSelectedThemeMode(themeModeRadioOption.themeMode)
-                                    }
-                                }
-                            )
-                        }
+                            .fillMaxSize()
+                            .padding(innerPadding),
+                        color = MaterialTheme.colorScheme.background
                     ) {
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxSize(),
-                            color = MaterialTheme.colorScheme.background
-                        ) {
-                            MainContent(
-                                uiState = currentUiState.contentUiState,
-                                temperaturePartsEvents = temperaturePartsEvents,
-                                altitudePartsEvents = altitudePartsEvents
-                            )
-                        }
+                        MainContent(
+                            uiState = currentUiState.contentUiState,
+                            temperaturePartsEvents = temperaturePartsEvents,
+                            altitudePartsEvents = altitudePartsEvents
+                        )
+                    }
+
+                    if (shouldShowThemeModeDialog) {
+                        ThemeModeDialog(
+                            selected = currentUiState.themeMode,
+                            event = viewModel,
+                            modifier = Modifier.padding(innerPadding)
+                        )
                     }
                 }
             }

@@ -12,8 +12,7 @@ import com.ebata_shota.baroalitimeter.domain.model.content.ThemeMode
 import com.ebata_shota.baroalitimeter.domain.model.content.UserActionEvent
 import com.ebata_shota.baroalitimeter.domain.usecase.ContentParamsUseCase
 import com.ebata_shota.baroalitimeter.domain.usecase.ThemeUseCase
-import com.ebata_shota.baroalitimeter.ui.parts.AltitudePartsEvents
-import com.ebata_shota.baroalitimeter.ui.parts.TemperaturePartsEvents
+import com.ebata_shota.baroalitimeter.ui.dialog.ThemeModeDialogEvent
 import com.google.firebase.analytics.FirebaseAnalytics
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -36,7 +35,7 @@ constructor(
     private val contentParamsUseCase: ContentParamsUseCase,
     private val themeUseCase: ThemeUseCase,
     private val firebaseAnalytics: FirebaseAnalytics,
-) : ViewModel() {
+) : ViewModel(), ThemeModeDialogEvent {
 
     sealed interface MainUiState {
 
@@ -141,11 +140,8 @@ constructor(
         initialValue = MainUiState.Uninitialized
     )
 
-    fun onSelectedThemeMode(themeMode: ThemeMode) {
-        viewModelScope.launch {
-            themeUseCase.setThemeMode(themeMode)
-        }
-    }
+    private val _themeModeDialogState = MutableStateFlow<Boolean>(false)
+    val themeModeDialogState = _themeModeDialogState.asStateFlow()
 
     private val _showUndoSnackBarEvent = MutableSharedFlow<ShowUndoSnackBarEvent>()
     val showUndoSnackBarEvent: SharedFlow<ShowUndoSnackBarEvent> = _showUndoSnackBarEvent.asSharedFlow()
@@ -383,5 +379,20 @@ constructor(
             format = "%,.${fractionDigits}f"
         }
         return format.format(this)
+    }
+
+    fun onClickThemeMenu() {
+        _themeModeDialogState.update { true }
+    }
+
+    override fun onClickThemeMode(themeMode: ThemeMode) {
+        viewModelScope.launch {
+            themeUseCase.setThemeMode(themeMode)
+            onDismissThemeModeDialog()
+        }
+    }
+
+    override fun onDismissThemeModeDialog() {
+        _themeModeDialogState.update { false }
     }
 }
