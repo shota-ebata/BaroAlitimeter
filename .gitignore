@@ -18,3 +18,6 @@ local.properties
 /key_store_info.properties
 /vendor/bundle/
 release-keystore.keystore
+
+# ClaudeCode
+/CLAUDE.md
